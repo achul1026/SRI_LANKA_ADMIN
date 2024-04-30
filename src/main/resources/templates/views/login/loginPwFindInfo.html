@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link th:href="@{/images/favicon-16x16.png}" rel="icon">
+    <link th:href="@{/images/favicon-32x32.png}" rel="icon">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/rda.modal.js}"></script>
+    <title>SRILANKA</title>
+</head>
+<body>
+	<section id="LoginSection">
+		<div id="loginContainer">
+		    <div class="rda-wrap">
+		        <div id="findTitleBox">
+		            <h1 id="findTitle">비밀번호 찾기</h1>
+		        </div>
+		        <div id="loginContentBox">
+		        	<div id="loginButtonBox">
+		        		<a th:href="@{/login/find/id/info}" class="idpw-toggle-button">아이디 찾기</a>
+		        		<a th:href="@{/login/find/pw/info}" class="idpw-toggle-button active">비밀번호 찾기</a>
+		        	</div>
+		            <form>
+		                <div id="pwFind">
+		                    <div class="login-input-box">
+		                        <label for="mngrAccountId" class="login-input-title">아이디</label>
+		                        <input type="text" id="mngrAccountId" placeholder="아이디를 입력해주세요." class="login-input" maxlength="12"/>
+		                        <div class="error-message"></div>
+		                    </div>
+		                    <div class="login-input-box">
+		                        <label for="mngrEmail" class="login-input-title">이메일</label>
+		                        <input type="email" id="mngrEmail" placeholder="이메일을 입력해주세요." class="login-input" maxlength="25"/>
+		                        <div class="error-message"></div>
+		                    </div>
+		                </div>		                
+			            <div>
+			                <button type="button" id="find-button">비밀번호 찾기</button>
+			            </div>
+		            </form>
+		        </div>
+		    </div>
+		</div>
+	</section>
+</body>
+<script type="text/javascript">
+	
+	$('#find-button').on('click', function(){
+		var mngrEmail = $("#mngrEmail").val();
+		var formData = {
+				mngrAccountId: $("#mngrAccountId").val(),
+				mngrEmail: mngrEmail
+		};
+		$.ajax({
+			url: "/login/find/pw/info",
+			type: "POST",
+			contentType: "application/json",
+			data: JSON.stringify(formData),
+			success: function(data){
+                if(data.code == 200){
+					new ModalBuilder().init().ajaxBody("/login/find/pw/result").footer(1,'로그인',function(button, modal){
+						window.location.href="/login";
+						modal.close();
+					}).open();
+					$('#modal-body').css('padding', '40px');
+					$('#modal-footer').css('padding', '0 40px 40px 40px');
+                }
+			}
+		});
+		
+	})
+</script>
+</html>

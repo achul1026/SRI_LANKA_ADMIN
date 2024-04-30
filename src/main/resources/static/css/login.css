@@ -1,0 +1,161 @@
+@charset "UTF-8";
+
+#LoginSection {
+	width:100%;
+	height:100vh;
+	background-color:#353535;
+}
+#loginContainer {
+	position:fixed;
+	top:50%;
+	left:50%;
+	border-radius:20px;
+	background-color:var(--white);
+	transform:translate(-50%, -50%);
+}
+.rda-wrap {
+	padding:58px;
+}
+#loginLogoBox {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	gap:10px;
+	margin-bottom:64px;
+}
+#loginLogo {
+	width:43px;
+	height:43px;
+}
+#loginLogo img {
+	width:100%;
+	height:100%;
+}
+#loginTitle {
+	font-size:30px;
+	font-weight:600;
+	color:var(--key-color);
+}
+.login-input-title {
+	display:block;
+	margin-bottom:8px;
+	font-size:14px;
+	font-weight:600;
+}
+.login-input {
+	width:302px;
+	padding:12px;
+	font-size:14px;
+	border:1px solid #353535;
+	border-radius:6px;
+	outline:none;
+}
+.login-input::placeholder {
+	font-size:14px;
+	font-weight:400;
+	color:#ccc;
+}
+#loginIdSave {
+	padding-bottom:20px;
+	border-bottom:1px solid #808080;
+}
+#loginButtonBox {
+	display:flex;
+	justify-content:space-between;
+	margin:20px 0;
+}
+#loginButton {
+	margin-right:16px;
+}
+.login-button {
+	width:100%;
+	padding:12px 0;
+	color:var(--white);
+	font-weight:600;
+	border-radius:6px;
+	background-color:var(--key-color);
+	text-align:center;
+}
+#loginPassword {
+	text-align:center;
+}
+#loginSearch {
+	color:var(--key-color);
+}
+
+
+/* loginFind */
+#findTitleBox {
+	margin-bottom:34px;
+	text-align:center;
+}
+#findTitle {
+	font-size:20px;
+	font-weight:600;
+	color:var(--key-color);
+}
+.idpw-toggle-button {
+	width:100%;
+	padding:12px 0;
+	border-bottom:1px solid var(--black);
+	text-align:center;
+	cursor:pointer;
+}
+.idpw-toggle-button.active {
+	color:var(--key-color);
+	border-bottom:1px solid var(--key-color);
+}
+#find-button, .password-change {
+	display:block;
+	width:100%;
+	margin-top:32px;
+	padding:12px 0;
+	font-weight:600;
+	color:var(--white);
+	border-radius:6px;
+	background-color:var(--key-color);
+}
+.idpw-toggle-button:hover, #find-button:hover {
+	opacity:0.9;
+}
+
+
+/* join */
+#joinFlexBox {
+	display:flex;
+	gap:24px;
+}
+.join-required {
+	color:var(--key-color);
+}
+
+.select-box {
+	width:100%;
+    padding:12px;
+    color: var(--black);
+    border: 1px solid #353535;
+    border-radius: 6px;
+    font-size:14px;
+    background:url('../images/join_select_arrow.png') no-repeat 96% 50%;
+    background-size:10px 7px;
+    -webkit-appearance:none; 
+    -moz-appearance:none;
+    appearance:none;
+    outline: none;
+}
+
+.error-message {
+	margin:8px 0;
+    color:var(--danger);
+    font-size:12px;
+    font-weight: 500;
+}
+
+
+/* mypage */
+.mypage-table-wrap .infoTable th{
+	width:20%;
+}
+.mypage-table-wrap .infoTable td{
+	width:30%;
+}

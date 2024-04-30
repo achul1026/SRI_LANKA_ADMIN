@@ -1,0 +1,239 @@
+@charset "UTF-8";
+
+
+#infoTitle, .info-title {
+	position:relative;
+	font-weight:600;
+	color:var(--key-color);
+}
+.infoTableWrap {
+	margin-top:16px;
+}
+.infoTable {
+	border-top:2px solid #cfcfcf;
+	border-bottom:2px solid #cfcfcf;
+}
+.infoTable th {
+	padding:12px;
+	/* font-weight:600; */
+	border-bottom:1px solid #d9d9d9;
+	background-color:#f2f2f2;
+	vertical-align:middle;
+}
+.infoTable td {
+	position:relative;
+	padding:12px;
+	border-bottom:1px solid #d9d9d9;
+	vertical-align:middle;
+}
+
+.infoTable.table-width th{
+	width:15%;
+}
+.infoTable.table-width td{
+	width:35%;
+}
+
+.infoTable tr:last-child th, .infoTable tr:last-child td {
+	border:none;
+}
+.infoTable.table-width .select-list-box {
+	width:100%;
+    background:url('../images/join_select_arrow.png') no-repeat 97% 50%;
+    background-size:10px 7px;	
+}
+/* #infoTable input[type="text"], #infoTable input[type="password"], 
+#infoTable input[type="email"] {
+	width:70%;
+	border:none;
+	outline:none;
+} */
+/* .infoTable .select-list-box {
+	width:100%;
+	padding-left:0;
+	background-color:var(--white);
+	background-position:97% 50%;
+} */
+
+/* table checkBox */
+.table-checkbox th {
+	width:14%;
+}
+.table-checkbox td {
+	width:36%;
+}
+.table-checkbox label {
+	display:inline-block;
+	width:130px;
+}
+.table_item {
+	position:relative;
+}
+.table_item::before {
+	content:'';
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background-color:var(--white);
+	opacity:0.7;
+}
+.table_item.active::before {
+	position:unset;
+}
+.infoTableDetail .table_item::before {
+	content:'';
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background-color:unset;
+	opacity:unset;
+}
+.info-button-box {
+	position:relative;
+	display:flex;
+	justify-content:center;
+	column-gap:8px;
+	margin:32px 0;
+}
+#codeChangeBox {
+	margin-top:8px;
+	text-align:right;
+}
+#codeAdminBox {
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	margin-bottom:8px;
+}
+#codeAdminBox > div {
+	font-weight:600;
+}
+
+.screen-division.menu-container {
+	gap:1%;
+}
+.menu-tree-box {
+	width:25%;
+}
+.menu-table-list-box {
+	width:74%;
+}
+.menu-list-search-box {
+	display:flex;
+	margin-bottom:14px;
+}
+.menu-list-search-box .input-text{
+	margin-left:0;
+}
+
+/* sidebar division */
+.menu-tree-box .scroll{
+	height:calc(100vh - 170px);
+	/* max-height:calc(100vh - 130px); */
+	overflow-x:hidden;
+	overflow-y:auto;
+}
+.division-box {
+	padding:4px;
+}
+.division-title-box {
+	display:flex;
+	justify-content:space-between;
+	align-items:flex-start;
+	cursor:pointer;
+}
+.division-title {
+	padding-bottom:2px;
+	margin-bottom: 10px;
+}
+.division-title-arrow {
+	transform:rotate(90deg);
+	transition:transform 0.3s;
+}
+.division-title-arrow.right-arrow {
+	transform:rotate(0);
+}
+.division-box.active .division-title {
+	color:var(--key-color);
+}
+.division-box.active .division-title-arrow{
+	position:relative;
+	right:-1px;
+	transform:rotate(-90deg);	
+}
+.division-not-active.on {
+	color:var(--key-color);
+}
+.division-menu {
+	display:none;
+	padding: 0;
+	margin: 0;
+	margin-left:14px; 
+}
+.division-box:nth-child(1) .division-menu {
+	display:block;
+}
+.division-menu li {
+	position:relative;
+	display:flex;
+	justify-content:space-between;
+	padding: 8px 0 8px 30px;
+	border-left: 2px solid #ededed;
+	transition: all 0.3s;
+}
+.division-menu li:before {
+	content:'';
+	position:absolute;
+	left:0;
+	top:50%;
+	width:16px;
+	height:2px;
+	background-color:#ededed;
+	transform:translateY(-50%);
+}
+.division-menu li:after {
+	content:'';
+	position:absolute;
+	left:16px;
+	top:50%;
+	width:8px;
+	height:8px;
+	border-radius:100%;
+	background-color:#ededed;
+	transform:translateY(-50%);
+}
+.division-menu li a {
+	position:relative;
+	display:inline-block;
+	width:100%;	
+}
+.division-menu li:hover:after {
+	background-color:var(--key-color);
+}
+.division-menu li:hover a {
+	color:var(--key-color);
+}
+.division-menu-arrow {
+	position:relative;
+	right:3px;
+	transition:0.3s;
+	opacity:0;
+}
+.division-menu li:hover .division-menu-arrow {
+	right:0;
+	opacity:1;
+}
+.division-menu li.active:after {
+	background-color:var(--key-color);
+}
+.division-menu li.active a {
+	color:var(--key-color);
+}
+.division-menu li.active .division-menu-arrow {
+	right:0;
+	opacity:1;
+}

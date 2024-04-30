@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+	<th:block layout:fragment="modalContent">
+        <div>
+			<div id="infoTableWrap">
+				<form id="alarmUpdate" name="alarmUpdate">
+				<input type="hidden" name="bbsType" value="alarm">
+					<table class="modal-table">
+						<tr>
+							<th>제목</th>
+							<td>
+								<input type="text" class="wd100" name="bbsTitle" th:value="${tlBbsInfo.bbsTitle}" placeholder="제목을 입력해주세요."/>
+							</td>
+							<th>작성자</th>
+							<td><input type="text" th:value="${tlBbsInfo.registId}" readonly></td>
+						</tr>
+						<tr>
+							<th>작성일</th>
+							<td id="alarmToday"></td>
+							<th>노출 여부</th>
+							<td>						
+								<select class="select-list-box" name="dspyYn">
+									<option value="Y" th:selected="${tlBbsInfo.dspyYn == 'Y'}">노출</option>
+									<option value="N" th:selected="${tlBbsInfo.dspyYn == 'N'}">미노출</option>
+								</select>
+							</td>					
+						</tr>
+						<tr>
+							<th class="vertical-middle">내용</th>
+							<td colspan="3">
+								<textarea class="text-area" name="bbsCnts" th:text="${tlBbsInfo.bbsCnts}" placeholder="내용을 입력해주세요."></textarea>
+							</td>
+						</tr>
+					</table>
+				</form>
+			</div>
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	let today = new Date();
+	let year = today.getFullYear();
+	let month = (today.getMonth() + 1 < 10) ? '0' + (today.getMonth() + 1) : (today.getMonth() + 1); 
+	let date = (today.getDate() < 10) ? '0' + (today.getDate()) : (today.getDate());
+	let dateSet = ''+year+'-'+month+'-'+date+'';
+	
+	$('#alarmToday').text(dateSet);
+</script>

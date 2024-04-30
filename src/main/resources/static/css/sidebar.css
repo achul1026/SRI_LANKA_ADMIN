@@ -1,0 +1,160 @@
+@charset "UTF-8";
+
+#sideBar {
+	width:280px;
+	min-height:100vh;
+	background-color:#353535;
+	transition:width 0.4s;
+}
+.sidebarActive #sideBar {
+	width:0px;
+}
+#sideBarWrap {
+	position:relative;
+	height:100%;
+	padding:34px;
+}
+#sideLogoBox {
+	display:flex;
+	align-items:center;
+	gap:10px;
+}
+#logoImg {
+	width:43px;
+	height:43px;
+}
+#logoImg img {
+	width:100%;
+	height:100%;
+}
+#sideTitle {
+	font-size:30px;
+	font-weight:600;
+	color:var(--white);
+}
+#sideBarList {
+	margin-top:34px;
+}
+.sidebar-list-box {
+	margin-top:20px;
+}
+.side-depth1 {
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	color:var(--white);
+	font-weight:600;
+	cursor:pointer;
+}
+.side-depth1:hover {
+	color:var(--key-color);
+}
+.sidebar-list-box.active .side-depth1,
+.sidebar-list-box.on .side-depth1 {
+	color:var(--key-color);
+}
+.depth1-arrow {
+	transform:rotate(180deg);
+	transition:0.3s;
+}
+.sidebar-list-box.active .depth1-arrow {
+	transform:rotate(0);
+}
+.sidebar-list-box.on .side-depth2-box {
+	display:block !important;
+}
+.sidebar-list-box.on .depth1-arrow {
+	transform:rotate(0);
+}
+.side-depth2-box {
+	display:none;
+	margin-top:14px;
+	padding:12px;
+	border-radius:4px;
+	background-color:var(--white);
+}
+.side-depth2 a {
+	display:inline-block;
+	width:100%;
+	padding:12px;
+	margin-bottom:1px;
+}
+.side-depth2:nth-last-child(1) a {
+	margin-bottom:0;
+}
+.side-depth2 a:hover {
+	color:var(--white);
+	border-radius:6px;
+	background-color:var(--key-color);
+}
+.side-depth2.active a {
+	color:var(--white);
+	border-radius:6px;
+	background-color:var(--key-color);
+}
+#sideBarFooter {
+	position:absolute;
+	bottom:34px;
+	left:34px;
+	color:var(--white);
+}
+#sideBarButton {
+	position:fixed;
+	top:50%;
+	left:280px;
+	padding:4px 6px 4px 4px;
+	border-radius:0 6px 6px 0;
+	background-color:#353535;
+	transform:translateY(-50%);
+	transition:left 0.4s;
+	z-index:9999;
+}
+#sideBarButton img {
+	width:8px;
+	transform:rotate(180deg);
+}
+.sidebarActive #sideBarWrap {
+	padding:0;
+}
+.sidebarActive #sideBarButton{
+	left:0;
+}
+.sidebarActive #sideBarButton img {
+	transform:rotate(0deg);
+}
+#sidebarInfo {
+	position:absolute;
+	bottom:0;
+	left:0;
+	width:100%;
+	color:var(--white);
+}
+#sidebarInfoWrap {
+	padding:34px;
+}
+#sidebarUserBox {
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	width:100%;
+	cursor:pointer;
+}
+#sidebarInfoWrap.active #sidebarUserBox{
+	color:var(--key-color);
+}
+#sidebarUser {
+	display:flex;
+	gap:8px;
+	font-size:18px;
+}
+#sidebarUserIcon {
+	position:relative;
+	top:3px;
+}
+#sidebarUserArrow {
+	transform:rotate(180deg);
+	transition:0.3s;
+}
+#sidebarInfoWrap.active #sidebarUserArrow {
+	transform:rotate(0);
+}

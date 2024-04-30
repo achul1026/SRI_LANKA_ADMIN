@@ -1,0 +1,14 @@
+@charset "UTF-8";
+
+#header {
+	position:relative;
+	width:calc(100vw - 340px);
+	margin-top:30px;
+	padding:14px 30px;
+	color:var(--white);
+	background-color:#353535;
+	box-shadow: 1px 4px 14px 0px rgba(163, 163, 163, 0.25);
+}
+.header-link a {
+	color:var(--white);
+}

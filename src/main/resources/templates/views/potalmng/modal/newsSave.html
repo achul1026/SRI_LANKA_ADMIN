@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+	<th:block layout:fragment="modalContent">
+		<form id="newsSave" name="newsSave">
+		<input type="hidden" name="brdTypeCd" value="news">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>작성일</th>
+							<td><input type="text" th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}" readonly></td>
+						</tr>
+						<tr>
+							<th>작성자</th>
+							<td><input type="text" name="crtId" th:value="${writer}" readonly></td>
+						</tr>
+						<tr>
+							<th>제목</th>
+							<td><input type="text" name="brdTitle"></td>
+						</tr>
+						<tr>
+							<th>내용</th>
+							<td><input type="text" name="brdContent"></td>
+						</tr>
+						<tr>
+							<th>첨부파일</th>
+							<td>
+								<div id="fileList"></div>
+								<input type="file" id="fileInput" multiple="multiple" name="files" onchange="updateFileList()"/>
+								<input type="hidden" name="extsChk" value="jpg">
+								<input type="hidden" name="extsChk" value="png">
+							</td>
+						</tr>
+						<tr>
+							<th>노출여부</th>
+							<td>
+								<input type="radio" name="useYn" value="Y" checked>노출
+								<input type="radio" name="useYn" value="N">미노출
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

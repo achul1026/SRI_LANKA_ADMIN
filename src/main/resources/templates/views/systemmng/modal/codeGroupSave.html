@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="groupCodeSaveForm" name="groupCodeSaveForm">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>공통 코드</th>
+							<td><input type="text" name="grpCd" placeholder="공통 코드를 입력하세요."></td>
+							<th>사용여부</th>
+							<td>
+								<!--
+								2024.04.15 기획서 반영 주석 
+								<input type="text" name="grpcdDescr" placeholder="그룹 코드 설명을 입력하세요."> -->
+								<select class="select-list-box" name="useYn">
+									<option value="Y">사용</option>
+									<option value="N">미사용</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>공통 코드명</th>
+							<td colspan='3'><input type="text" name="grpcdNm" placeholder="공통 코드명을 입력하세요."></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

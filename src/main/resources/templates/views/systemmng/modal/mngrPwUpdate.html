@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="pwUpdateForm">
+			<div>
+				<table class="modal-table">
+					<tr>
+						<th>기존 비밀번호 <span class="required">*</span></th>
+						<td><input type="password" name="userPswd" placeholder="기존 비밀번호를 입력하세요."></td>
+					</tr>
+					<tr>
+						<th>새 비밀번호 <span class="required">*</span></th>
+						<td><input type="password" id="newUserPswd" name="newUserPswd" placeholder="새 비밀번호를 입력하세요."></td>
+					</tr>
+					<tr>
+						<th>새 비밀번호 확인 <span class="required">*</span></th>
+						<td><input type="password" id="newUserPswdChk" placeholder="새 비밀번호를 다시 입력하세요."></td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

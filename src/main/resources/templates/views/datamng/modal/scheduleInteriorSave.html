@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px;">
+			<div class="list-search-box text-left mb8">
+				<select class="select-list-box">
+					<option>전체</option>
+					<option>ID</option>
+					<option>이름</option>
+					<option>연락처</option>
+					<option>이메일</option>
+				</select>			
+				<input type="text" class="input-text" placeholder="검색어를 입력해주세요.">
+				<input type="button" class="is-key-button" value="검색">
+			</div>					
+			<div class="table-wrap">
+				<div class="table-box">
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>선택</th>
+								<th>번호</th>
+								<th>ID</th>
+								<th>이름</th>
+								<th>연락처</th>
+								<th>이메일</th>
+								<th>소속</th>
+								<th>권한</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><input type="checkbox" id="checked_invst01" class="invst-checked" data-invstid="invst01"></td>
+								<td>1</td>
+								<td>inki Moon124</td>
+								<td class="invst-name">문인기</td>
+								<td>010-1234-4567</td>
+								<td>inkiMoon@gamil.com</td>
+								<td>도로 교통</td>
+								<td>최고 관리자</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox" id="checked_invst02" class="invst-checked" data-invstid="invst02"></td>
+								<td>1</td>
+								<td>inki Moon124</td>
+								<td class="invst-name">문인기2</td>
+								<td>010-1234-4567</td>
+								<td>inkiMoon@gamil.com</td>
+								<td>도로 교통</td>
+								<td>최고 관리자</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox" id="checked_invst03" class="invst-checked" data-invstid="invst03"></td>
+								<td>1</td>
+								<td>inki Moon124</td>
+								<td class="invst-name">문인기3</td>
+								<td>010-1234-4567</td>
+								<td>inkiMoon@gamil.com</td>
+								<td>도로 교통</td>
+								<td>최고 관리자</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox" id="checked_invst04" class="invst-checked" data-invstid="invst04"></td>
+								<td>1</td>
+								<td>inki Moon124</td>
+								<td class="invst-name">문인기4</td>
+								<td>010-1234-4567</td>
+								<td>inkiMoon@gamil.com</td>
+								<td>도로 교통</td>
+								<td>최고 관리자</td>
+							</tr>
+							<tr>
+								<td><input type="checkbox" id="checked_invst05" class="invst-checked" data-invstid="invst05"></td>
+								<td>1</td>
+								<td>inki Moon124</td>
+								<td class="invst-name">문인기5</td>
+								<td>010-1234-4567</td>
+								<td>inkiMoon@gamil.com</td>
+								<td>도로 교통</td>
+								<td>최고 관리자</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="selectInvstContainer">
+			<div>조사원 수 : ( <span id="totalSelectInvstNumber" class="required">0</span> / <span id="totalInvstNumber">2</span> )</div>
+			<div id="selectInvstWrap">
+				<ul class="select-name"></ul>
+			</div>
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	$('.invst-checked').on('change', function(){
+		let checked = $(this).is(':checked');
+		let checkedName = $(this).parent().siblings('.invst-name').text();
+		let invstId = $(this).data('invstid');
+		
+		
+		let checkedNameSet = '<li id="'+invstId+'">'
+			checkedNameSet += 	'<span>'
+			checkedNameSet += 		''+checkedName+''
+			checkedNameSet += 	'</span>'
+			checkedNameSet += 	'<span class="invst-img" onclick="removeList(\''+invstId+'\')">'
+			checkedNameSet += 		'<img src="/images/close_black.png" alt="close">'
+			checkedNameSet += 	'</span>'
+			checkedNameSet += '</li>'
+		
+ 		if(checked == true) {
+			$('.select-name').append(checkedNameSet);
+		} else {
+			$("#"+invstId).remove();
+		}
+			
+		$('#totalSelectInvstNumber').text($('.select-name li').length);
+	})
+	
+	
+	function removeList(invstId){
+		$("#"+invstId).remove();
+		$("#checked_"+invstId).prop("checked",false);
+		$('#totalSelectInvstNumber').text($('.select-name li').length);
+	}
+	
+</script>

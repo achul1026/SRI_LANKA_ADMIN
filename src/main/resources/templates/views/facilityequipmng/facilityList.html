@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+ 		<div id="listSelectButtonBox">
+			<a th:href="@{/facilityequipmng/facility}" class="is-key-button">상태관리</a>
+			<a th:href="@{/facilityequipmng/facility/history}" class="is-basic-button">하자이력</a>
+			<a th:href="@{/facilityequipmng/facility/info}" class="is-basic-button">정보관리</a>
+		</div>
+		<div class="list-search-wrap">
+			<div class="list-search-box">
+				<span>장비ID</span>
+				<input type="text" class="input-text" placeholder="검색어를 입력해주세요.">
+				<input type="button" class="is-key-button" value="검색"/>
+			</div>		
+		</div>
+		<div id="listTableContainer">
+			<div id="totalList">총 <span id="totalCount"></span>건의 검색 결과를 찾았습니다.</div>
+			<table id="listTable">
+				<thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>ID</th>
+	                    <th>
+	                    	<select class="table-filter">
+	                    		<option value="01" selected>시설물 유형</option>
+	                    	</select>
+	                    </th>
+	                    <th>
+	                    	<select class="table-filter">
+	                    		<option value="" selected>상태</option>
+	                    		<option value="">정상</option>
+	                    		<option value="">장애</option>
+	                    	</select>	                    
+	                    </th>
+	                    <th>설치일</th>
+	                    <th>설치위치</th>
+	                </tr>
+				</thead>
+				<tbody>
+                	<tr class="table-link">
+                		<td>1</td>
+                		<td>TAB0001</td>
+                		<td>신호등</td>
+                		<td>정상</td>
+                		<td>2024-02-02</td>
+                		<td>000.000.00.00</td>
+                	</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- <div th:insert="tags/paging/paging :: pagingFragment"></div> -->
+	</th:block>
+</html>
+<script type="text/javascript">
+	$('.table-link').on('click', function(){
+		new ModalBuilder().init("시설물 정보").ajaxBody("/facilityequipmng/facility/state/detail").footer(1,'장애처리',function(button, modal){
+			modal.close();
+			new ModalBuilder().init("하자 처리").ajaxBody("/facilityequipmng/facility/state/handling").footer(5,
+				'등록',function(button, modal){
+				
+				},'수정', function(button, modal){
+					
+				},'취소', function(button, modal){
+					modal.close();
+				}).open();
+		}).open();
+	})
+		
+</script>

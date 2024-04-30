@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link th:href="@{/images/favicon-16x16.png}" rel="icon">
+    <link th:href="@{/images/favicon-32x32.png}" rel="icon">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/rda.common.js}"></script>
+    <script th:src="@{/js/prefixfree.min.js}"></script>
+    <script th:src="@{/js/rda.validation.js}"></script>
+    <script th:src="@{/js/rda.modal.js}"></script>
+    <title>SRILANKA</title>
+    <link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}"/>
+	<script type="text/javascript">
+	    var __contextPath__ = $('#contextPathHolder').attr('data-contextPath');
+	    if(isNull(__contextPath__)) __contextPath__ = '';  
+	</script>
+</head>
+<body>
+	<section id="LoginSection">
+		<div id="loginContainer">
+		    <div class="rda-wrap">
+		        <div id="loginLogoBox">
+		            <h1 id="loginTitle">회원가입</h1>
+		        </div>
+		        <div id="loginContentBox">
+		            <form id="joinForm" autocomplete="off">
+		            	<div id="joinFlexBox">
+			                <div>
+			                    <div class="login-input-box">
+			                        <label for="userNm" class="login-input-title">이름 <span class="join-required">*</span></label>
+			                        <input type="text" id="userNm" name="userNm" placeholder="이름을 입력해주세요." class="login-input"
+			                         minlength="4" maxlength="30" pattern="^[A-Za-z]+$" data-pattern-mismatch-text="4~30자리의 영문 대소문자" required/>
+			                        <div class="error-message" id="userNmTrgt"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userId" class="login-input-title">아이디 <span class="join-required">*</span></label>
+			                        <input type="text" id="userId" name="userId" placeholder="아이디를 입력해주세요." class="login-input"			                        	
+			                        minlength="6" maxlength="12" data-pattern-mismatch-text="6~12자리의 영문 대소문자" pattern="^[A-Za-z]+$" required/>
+			                        <div class="error-message" id="userIdTrgt"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userPswd" class="login-input-title">비밀번호 <span class="join-required">*</span></label>
+			                        <input type="password" id="userPswd" name="userPswd" placeholder="비밀번호를 입력해주세요." class="login-input"
+			                        minlength="8" maxlength="20" pattern="^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).*$" data-pattern-mismatch-text=" 8~20자리의 영문 소문자+숫자+특수문자" required/>
+                                     <div class="error-message" id="userPswdTrgt"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userBffltd" class="login-input-title">소속</label>
+			                        <select class="select-box" name="userBffltd">
+			                        	<option>선택</option>
+			                        	<option th:each="item,status : ${bffltdList}" th:value="${item.cd}" th:text="${item.cdNm}"></option>
+			                        </select>
+			                    </div>
+			                </div>
+			                <div>
+			                    <div class="login-input-box">
+			                        <label for="userTel" class="login-input-title">연락처 <span class="join-required">*</span></label>
+			                        <!-- 스리랑카 전화번호 정규식 적용 -->
+									<!-- <input type="tel" id="mngrTel" name="mngrTel" placeholder="연락처를 입력해주세요." class="login-input"
+		                        	maxlength="11" pattern="^(0\d{9}|0\d{2}-\d{7})$" data-pattern-mismatch-text="연락처 형식을 확인해주세요." required/> -->
+									<input type="tel" id="userTel" name="userTel" placeholder="연락처를 입력해주세요." class="login-input"
+		                        	maxlength="11" pattern="^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$" data-pattern-mismatch-text="연락처 형식을 확인해주세요." required/>
+			                        <div class="error-message" id="userTelTrgt"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userEmail" class="login-input-title">이메일 <span class="join-required">*</span></label>
+ 									<input type="email" id="userEmail" name="userEmail" placeholder="이메일을 입력해주세요." class="login-input"
+			                        	maxlength="100" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+			                        	data-pattern-mismatch-text="이메일 형식을 확인해주세요." required/>
+			                        <div class="error-message" id="userEmailTrgt"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userPswdChk" class="login-input-title">비밀번호 확인 <span class="join-required">*</span></label>
+			                        <input type="password" id="userPswdChk" placeholder="비밀번호를 입력해주세요." class="login-input" required/>
+			                        <div id="confirmError" class="error-message"></div>
+			                    </div>
+			                    <div class="login-input-box">
+			                        <label for="userBffltd" class="login-input-title">부서</label>
+			                        <select class="select-box" name="userDept">
+			                        	<option>선택</option>
+			                        	<option th:each="item,status : ${deptList}" th:value="${item.cd}" th:text="${item.cdNm}"></option>
+			                        </select>
+			                    </div>
+			                </div>
+		            	</div>
+		                <div id="loginButtonBox">
+		                    <button type="submit" id="joinButton" class="login-button">사용자 등록</button>
+		                </div>
+		            </form>
+		        </div>
+			</div>
+	    </div>
+	</section>
+</body>
+</html>
+<script th:inline="javascript">
+	//비밀번호, 비밀번호 확인, 회원가입 성공
+	document.getElementById("joinForm").addEventListener("submit", function(event) {
+		const newPw = document.getElementById("userPswd").value;
+		const confirmPw = document.getElementById("userPswdChk").value;
+	    if (newPw !== confirmPw) {
+	        document.getElementById("confirmError").textContent = "비밀번호가 일치하지 않습니다.";
+	        event.preventDefault();
+	    } else {
+	    	var formdata = $("#joinForm").serialize();
+			$.ajax({
+	            url: __contextPath__+"/join/save",
+	            type: "post",
+	            data: $("#joinForm").serialize(),
+	            success: function(data){
+	                if(data.code == 200){
+	                    new ModalBuilder().init().successBody('관리자 승인 후 승인 확인 메일이 가입시 작성한 이메일로 발송됩니다.').footer(4,'확인',function(button, modal){
+		                    location.href= __contextPath__+"/login";
+		                    modal.close();
+	                    }).open();
+	                } else {
+// 	                	var message = data.message;
+// 	                	alert("data" + data);
+// 	                	var msgTrgt = message.split("/")[0];
+// 	                	alert(msgTrgt);
+// 	                	var errorMsg = message.split("/")[1];
+// 	                	alert(errorMsg);
+// 	                	$("#"+msgTrgt+"Trgt").text(errorMsg);
+	                }
+	            }
+	        });
+			event.preventDefault();			
+		}
+	});
+</script>

@@ -1,0 +1,26 @@
+stages:  
+  - build
+  - deploy
+
+build-job :
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - chmod +x gradlew
+    - ./gradlew clean build
+    - echo "Compile complete."
+
+deploy-job :
+  variables:
+    GIT_STRATEGY: fetch
+    GIT_CLEAN_FLAGS: none
+  stage: deploy
+  script:
+    - echo "배포시작..."
+    - cp /home/gitlab-runner/builds/h636sxd-a/0/srilanka/sri_lanka_admin/build/libs/sri_lanka_admin-0.0.1-SNAPSHOT-plain.war /home/jboss/EAP-7.4.0/application/sri_lanka_admin/deployments/
+    - sudo chown jboss:jboss /home/jboss/EAP-7.4.0/application/sri_lanka_admin/deployments/sri_lanka_admin-0.0.1-SNAPSHOT-plain.war
+    - cd /home/jboss/EAP-7.4.0/application/sri_lanka_admin
+    - ./stop.sh
+    - sleep 5
+    - ./start.sh
+    - echo "배포종료."

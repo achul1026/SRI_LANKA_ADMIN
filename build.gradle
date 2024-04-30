@@ -1,0 +1,94 @@
+plugins {
+    id 'org.springframework.boot' version "${springbootVersion}"
+    id 'io.spring.dependency-management' version "${springbootDependencyVersion}"
+    //querydsl 플러그인 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "${gradleQuerydslVersion}"
+    id 'java'
+    id 'war'
+}
+
+
+
+group = 'com.sri.lanka.traffic.admin'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+	// JPA
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	// Hibernate Spatial 의존성 추가
+    implementation 'org.hibernate:hibernate-spatial:5.6.0.Final'
+    implementation 'org.locationtech.jts:jts-core:1.17.0'
+    
+   	// Thymeleaf
+	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+	implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity5"
+	implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect"
+    // Web
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	// Security
+	implementation "org.springframework.boot:spring-boot-starter-security"
+	// Validation
+	implementation "org.springframework.boot:spring-boot-starter-validation"
+    // Lombok
+	compileOnly "org.projectlombok:lombok"
+    // devTools
+	developmentOnly "org.springframework.boot:spring-boot-devtools"
+	// Tomcat
+	providedRuntime "org.springframework.boot:spring-boot-starter-tomcat"
+    // Postgre Sql
+	runtimeOnly "org.postgresql:postgresql:${postgresqlVersion}"
+	// QueryDSL
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-core:${queryDslVersion}"
+	
+	annotationProcessor "org.projectlombok:lombok"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	
+	// https://mvnrepository.com/artifact/org.apache.poi/poi
+	implementation 'org.apache.poi:poi:5.2.3'
+	
+	// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	implementation 'org.apache.poi:poi-ooxml:5.2.3'
+		
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+def querydslDir = "$buildDir/generated/querydsl" //QueryDSL로 생성된 소스가 저장되는 위치
+
+querydsl {
+	jpa = true //JPA 사용여부 설정
+	querydslSourcesDir = querydslDir
+}
+
+sourceSets {
+	main.java.srcDir querydslDir// 빌드시 컴파일이 필요한 소스위치
+}
+
+//QueryDSL 컴파일시 참조할 설정정보
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath //외부라이브러리 컴파일 경로 상속
+}

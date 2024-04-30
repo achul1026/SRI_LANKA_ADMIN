@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px;">
+			<form>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>이름</th>
+							<td class="text-left">
+								<input type="text" id="invstId" class="modal-input-text" placeholder="이름을 입력해주세요.">
+							</td>
+							<th>생년월일</th>
+							<td class="text-left">
+								<input type="text" id="invstDate" class="modal-input-text" placeholder="생년월일을 입력해주세요.">
+							</td>
+						</tr>
+						<tr>
+							<th>핸드폰 번호</th>
+							<td class="text-left">
+								<input type="text" id="invstPhone" class="modal-input-text" placeholder="핸드폰번호를 입력해주세요.">
+							</td>
+							<th>이메일</th>
+							<td class="text-left">
+								<input type="text" id="invstEmail" class="modal-input-text" placeholder="이메일을 입력해주세요.">
+							</td>
+						</tr>						
+					</tbody>
+				</table>
+				<div class="mt8"><button type="button" id="test" class="is-key-button">추가하기</button></div>								
+			</form>
+		</div>
+		<div id="selectInvstContainer">
+			<div>조사원 수 : ( <span id="totalSelectInvstNumber" class="required">0</span> / <span id="totalInvstNumber">2</span> )</div>
+			<div class="table-wrap mt16">
+				<div class="table-box">
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>이름</th>
+								<th>생년월일</th>
+								<th>연락처</th>
+								<th>이메일</th>
+								<th>삭제</th>
+							</tr>
+						</thead>
+						<tbody id="invstAddList">
+						</tbody>
+					</table>
+				</div>
+			</div>				
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	$('#test').on('click', function(){
+		let invstId = $('#invstId').val();
+		let invstDate = $('#invstDate').val();
+		let invstPhone = $('#invstPhone').val();
+		let invstEmail = $('#invstEmail').val();
+		
+		let invstExtemal = 	'<tr>'
+			invstExtemal +=		'<td>'
+			invstExtemal +=			invstId
+			invstExtemal +=		'</td>'
+			invstExtemal +=		'<td>'
+			invstExtemal +=			invstDate
+			invstExtemal +=		'</td>'
+			invstExtemal +=		'<td>'
+			invstExtemal +=			invstPhone
+			invstExtemal +=		'</td>'
+			invstExtemal +=		'<td>'
+			invstExtemal +=			invstEmail
+			invstExtemal +=		'</td>'
+			invstExtemal +=		'<td>'
+			invstExtemal +=			'<span class="invst-img" onclick="removeList(this)">'
+			invstExtemal += 			'<img src="/images/close_black.png" alt="close">'
+			invstExtemal += 		'</span>'
+			invstExtemal +=		'</td>'
+			invstExtemal += '</tr>'
+			
+		$('#invstAddList').append(invstExtemal);
+			
+		let invstList = $('#invstAddList').children('tr').length;
+		$('#totalSelectInvstNumber').text(invstList);
+	})
+	
+	function removeList(_this) {
+		$(_this).closest('tr').remove();		
+		let invstList = $('#invstAddList').children('tr').length;
+		$('#totalSelectInvstNumber').text(invstList);
+	}
+	
+</script>

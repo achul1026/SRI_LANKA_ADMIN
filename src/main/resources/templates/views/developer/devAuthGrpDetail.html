@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+	<th:block layout:fragment="content">
+		<div class="is-box">
+			<div>
+				<h3 id="infoTitle">권한 상세</h3>
+			</div>
+			<div class="infoTableWrap">
+				<table class="infoTable survey-save-table">
+					<tr>
+						<th>권한 이름</th>
+						<td th:text="${authInfo.authgrpNm}">권한 이름</td>
+					</tr>
+					<tr>
+						<th>권한 이름</th>
+						<td th:text="${authInfo.bffltdNm}">권한 이름</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="info-button-box">
+			<a
+				th:href="@{/developer/authgrp/update/{authgrpId}(authgrpId=${authInfo.authgrpId})}"
+				class="is-key-button">수정하기</a> <a th:onclick="authGrpDelete([[${authInfo.authgrpId}]])"
+				class="is-key-button" id="authDelete">삭제</a> <a
+				th:href="@{/developer/authgrp}" class="is-basic-button">이전 페이지</a>
+		</div>
+	</th:block>
+</html>
+<script>
+	function authGrpDelete(authgrpId){
+		new ModalBuilder().init().successBody("권한을 삭제하시겠습니까?").footer(3,'삭제',function(button, modal){
+	        fetch(__contextPath__ + "/developer/authgrp/" + authgrpId,{
+				method: "DELETE"
+			})
+			.then(response => response.json())
+  			.then(result => {	
+					  			if(result.code == '200'){
+									  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  window.location.href = __contextPath__+"/developer/authgrp";
+									  }).open();
+								}else{
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  modal.close();
+									  }).open();
+								}
+				  			}
+				  )
+			
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+</script>	

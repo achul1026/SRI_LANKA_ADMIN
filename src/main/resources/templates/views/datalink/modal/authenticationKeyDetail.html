@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+	<th:block layout:fragment="modalContent">
+		<form id="apiSaveForm" name="apiSaveForm">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>이메일</th>
+							<td colspan="3">TEST</td>
+						</tr>
+						<tr>
+							<th>인증키 발급</th>
+							<td>
+								<span class="modal-table-flex">
+									<input type="text" id="generatingKey" class="modal-flex-input" readonly/>
+									<input type="button" id="generatingKeyButton" class="is-key-button" value="인증키 발급"/>								
+								</span>
+							</td>
+							<th>인증키 만료일</th>
+							<td><input type="text" id="generatingKeyDate" readonly/></td>
+						</tr>
+						<tr>
+							<th>신청사유</th>
+							<td colspan="3">TEST</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>	
+		</form>
+	</th:block>
+</html>
+<script>
+	
+	const keyButton = document.getElementById('generatingKeyButton');
+	const key = document.getElementById('generatingKey');
+	const keyDate = document.getElementById('generatingKeyDate');
+	keyButton.addEventListener('click', () => {
+		
+		//인증키
+		key.value = "TEST12313123";
+		
+		//인증키 생성 후 버튼 텍스트 변경
+		keyButton.value = "인증키 변경";
+		
+		//인증키만료일
+		keyDate.value = "2025-01-01"
+	})
+
+</script>

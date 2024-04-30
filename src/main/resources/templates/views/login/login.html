@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link th:href="@{/images/favicon-16x16.png}" rel="icon">
+    <link th:href="@{/images/favicon-32x32.png}" rel="icon">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/common.js}"></script>
+    <title>SRILANKA</title>
+    <link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}"/>
+	<script type="text/javascript">
+	    var __contextPath__ = $('#contextPathHolder').attr('data-contextPath');
+	    if(isNull(__contextPath__)) __contextPath__ = '';  
+	</script>
+</head>
+<body>
+	<section id="LoginSection">
+		<div id="loginContainer">
+		    <div class="rda-wrap">
+		        <div id="loginLogoBox">
+		            <div id="loginLogo"><img th:src="@{/images/logo.png}" alt="로고"></div>
+		            <h1 id="loginTitle">RDA</h1>
+		        </div>
+		        <div id="loginContentBox">
+		            <form th:action="@{/login/confirm}" method="post">
+		                <div>
+		                    <div class="login-input-box">
+		                        <label for="mngrAccountId" class="login-input-title">아이디</label>
+		                        <input type="text" id="userId" name="userId" placeholder="아이디를 입력해주세요." class="login-input" maxlength="12"></input>
+		                        <div class="error-message"></div>
+		                    </div>
+		                    <div class="login-input-box">
+		                        <label for="mngrAccountPwd" class="login-input-title">비밀번호</label>
+		                        <input type="password" id="userPswd" name="userPswd" placeholder="비밀번호를 입력해주세요." class="login-input" maxlength="20"></input>
+		                        <div class="error-message"></div>
+		                    </div>
+		                </div>
+		                <div id="loginIdSave">
+	                        <input type="checkbox" id="loginIdCheckBox">
+	                        <label for="loginIdCheckBox" class="login-check-txt">아이디 저장</label>
+		                </div>
+		                <div id="loginButtonBox">
+		                    <button type="submit" id="loginButton" class="login-button">로그인</button>
+		                    <a th:href="@{/join}" class="login-button">회원가입</a>
+		                </div>
+		            </form>
+		            <div id="loginPassword">
+		                <a th:href="@{/login/find/id/info}" id="loginSearch">아이디 / 비밀번호 찾기</a>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+	</section>
+</body>
+</html>

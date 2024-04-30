@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="searchForm" name="searchForm" onsubmit="asynchronousSearchList('1');">
+			<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		</form>
+		<div>
+			<table class="modal-table modal-table-center">
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>권한 명</th>
+						<th>권한 설명</th>
+						<th>설정</th>
+					</tr>
+				</thead>
+				<tbody id="authListTbody">
+					<th:block th:if="${totalCnt > 0}">
+						<tr th:each="item,status : ${authList}">
+		                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+		                    <td>
+		                    	<input type="hidden" class="hidden-authNm" th:value="${item.authNm}"/>
+		                    	<input type="text" class="input-reset authNm auth-input-readonly" th:value="${item.authNm}" readonly/>
+		                    </td>
+		                    <td>
+		                    	<input type="hidden" class="hidden-authDescr" th:value="${item.authDescr}"/>
+		                    	<input type="text" class="input-reset authDescr auth-input-readonly" th:value="${item.authDescr}" readonly>
+		                    </td>
+		                    <td class="modal-auth-button-box">
+		                    	<span class="modal-auth-update-box">
+			                    	<input type="button" onclick="modalAuthUpdateBtn(this);" class="modalAuthUpdateBtn input-reset" value="수정"/>
+			                    	/
+			                    	<input type="button" th:onclick="modalAuthRemoveBtn(this,[[${item.authId}]]);" class="input-reset" value="삭제"/>
+		                    	</span>
+		                    	<span class="modal-auth-save-box none">
+			                    	<input type="button" th:onclick="modalAuthSaveBtn(this,[[${item.authId}]]);" class="modalAuthSaveBtn input-reset" value="확인"/>
+			                    	/
+			                    	<input type="button" onclick="modalAuthCancelBtn(this);" class="modalAuthCancelBtn input-reset" value="취소"/>
+		                    	</span>
+		                    </td>
+		                </tr>
+	                </th:block>
+	                <th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="4">검색 결과가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+		<div id="pagingDiv" th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+		<form id="authSaveForm" name="authSaveForm">
+			<table class="modal-table mt16">
+				<tr>
+					<th>권한 명</th>
+					<td>
+						<input type="text" id="authNmInput" name="authNm" placeholder="권한 명"/>
+					</td>
+				</tr>
+				<tr>
+					<th>권한 설명</th>
+					<td>
+						<input type="text" id="authDescrInput" name="authDescr" placeholder="권한 설명"/>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</th:block>
+</html>
+<script type="text/javascript">
+	//수정버튼
+	modalAuthUpdateBtn = (_this) => {
+		const closest = _this.closest('tr');
+		const parent = closest.querySelector('.modal-auth-update-box');
+		const siblings = closest.querySelector('.modal-auth-save-box');
+		const input = closest.querySelectorAll('.auth-input-readonly');
+		const authNm = closest.querySelector('.authNm');
+		const authDescr = closest.querySelector('.authDescr');
+		
+		parent.classList.add('none');
+		siblings.classList.remove('none');
+		input.forEach(input => input.readOnly = false);
+		authNm.value = '';
+		authDescr.value = '';
+		authNm.placeholder = '권한명을 입력해주세요.';
+		authDescr.placeholder = '권한 설명을 입력해주세요.';
+	}
+	
+	//삭제버튼
+	modalAuthRemoveBtn = (_this, authId) => {
+		const pageNo = document.getElementById('asynchronousPageNo').value;
+		const tr = _this.closest('tr');
+		new ModalBuilder().init().alertBody('삭제하면 복구가 불가능합니다. 삭제하시겠습니까?').footer(3,'확인',function(button, modal){
+			fetch(__contextPath__+"/systemmng/auth/setting/"+authId,{
+				method: "DELETE"
+			})
+			.then(response => response.json())
+  			.then(result => {
+					  			if(result.code == '200'){
+									  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  modal.close();
+										  asynchronousSearchList(pageNo);
+									  }).open();
+								}else{
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  modal.close();
+									  }).open();
+								}
+				  			}
+				  )
+			modal.close();
+		}, '취소',function(button, modal){
+			modal.close();
+		}).open();		
+	}
+	
+	//확인버튼
+	modalAuthSaveBtn = (_this, authId) => {
+		const pageNo = document.getElementById('asynchronousPageNo').value;
+		const closest = _this.closest('tr');
+		const parent = closest.querySelector('.modal-auth-save-box');
+		const siblings = closest.querySelector('.modal-auth-update-box');
+		const authNm = closest.querySelector('.authNm').value;
+		const authDescr = closest.querySelector('.authDescr').value;
+		
+		new ModalBuilder().init().alertBody('저장하시겠습니까?').footer(3,'확인',function(button, modal){
+			const formData = new FormData();
+		    formData.append('authNm', authNm);
+		    formData.append('authDescr', authDescr);
+		    
+			fetch(__contextPath__+"/systemmng/auth/setting/"+authId,{
+				method: "PUT",
+				body: formData
+			})
+			.then(response => response.json())
+  			.then(result => {
+					  			if(result.code == '200'){
+									  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  modal.close();
+										  asynchronousSearchList(pageNo);
+									  }).open();
+								}else{
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										  modal.close();
+									  }).open();
+								}
+				  			}
+				  )
+			
+				parent.classList.add('none');
+				siblings.classList.remove('none');
+				modal.close();
+			}, '취소',function(button, modal){
+				modal.close();
+		}).open();
+	}
+	
+	//취소버튼
+	modalAuthCancelBtn = (_this) => {
+		const closest = _this.closest('tr');
+		const parent = closest.querySelector('.modal-auth-save-box');
+		const siblings = closest.querySelector('.modal-auth-update-box');
+		const input = closest.querySelectorAll('.auth-input-readonly');
+		const authNm = closest.querySelector('.authNm');
+		const authDescr = closest.querySelector('.authDescr');
+		
+		parent.classList.add('none');
+		siblings.classList.remove('none');
+		
+		authNm.value = closest.querySelector('.hidden-authNm').value;
+		authDescr.value = closest.querySelector('.hidden-authDescr').value;
+		input.forEach(input => input.readOnly = true);
+	}
+</script>

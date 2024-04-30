@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="codeSaveForm" name="codeSaveForm">
+			<input type="hidden" name="grpcdId" th:value="${tcCdGrp.grpcdId}"/>
+			<div>
+				<table class="modal-table">
+					<tr>
+						<th>공통 코드</th>
+						<td th:text="${tcCdGrp.grpCd}"></td>
+						<th>공통 코드명</th>
+						<td th:text="${tcCdGrp.grpcdNm}"></td>
+					</tr>
+					<tr>
+						<th>하위 코드</th>
+						<td><input type="text" name="cd" placeholder="하위 코드를 입력하세요."></td>
+						<th>하위 코드명</th>
+						<td><input type="text" name="cdNm" placeholder="하위 코드명을 입력하세요."></td>
+					</tr>
+					<tr>
+						<th>사용여부</th>
+						<td class="text-left">
+							<select class="select-list-box" id="useYn" name="useYn">
+								<option value="Y">Y</option>
+								<option value="N">N</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

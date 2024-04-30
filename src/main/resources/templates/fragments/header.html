@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<th:block th:fragment="headerFragment">
+		<div id="header">
+			<div class="header-link">
+				<th:block th:if="${menuDepthInfo != null}">
+					<a th:if="${not #strings.isEmpty(menuDepthInfo.menuNm)}" 
+							th:href="${menuDepthInfo.menuUrlpttrn}" 
+							th:text="${menuDepthInfo.menuNm}" id="headerDetph1">접속한 화면의 depth1</a>
+					<a th:if="${not #strings.isEmpty(menuDepthInfo.subMenuNm)}" 
+							th:href="${menuDepthInfo.subMenuUrl}" 
+							th:classappend="${menuDepthInfo.menuActiveLocation eq 'TWO' ? 'txt-underline' : ''}" 
+							th:text="' > ' + ${menuDepthInfo.subMenuNm} " id="headerDepth2">접속한 화면의 depth2</a>
+					<a th:if="${not #strings.isEmpty(menuDepthInfo.currentMenuNm)}" 
+							th:href="${menuDepthInfo.currentMenuUrl}" 
+							th:classappend="${menuDepthInfo.menuActiveLocation eq 'THREE' ? 'txt-underline' : ''}" 
+							th:text="' > ' + ${menuDepthInfo.currentMenuNm}" id="headerDepth3">접속한 화면의 depth3</a>
+	            </th:block>
+			</div>
+		</div>
+	</th:block>
+</html>

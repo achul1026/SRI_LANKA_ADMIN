@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div id="findModalBox">
+			<div id="successImg"><img th:src="@{/images/success.png}" alt="성공"></div>
+			<div id="successTitle">아이디 찾기 완료</div>
+			<div id="successTxt">개인정보와 일치하는 아이디는 <span th:text="${userId}">AccountId</span> 입니다.</div>
+		</div>
+	</th:block>
+</html>

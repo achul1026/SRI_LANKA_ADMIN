@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="modal-group-detail-wrap">
+			<ul>
+				<li class="modal-group-detail-box">
+					<span>소속</span>
+					<span th:text="${authInfo.bffltdNm}">RDA</span>
+				</li>
+				<li class="modal-group-detail-box">
+					<span>그룹유형</span>
+					<span th:text="${authInfo.authgrpNm}">교통 데이터 관리자</span>
+				</li>
+				<li class="modal-group-detail-box">
+					<span>소속 인원 수</span>
+					<span th:text="${totalCnt}">10명</span>
+				</li>
+			</ul>
+		</div>
+		<div class="modal-auth-tree-wrap scroll">
+			<div class="modal-auth-title">
+				<span><img th:src="@{/images/auth_group.png}" alt="auth"></span>
+				<div>권한 상세 설정</div>
+				<input type="hidden" id="authId" th:value="${tcAuthMng.authId}" />
+				<input type="hidden" id="authNm" th:value="${tcAuthMng.authNm}" />
+				<input type="hidden" id="authDescr" th:value="${tcAuthMng.authDescr}" />
+				<input type="hidden" id="authgrpId" th:value="${tcAuthMng.authgrpId}" />
+			</div>
+			<th:block th:each="item : ${authMenuInfo.authMenuList}">
+				<div class="modal-auth-check-box">
+					<div class="modal-auth-depth1-box" th:id="${item.menuId}" name="parentMenu" th:data-parentmenuauthId="${item.menuauthId}" data-checked-value="N">
+						<input type="checkbox" class="depth1-all-checked" th:checked="${#lists.contains(item.subAuthMenuList.![srchYn == 'Y' or inputYn == 'Y' or updtYn == 'Y' or delYn == 'Y'], true)}"/>
+						<span class="modal-auth-depth1" th:text="${item.menuNm}">데이터 통계</span>
+						<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+					</div>
+					<div class="modal-auth-depth2-box">
+						<th:block th:each="subItem : ${item.subAuthMenuList}">
+							<ul name="subMenuId" th:data-submenuid="${subItem.menuId}" th:data-menuauthId="${subItem.menuauthId}" th:data-parent-menuid="${item.menuId}">
+								<li class="auth-detph2">
+									<input type="checkbox" class="depth2-all-checked" th:checked="${subItem.srchYn == 'Y' or subItem.inputYn == 'Y' or subItem.updtYn == 'Y' or subItem.delYn == 'Y'}"/>
+									<span class="modal-auth-depth2" th:text="${subItem.menuNm}">GIS 시각화 통계/분석</span>
+									<ul class="modal-auth-depth3-box">
+										<li>
+											<input type="checkbox" class="depth3-checked" name="srchYn" th:checked="${subItem.srchYn eq 'Y'}"/>
+											<span>조회</span>		
+										</li>
+										<li>
+											<input type="checkbox" class="depth3-checked" name="inputYn" th:checked="${subItem.inputYn eq 'Y'}"/>
+											<span>등록</span>		
+										</li>
+										<li>
+											<input type="checkbox" class="depth3-checked" name="updtYn" th:checked="${subItem.updtYn eq 'Y'}"/>
+											<span>수정</span>		
+										</li>
+										<li>
+											<input type="checkbox" class="depth3-checked" name="delYn" th:checked="${subItem.delYn eq 'Y'}"/>
+											<span>삭제</span>		
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</th:block>
+					</div>
+				</div>
+			</th:block>
+		</div>
+	</th:block>
+</html>
+<script th:inline="javascript">
+	$('.modal-auth-depth1-box span').on('click', function(){
+		$(this).parent().toggleClass('active');
+	    $(this).parent().siblings('.modal-auth-depth2-box').stop().slideToggle(300);
+	})
+	
+	$('.modal-auth-depth2').on('click', function(){
+		$(this).parent().toggleClass('active');
+	    $(this).next().stop().slideToggle(300);
+	})
+	
+	//depth1 check
+	const depth1CheckBox = document.querySelectorAll('.depth1-all-checked');
+	depth1CheckBox.forEach(depth1 => {
+		depth1.addEventListener('change', () => {
+			const closest = depth1.closest('.modal-auth-check-box');
+			const parent = depth1.closest('.modal-auth-depth1-box');
+			const parentSiblings = parent.querySelector('.modal-auth-depth1');
+			const inputItem = closest.querySelectorAll('input[type="checkbox"]');
+			
+			//하위메뉴 노출
+			if(!parent.classList.contains('active')) parentSiblings.click();
+			
+			//depth1 checkbox 누르면 하위 메뉴 checkbox true, false
+			if(depth1.checked == true){
+				inputItem.forEach(input => input.checked = true);
+			} else {
+				inputItem.forEach(input => input.checked = false);
+				parentSiblings.click();
+			}
+		})
+	})
+	
+	//depth2 check
+	const depth2CheckBox = document.querySelectorAll('.depth2-all-checked');
+	depth2CheckBox.forEach(depth2 => {
+		depth2.addEventListener('change', () => {
+			const depth1 = depth2.closest('.modal-auth-check-box').querySelector('.depth1-all-checked');
+			const parent = depth2.closest('li');
+			const siblingsTitle = parent.querySelector('.modal-auth-depth2');
+			const inputItem = parent.querySelectorAll('input[type="checkbox"]');
+			const closest = depth2.closest('.modal-auth-depth2-box');
+			const siblingsInput = closest.querySelectorAll('.depth2-all-checked');
+			
+			//상위메뉴 체크
+			const allUnchecked = Array.from(siblingsInput).every(checkbox => !checkbox.checked);
+			if(allUnchecked){
+				depth1.click();
+			} else {
+				depth1.checked = !allUnchecked;
+			}
+			
+			//하위메뉴 노출
+			if(!parent.classList.contains('active')) siblingsTitle.click();
+			
+			//depth2 checkbox 누르면 하위 메뉴 checkbox true, false
+			if(depth2.checked == true){
+				inputItem.forEach(input => input.checked = true);
+			} else {
+				inputItem.forEach(input => input.checked = false);
+				siblingsTitle.click();
+			}
+		})
+	})
+	
+	//depth3 click
+	const depth3Check = document.querySelectorAll('.depth3-checked');
+	depth3Check.forEach(depth3 => {
+		depth3.addEventListener('change', () => {
+			const depth1 = depth3.closest('.modal-auth-check-box').querySelector('.depth1-all-checked');
+			const depth2 = depth3.closest('.auth-detph2');
+			const depth2CheckBox = depth2.querySelector('.depth2-all-checked');
+			const siblingsInput = depth2.querySelectorAll('.depth3-checked');
+			const allUnchecked = Array.from(siblingsInput).every(checkbox => !checkbox.checked);
+			
+			//상위메뉴 체크
+			if(allUnchecked){
+				depth2CheckBox.click();
+			} else {
+				depth2CheckBox.checked = !allUnchecked;
+				depth1.checked = !allUnchecked;
+			}
+		})
+	})
+	
+</script>

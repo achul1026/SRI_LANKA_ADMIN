@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">장비이력 수정</h3>
+        </div>
+        <div>
+			<div id="infoTableWrap">
+				<table id="infoTable">
+					<tr>
+						<th>장비ID</th>
+						<td>들어갈정보</td>
+						<th>장비유형</th>
+						<td>
+							<select class="select-list-box">
+								<option>TEST</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>발생일시</th>
+						<td>
+							<input type="text" class="input-text startPicker" placeholder="기간을 설정해주세요.">
+							<span class="select-time-box mr8">
+								<select class="select-list-box select-hour startHour"></select>
+								<select class="select-list-box select-minute-unit"></select>
+							</span>
+						</td>
+						<th>장애분류</th>
+						<td>
+							<select class="select-list-box">
+								<option>TEST</option>
+							</select>						
+						</td>
+					</tr>
+					<tr>
+						<th>처리일시</th>
+						<td>
+							<input type="text" class="input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+							<span class="select-time-box mr8">
+								<select class="select-list-box select-hour endHour"></select>
+								<select class="select-list-box select-minute-unit"></select>
+							</span>						
+						</td>
+						<th>장애지속시간</th>
+						<td>들어갈정보</td>
+					</tr>
+					<tr>
+						<th>처리여부</th>
+						<td>
+							<select class="select-list-box">
+								<option>TEST</option>
+							</select>							
+						</td>
+						<th>담당자</th>
+						<td>
+							<input type="text" />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+                <a th:href="@{/facilityequipmng/mobileequip/history}" class="is-key-button">수정</a>
+                <a th:href="@{/facilityequipmng/mobileequip/history}" class="is-basic-button">취소</a>
+            </div>			
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+</script>

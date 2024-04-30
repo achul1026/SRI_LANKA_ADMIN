@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+      <th:block layout:fragment="content">
+      	<div class="is-box">
+	      	<form id="searchForm" name="searchForm" action="/datalink/openapi" method="get">
+	      		<div class="list-search-wrap">
+					<div class="list-search-box">
+						<select class="select-list-box" name="searchType">
+							<option>분류</option>
+							<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
+							<option value="apiNm" th:selected="${searchInfo.searchType} == 'apiNm'">API 명</option>
+							<option value="apiDesc" th:selected="${searchInfo.searchType} == 'apiDesc'">API 설명</option>
+							<option value="crtId" th:selected="${searchInfo.searchType} == 'crtId'">작성자</option>
+						</select>
+						<select class="select-list-box ml8" name="">
+							<option>관리기관</option>
+						</select>
+						<input type="text" id="searchContent" class="input-text"  name="searchContent" placeholder="검색어를 입력해주세요.">
+						<button type="submit" id="searchBtn" class="is-key-button">검색</button>
+					</div>		
+	      		</div>
+			</form>
+			<div id="listTableContainer">
+				<div class="list-save-box">
+					<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
+					<div>
+						<input type="button" class="is-key-button" id="openApiSave" onclick="openApiSave()" value="API 등록"/>
+					</div>
+				</div>
+				<table id="listTable">
+					<thead>
+		                <tr>
+		                    <th>번호</th>
+		                    <th>분류</th>
+		                    <th>서비스명</th>
+		                    <th>서비스 URL</th>
+		                    <th>관리기관</th>
+		                    <th>갱신일</th>
+		                </tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${totalCnt > 0}">
+							<tr th:each="item : ${sriOpenApiList}" class="table-link" th:onclick="updateOpenApi([[${item.apiId}]])">
+								<td><input type="checkbox" name="checkbox" th:value="${item.apiId}"/></td>
+								<td th:text="${item.apiNm}"></td>
+								<td th:text="${item.apiDesc}"></td>
+								<td th:text="${@commonUtils.formatLocalDateTime(item.crtDt)}"></td>
+								<td th:text="${item.crtId}"></td>
+							</tr>
+						</th:block>
+						<tr class="table-link">
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div th:insert="tags/paging/paging :: pagingFragment"></div>
+      	</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	// API 등록
+	function openApiSave(){
+		new ModalBuilder().init("OpenAPI 등록", '1200').ajaxBody("/datalink/openapi/save").footer(3,'등록',function(button, modal){
+			fetch(__contextPath__+"/datalink/openapi",{
+				method: "POST",
+				body: new FormData($("#apiSaveForm")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == '200'){
+					new ModalBuilder().init().successBody('API 등록이 완료되었습니다.').footer(4,'확인',function(button, modal){
+	                	location.href= __contextPath__+"/datalink/openapi";
+	                	modal.close();
+	                }).open();
+				}
+			})
+			modal.close();
+		}, '취소', function(button, modal){
+			location.href= __contextPath__+"/datalink/openapi";
+			modal.close();
+		}).open();
+	}
+	
+	// 전체선택
+	function selectAll()  {
+		if($('input:checkbox').is(':checked') == true){
+			$('input:checkbox').prop('checked', false);
+		} else {
+			$('input:checkbox').prop('checked', true);				
+		}
+	}
+	
+	// API 삭제
+	function deleteOpenApi(){
+		new ModalBuilder().init().alertBody('해당 API를 삭제하시겠습니까?').footer(3,'확인',function(button, modal){
+			const selectedElements = document.querySelectorAll('input[name="checkbox"]:checked');
+		    const apiIds = Array.from(selectedElements).map(el => el.value);
+		    
+	        fetch(__contextPath__+"/datalink/openapi",{
+				method: "DELETE",
+				headers: {
+		            'Content-Type': 'application/json',
+		        },
+		        body: JSON.stringify({ apiIds: apiIds })
+		    })
+			.then(response => response.json())
+			.then(result => {
+								if(result.code == '200'){
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+										window.location.reload();
+									}).open();
+								} else {
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+									}).open();
+								}
+				
+			})
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+	
+	// API 수정
+	function updateOpenApi(apiId){
+		new ModalBuilder().init("OPEN API 수정").ajaxBody(__contextPath__+"/datalink/openapi/"+apiId+"/update").footer(2,"수정",function(button,modal){
+			fetch(__contextPath__+"/datalink/openapi/"+apiId,{
+				method: "PUT",
+				body: new FormData($("#apiUpdateForm")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+								if(result.data.code == '200'){
+									new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+										modal.close();
+										window.location.reload();
+									}).open();
+								} else {
+									new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+										modal.close();
+									}).open();
+								}
+				
+			})
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+	
+</script>

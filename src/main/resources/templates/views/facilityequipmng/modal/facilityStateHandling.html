@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container wd800">			
+			<div class="table-wrap">
+				<div class="table-box">
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>보수 작업 내용</th>
+								<th>하자 발생 일시</th>
+								<th>처리여부</th>
+								<th>하자 보수 일시</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>프로그램 오류</td>
+								<td>2023-11-11 13:13:00</td>
+								<td>완료</td>
+								<td>2023-12-18 13:49:00</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- <div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div> -->
+		<div>
+			<table class="modal-table">
+				<tr>
+					<th>시설물 ID</th>
+					<td>들어갈내용</td>
+					<th>시설물 유형</th>
+					<td>
+						<select class="select-list-box">
+							<option>들어갈내용</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>발생일자</th>
+					<td>
+						<input type="text" class="modal-input-text startPicker ml0" placeholder="기간을 설정해주세요.">
+					</td>
+					<th>발생시간</th>
+					<td>
+						<select class="select-list-box select-hour mr8"></select>
+						<select class="select-list-box select-minute-unit"></select>
+					</td>
+				</tr>
+				<tr>
+					<th>처리일자</th>
+					<td>
+						<input type="text" class="modal-input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+					</td>
+					<th>처리시간</th>
+					<td>
+						<select class="select-list-box select-hour mr8"></select>
+						<select class="select-list-box select-minute-unit"></select>
+					</td>
+				</tr>
+				<tr>
+					<th>처리여부</th>
+					<td>
+						<select class="select-list-box">
+							<option>들어갈내용</option>
+						</select>
+					</td>
+					<th>보수 작업 내용</th>
+					<td><input type="text" placeholder="보수 작업 내용을 입력해주세요."/></td>
+				</tr>
+				<tr>
+					<th>시공자</th>
+					<td><input type="text" class="modal-input-text" placeholder="시공자 이름을 입력해주세요."/></td>
+				</tr>
+			</table>		
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	datePickerSet();
+	selectMinuteSet();
+</script>

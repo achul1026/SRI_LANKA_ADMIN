@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link th:href="@{/images/favicon-16x16.png}" rel="icon">
+    <link th:href="@{/images/favicon-32x32.png}" rel="icon">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+    <script th:src="@{/js/rda.common.js}"></script>
+    <script th:src="@{/js/rda.validation.js}"></script>
+    <script th:src="@{/js/rda.modal.js}"></script>
+    <title>SRILANKA</title>
+</head>
+<body>
+	<section id="LoginSection">
+		<div id="loginContainer">
+		    <div class="rda-wrap">
+		        <div id="findTitleBox">
+		            <h1 id="findTitle">비밀번호 변경</h1>
+		        </div>
+		        <div id="loginContentBox">
+		            <form id="joinForm">
+		                <div id="pwFind">
+		                    <div class="login-input-box">
+		                        <label for="mngrAccountPwd" class="login-input-title">새 비밀번호 <span class="join-required">*</span></label>
+		                        <input type="password" id="mngrAccountPwd" name="mngrAccountPwd" placeholder="비밀번호를 입력해주세요." class="login-input"
+		                        minlength="8" maxlength="20" pattern="^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).*$" data-pattern-mismatch-text=" 8~20자리의 영문 소문자+숫자+특수문자로 입력해주세요." required/>
+                                 <div class="error-message" id="mngrAccountPwdTrgt"></div>
+		                    </div>		                    
+							<div class="login-input-box">
+		                        <label for="mngrAccountPwdChk" class="login-input-title">새 비밀번호 확인 <span class="join-required">*</span></label>
+		                        <input type="password" id="mngrAccountPwdChk" placeholder="비밀번호를 입력해주세요." class="login-input" required/>
+		                        <div id="confirmError" class="error-message"></div>
+		                    </div>		                    
+		                </div>		                
+			            <div>
+			                <button type="submit" id="pwdChangeButton" class="password-change">비밀번호 변경</button>
+			            </div>
+		            </form>
+		        </div>
+		    </div>
+		</div>
+	</section>
+</body>
+<script type="text/javascript">
+	document.getElementById("joinForm").addEventListener("submit", function(event) {
+    	const newPw = document.getElementById("mngrAccountPwd").value;
+    	const confirmPw = document.getElementById("mngrAccountPwdChk").value;
+	    if (newPw !== confirmPw) {
+	        document.getElementById("confirmError").textContent = "새 비밀번호와 비밀번호가 일치하지 않습니다.";
+	        event.preventDefault();
+	    } else {
+	    	new ModalBuilder().init().successBody('비밀번호가 변경되었습니다.').footer(4,'확인',function(button, modal){
+                location.href= "/login";
+                modal.close();
+            }).open();
+			event.preventDefault();			
+		}
+	});	
+</script>
+</html>

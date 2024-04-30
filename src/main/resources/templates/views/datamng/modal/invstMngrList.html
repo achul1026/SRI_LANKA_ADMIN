@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px;">
+			<div class="list-search-box text-left mb8">
+				<form id="searchForm" onSubmit="return false;">
+					<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+					<div class="list-search-box">
+						<select name="searchType" class="select-list-box">
+							<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
+							<option value="mngrId" th:selected="${searchInfo.searchType} == 'mngrId'">ID</option>
+							<option value="mngrNm" th:selected="${searchInfo.searchType} == 'mngrNm'">이름</option>
+							<option value="mngrTel" th:selected="${searchInfo.searchType} == 'mngrTel'">연락처</option>
+							<option value="mngrEmail" th:selected="${searchInfo.searchType} == 'mngrEmail'">이메일</option>
+						</select>
+						<input type="text" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
+						<button type="button" class="is-key-button" onclick="asynchronousSearchList();">검색</button>
+					</div>		
+				</form>
+			</div>					
+			<div class="table-wrap">
+				<div class="table-box">
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>선택</th>
+								<th>번호</th>
+								<th>ID</th>
+								<th>이름</th>
+								<th>연락처</th>
+								<th>이메일</th>
+								<th>소속</th>
+								<th>권한</th>
+							</tr>
+						</thead>
+						<tbody>
+							<th:block th:if="${totalCnt > 0}">
+				                <tr class="table-link" onclick="checkedSet(this)" th:each="item,status : ${mngrList}">
+									<td><input type="radio" class="mngrCheckBox" name="mngrList" th:value="${item.usermngId}"></td>
+				                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+				                    <td class="userId" th:text="${item.userId}"></td>
+				                    <td th:text="${item.userNm}"></td>
+				                    <td th:text="${item.userTel}"></td>
+				                    <td th:text="${item.userEmail}"></td>
+				                    <td th:text="${item.bffltdNm}"></td>
+				                    <td th:text="${item.authNm}"></td>
+				                </tr>
+			                </th:block>
+			                <th:block th:if="${totalCnt == 0}">
+			                	<tr>
+			                		<td colspan="8">검색된 결과가 없습니다.</td>
+			                	</tr>
+			                </th:block>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	function asynchronousSearchList(){
+		let paramData = $("#searchForm").serialize();
+		$(".modal-container").remove();
+		new ModalBuilder().init('조사 담당자 등록').ajaxBody("/datamng/invst/mngr",paramData).footer(1,'등록',function(button, modal){
+			let mngrId, mngrNmValue;
+			const mngrChecked 		= document.querySelector('.mngrCheckBox:checked');
+			const modalUsermngId 	= mngrChecked.value;
+			const modalUserId 		= mngrChecked.closest('tr').querySelector('.userId').textContent;
+	
+			const exmnpicIdElement  = document.getElementById('exmnpicId');
+			exmnpicIdElement.value  = modalUserId;
+			const usermngIdElement  = document.getElementById('usermngId');
+			usermngIdElement.value  = modalUsermngId;
+			
+			modal.close();
+		}).open();
+	}
+</script>

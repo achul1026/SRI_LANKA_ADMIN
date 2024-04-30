@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="modal-date-wrap scroll">
+			<div id="scheduleTotalListNumberBox">
+				<span>총 조사 개수 : </span>
+				<span id="scheduleTotalListNumber"></span>
+			</div>
+			<th:block th:each="item : ${tmExmnScheduleList}"> 
+				<div class="modal-date-box">
+					<div class="modal-date-title-box">
+						<div class="modal-date-title" th:text="${item.tmExmnMng.exmnNm}"></div>
+						<span class="modal-date-title-bg" th:classappend="${item.tmExmnMng.colrCd.getCode()}"></span>
+					</div>
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>조사 지역</th>
+								<th>조사 기간</th>
+								<th>조사 시간</th>
+								<th>조사원</th>
+							</tr>
+						</thead>
+						<tbody class="modal-scroll-x">
+						<th:block th:if="${totalCnt > 0}">
+							<tr>
+								<td th:text="${item.tmExmnMng.exmnLc}"></td>
+								<td th:text="${@commonUtils.formatLocalDateTime(item.tmExmnMng.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.tmExmnMng.endDt,'YYYY-MM-dd')}"></td>
+								<td th:text="${@commonUtils.formatLocalDateTime(item.tmExmnMng.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.tmExmnMng.endDt,'HH:mm')}"></td>
+								<td>
+									<span th:text="${item.pollsterNm}" class="scroll modal-td-scroll"></span>
+								</td>
+							</tr>
+						</th:block>
+						<th:block th:if="${totalCnt == 0}">
+							<tr>
+								<td colspan="4">검색 결과가 없습니다.</td>
+							</tr>
+						</th:block>
+						</tbody>
+					</table>
+				</div>
+			</th:block>
+		</div>
+	</th:block>
+</html>
+<script th:inline="javascript">
+	 const totalCnt = /*[[${totalCnt}]]*/
+	 document.getElementById('scheduleTotalListNumber').innerText = totalCnt;
+</script>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+	<th:block layout:fragment="modalContent">
+		<form id="reportUpdate" name="reportUpdate">
+		<input type="hidden" name="brdTypeCd" value="report">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>작성일</th>
+							<td><input type="text" th:value="${tlBbsInfo.crtDt}" readonly></td>
+						</tr>
+						<tr>
+							<th>작성자</th>
+							<td><input type="text" th:value="${tlBbsInfo.crtId}" readonly></td>
+						</tr>
+						<tr>
+							<th>제목</th>
+							<td><input type="text" name="brdTitle" th:value="${tlBbsInfo.brdTitle}"></td>
+						</tr>
+						<tr>
+							<th>내용</th>
+							<td><input type="text" name="brdContent" th:value="${tlBbsInfo.brdContent}"></td>
+						</tr>
+						<tr>
+							<th>첨부파일</th>
+							<td>
+								<div th:each="item, status : ${tlBbsFile}">
+									<span th:text="${item.fileOriginNm}"></span>
+									<button type="button" th:onclick="deleteFileData([[${item.fileId}]], [[${tlBbsInfo.brdId}]])">X</button>
+<!-- 									<button type="button" th:onclick="download([[${item.fileId}]])">다운로드(테스트)</button> -->
+								</div>
+								<div id="fileList"></div>
+								<input type="file" id="fileInput" multiple="multiple" name="files" onchange="updateFileList()"/>
+								<input type="hidden" name="extsChk" value="jpg">
+								<input type="hidden" name="extsChk" value="png">
+							</td>
+						</tr>
+						<tr>
+							<th>노출여부</th>
+							<td>
+								<input type="radio" name="useYn" id="" value="Y" th:checked="${tlBbsInfo.useYn == 'Y'}">노출
+								<input type="radio" name="useYn" id="" value="N" th:checked="${tlBbsInfo.useYn == 'N'}">미노출
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

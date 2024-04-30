@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">사용자 상세 정보</h3>
+        </div>
+        <div>
+	        <form id="userUpdateForm" name="userUpdateForm">
+				<div id="infoTableWrap">
+					<table th:each="item,status : ${userInfo}" id="infoTable">
+						<tr>
+							<th>이름</th>
+							<td th:text="${item.userNm}"></td>
+							<th>ID</th>
+							<td><input type="text" id="userAccountId" name="userAccountId" th:value="${item.userAccountId}" readonly/></td>
+						</tr>
+						<tr>
+							<th>비밀번호</th>
+							<td>
+								<input type="button" class="is-key-button" id="passwordChange" value="비밀번호 변경">
+							</td>
+							<th>연락처</th>
+							<td><input type="text" name="userTel" th:value="${item.userTel}"/></td>
+						</tr>
+						<tr>
+							<th>이메일</th>
+							<td><input type="text" name="userEmail" th:value="${item.userEmail}"/></td>
+							<th>상태</th>
+							<td>
+								<select name="userSttsCd">
+									<option th:selected="${item.userSttsCd.name == '승인'}" value="APPROVAL">승인</option>
+									<option th:selected="${item.userSttsCd.name == '미승인'}" value="NOT_APPROVED">미승인</option>
+									<option th:selected="${item.userSttsCd.name == '정지'}" value="SUSPENDED">정지</option>
+									<option th:selected="${item.userSttsCd.name == '탈퇴'}" value="RESIGN">탈퇴</option>
+								</select>
+							</td>
+						</tr>
+					</table>
+				</div>
+	        </form>
+			<div class="info-button-box">
+				<a id="userUpdate" class="is-key-button">수정</a>
+                <a th:href="@{/systemmng/user}" class="is-basic-button">이전 페이지</a>
+            </div>
+        </div>
+	</th:block>
+</html>
+<script>
+	// 유저 정보 변경
+	$("#userUpdate").on('click', function(){
+		fetch(__contextPath__+"/systemmng/user",{
+			method: "PUT",
+			body: new FormData($("#userUpdateForm")[0])
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.data.code == '200'){
+				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+		            location.href= __contextPath__+"/systemmng/user";
+				}).open();
+			} else {
+				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+					modal.close();
+				}).open();
+			}
+		})
+	})
+	
+	// 비밀번호 변경
+	$('#passwordChange').on('click',function(){
+		var userAccountId = $("#userAccountId").val();
+		new ModalBuilder().init('비밀번호 변경').ajaxBody(__contextPath__+"/systemmng/user/pw/update").footer(3,'변경하기',function(button, modal){
+			var newUserAccountPwd = $("#newUserAccountPwd").val();
+			var newUserAccountPwdChk = $("#newUserAccountPwdChk").val();
+			if(newUserAccountPwd != newUserAccountPwdChk){
+				new ModalBuilder().init().alertBody("새로운 비밀번호가 일치하지 않습니다. 다시 확인해주세요.").footer(4,'확인',function(button, modal){
+				}).open();
+			} else {
+				fetch(__contextPath__+"/systemmng/user/pw/update/"+userAccountId,{
+	        		method: "PUT",
+	        		body: new FormData($("#pwUpdateForm")[0])
+	        	})
+	        	.then(response => response.json())
+	        	.then(result => {
+	        		if(result.code == '200'){
+						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+							modal.close();
+						}).open();
+					}else{
+						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+							modal.close();
+						}).open();
+					}
+	        	})
+			}
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	})
+</script>

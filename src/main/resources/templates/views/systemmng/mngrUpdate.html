@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 id="infoTitle">사용자 수정</h3>
+	        </div>
+	        <div>
+				<div class="infoTableWrap">
+					<form id="mngrUpdataForm" name="mngrUpdataForm">
+						<table class="infoTable table-width">
+							<tr>
+								<th>이름</th>
+								<td th:text="${userInfo.userNm}"></td>
+								<th>ID</th>
+								<td th:text="${userInfo.userId}" id="userId"></td>
+							</tr>
+							<tr>
+								<th>연락처</th>
+								<td><input type="text" name="userTel" class="input-table-text" th:value="${userInfo.userTel}"/></td>
+								<th>비밀번호</th>
+								<td>
+									<input type="button" name="" class="is-key-button" id="passwordChange" value="비밀번호 변경">
+								</td>
+							</tr>
+							<tr>
+								<th>이메일</th>
+								<td><input type="email" name="userEmail" class="input-table-text" th:value="${userInfo.userEmail}"/></td>
+								<th>소속</th>
+								<td>
+									<select class="select-list-box" name="userBffltd">
+			                        	<option th:each="bffltd,status : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}" th:selected="${userInfo.userBffltd == bffltd.cd}"></option>
+				                    </select>
+								</td>
+							</tr>
+							<tr>
+								<th>상태</th>
+								<td>
+									<select name="athrztSttsCd" class="select-list-box">
+										<option th:each="sttsList:${sttsCds}" th:text="${sttsList.name}" th:value="${sttsList.code}" th:selected="${userInfo.athrztStts.code eq sttsList.code}"></option>
+									</select>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+				<div class="info-button-box">
+	                <a id="accountModifySave" class="is-key-button">수정</a>
+	                <a th:href="@{/systemmng/mngr/{usermngId}(usermngId=${userInfo.usermngId})}" class="is-basic-button">취소</a>
+	            </div>
+	        </div>
+		</div>
+	</th:block>
+</html>
+<script>
+	$('#passwordChange').on('click',function(){
+		var userId = $("#userId").text();
+		new ModalBuilder().init('비밀번호 변경').ajaxBody(__contextPath__+"/systemmng/mngr/pw/update").footer(3,'변경하기',function(button, modal){
+			var newUserPswd = $("#newUserPswd").val();
+			var newUserPswdChk = $("#newUserPswdChk").val();
+			if(newUserPswd != newUserPswdChk){
+				new ModalBuilder().init().alertBody("새로운 비밀번호가 일치하지 않습니다. 다시 확인해주세요.").footer(4,'확인',function(button, modal){
+				}).open();
+			} else {
+				fetch(__contextPath__+"/systemmng/mngr/pw/update/"+userId,{
+	        		method: "PUT",
+	        		body: new FormData($("#pwUpdateForm")[0])
+	        	})
+	        	.then(response => response.json())
+	        	.then(result => {
+	        		if(result.code == '200'){
+						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+							modal.close();
+						}).open();
+						modal.close();
+					}else{
+						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+							modal.close();
+						}).open();
+					}
+	        	})
+			}
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	})
+	$('#accountModifySave').on('click', function(){
+//         new ModalBuilder().init().successBody('계정을 수정하시겠습니까?').footer(4,'확인',function(button, modal){
+			const userId = $("#userId").text();
+			const formData = new FormData($("#mngrUpdataForm")[0]);
+			formData.append("userId",userId);
+			
+        	fetch(__contextPath__+"/systemmng/mngr",{
+        		method: "PUT",
+        		body: formData
+        	})
+        	.then(response => response.json())
+        	.then(result => {
+        		if(result.code == '200'){
+					new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+			            location.href= __contextPath__+"/systemmng/mngr";
+					}).open();
+				}else{
+					new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+						modal.close();
+					}).open();
+				}
+        	})
+//         }).open();
+	})
+</script>

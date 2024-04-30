@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+.block-table-wrap {
+	display:flex;
+}
+.block-th-box {
+	width:16%;
+	padding: 12px;
+	font-weight:600;
+	border:1px solid #d3d3d3;
+	border-width:0 1px 1px 0;
+    background-color: #f2f2f2;
+    text-align:center;
+}
+.block-td-box {
+	position:relative;
+	width:84%;
+	padding:12px;
+	border:1px solid #d3d3d3;
+	border-width:0 1px 1px 0;
+}
+.block-table-wrap:nth-child(1) .block-th-box, 
+.block-table-wrap:nth-child(1) .block-td-box {
+	border-top:1px solid #d3d3d3;
+}
+.block-td-box input[type="text"] {
+	width:100%;
+	border:none;
+	outline:none;
+}
+.block-td-box > label {
+	margin-right:6px;
+}
+.auth-selcet-box span, .auth-selcet-box label {
+	margin-right:6px;
+}
+.auth-selcet-box label:nth-last-child(1) {
+	margin-right:0;
+}
+.screen-block .block-td-box:after {
+	content:'';
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+.screen-block .subMenuCheckBox, .screen-block .menuCheckBox {
+	display:none;
+}
+.startHour option:disabled, .endHour option:disabled,
+.startMinute option:disabled, .endMinute option:disabled{
+	background-color:#ededed;
+}

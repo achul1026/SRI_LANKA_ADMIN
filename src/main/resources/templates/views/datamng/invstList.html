@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+			<form id="searchForm" name="searchForm" th:action="@{/datamng/invst}">
+				<input type="hidden" name="pageNo" value="1">
+				<div class="list-search-wrap">
+					<div class="list-search-box">
+						<select class="select-list-box" name="searchTypeCd">
+							<option>선택</option>
+							<th:block th:each="item : ${exmnTypeCd}">
+								<option th:text="${item.getName()}" th:selected="${searchInfo.searchTypeCd eq item.getCode()}" th:value="${item.getCode()}"></option>
+							</th:block>
+						</select>
+						<input type="text" class="input-text" name="searchContent" placeholder="조사명을 입력해주세요." th:value="${searchInfo.searchContent}">
+						<div>
+							<label>조사기간</label>
+							<input type="text" class="input-text startPicker" name="startDate" placeholder="날짜를 선택해주세요." th:value="${searchInfo.startDate}">
+							<span>~</span>
+							<input type="text" class="input-text endPicker" name="endDate" placeholder="날짜를 선택해주세요." th:value="${searchInfo.endDate}">
+							<button type="submit" class="is-key-button">검색</button>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div id="listTableContainer">
+				<div class="list-save-box">
+					<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
+					<div>
+						<a href="/datamng/invst/save" class="is-key-button">업무등록</a>
+					</div>
+				</div>
+				<table id="listTable">
+					<thead>
+		                <tr>
+		                    <th>번호</th>
+		                    <th>조사 유형</th>
+		                    <th>조사명</th>
+		                    <th>조사 기간</th>
+		                    <th>조사 지역</th>
+		                    <th>조사 담당자</th>
+		                </tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${totalCnt > 0}">
+			                <tr class="table-link" th:each="item,status : ${invstList}" th:onclick="|location.href='@{/datamng/invst/{exmnmngId}(exmnmngId=${item.exmnmngId})}'|">
+								<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+			                    <td th:text="${item.exmnType.getName()}"></td> 
+			                    <td th:text="${item.exmnNm}"></td>
+			                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'YYYY-MM-dd')}"></td>
+			                    <td th:text="${item.exmnLc}"></td>
+			                    <td th:text="${item.exmnpicId}">미등록(개발예정)</td>
+			                </tr>
+						</th:block>
+						<th:block th:if="${totalCnt == 0}">
+							<tr>
+								<td colspan="6">검색 결과가 없습니다.</td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
+			<div th:insert="tags/paging/paging :: pagingFragment"></div>
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+</script>

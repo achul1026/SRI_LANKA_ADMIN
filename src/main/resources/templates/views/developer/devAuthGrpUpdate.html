@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">권한 수정</h3>
+        </div>
+        <div>
+		<div id="infoTableWrap">
+			<div>
+				<div class="infoTableWrap">
+					<form id="authGrpUpdateForm" name="authGrpUpdateForm">
+						<input type="hidden" id="authgrpId" name="authgrpId" th:value="${authInfo.authgrpId}" />
+						<table class="infoTable survey-save-table">
+							<tr>
+								<th>권한 이름</th>
+								<td>
+									<input type="text" th:value="${authInfo.authgrpNm}" name="authgrpNm"/>
+								</td>
+							</tr>
+							<tr>
+								<th>소속</th>
+								<td>
+									<select class="select-list-box" name="bffltdCd">
+		                        		<option value="">선택</option>
+		                        		<option th:each="bffltd,status : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}" th:selected="${authInfo.bffltdNm == bffltd.cdNm}"></option>
+			                   		</select>
+								</td>
+							</tr>
+							<tr>
+								<th>사용 여부</th>
+								<td>
+									<select id="useYn" name="useYn" class="select-list-box">
+		                        		<option value="Y" th:selected="${authInfo.useYn == 'Y'}">사용</option>
+		                        		<option value="N" th:selected="${authInfo.useYn == 'N'}">미사용</option>
+			                   		</select>
+								</td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</div>
+		</div>
+			<div class="info-button-box">
+                <a th:onclick="authGrpUpdate([[${authInfo.authgrpId}]])" class="is-key-button" id="authUpdate">수정</a>
+                <a th:href="@{/systemmng/authgrp/{authgrpId}(authgrpId=${authInfo.authgrpId})}" class="is-basic-button">이전 페이지</a>
+            </div>
+        </div>
+	</th:block>
+</html>
+<script>
+function authGrpUpdate(authgrpId) {
+	fetch(__contextPath__+"/developer/authgrp/"+authgrpId, {
+			method: "PUT",
+			body: new FormData($("#authGrpUpdateForm")[0])
+		})
+		.then(response => response.json())
+		.then(result => {
+			if(result.code == '200'){
+				new ModalBuilder().init().alertBody(result.message).footer(4,'확인', function(button, modal){
+					modal.close();
+					window.location.href = __contextPath__+"/developer/authgrp/"+authgrpId;
+				}).open();
+			} else {
+				new ModalBuilder().init().alertBody(result.message).footer(4,'확인', function(button, modal){
+					modal.close();
+				}).open();
+			}
+		});
+}
+</script>

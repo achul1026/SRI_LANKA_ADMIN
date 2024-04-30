@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 class="info-title mb8">공통 코드</h3>
+	        </div>
+	        <div>
+	        	<table class="list-table">
+	        		<thead>
+	        			<tr>
+	        				<th>공통 코드</th>
+	        				<th>공통 코드명</th>
+	        				<th>생성자</th>
+	        				<th>생성일</th>
+	        			</tr>
+	        		</thead>
+        			<tbody>
+	        			<tr>
+	        				<td th:text="${tcCdGrp.grpCd}"></td>
+	        				<td th:text="${tcCdGrp.grpcdNm}"></td>
+	        				<td th:text="${tcCdGrp.registId}"></td>
+	        				<td th:text="${@commonUtils.formatLocalDateTime(tcCdGrp.registDt, 'yyyy-MM-dd')}"></td>
+	        			</tr>
+        			</tbody>
+	        	</table>
+	        </div>
+		</div>
+		<div class="list-table-container is-box mt16">
+			<div id="codeAdminBox">
+				<h3 class="info-title">하위 코드</h3>
+			    <input type="button" id="codeSave" th:onclick="codeSave([[${tcCdGrp.grpcdId}]])" class="is-key-button" value="하위코드 등록"/>
+			</div>
+			<table class="list-table">
+				<thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>하위 코드</th>
+	                    <th>하위 코드명</th>
+	                    <th>생성자</th>
+	                    <th>생성일</th>
+	                    <th>사용 여부</th>
+	                </tr>
+				</thead>
+				<tbody>
+	                <th:block th:if="${totalCnt > 0}">
+		                <tr class="table-link" th:each="item, status : ${tcCdList}" th:onclick="codeUpdate([[${item.cdId}]], [[${item.grpcdId}]])">
+							<td th:text="${@commonUtils.getRownum(paging, status.index)}"></td>
+							<td th:text="${item.cd}"></td>
+							<td th:text="${item.cdNm}"></td>
+							<td th:text="${item.registId}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(item.registDt, 'yyyy-MM-dd')}"></td>
+							<td th:text="${item.useYn} == 'Y' ? '사용' : '미사용'"></td>
+						</tr>
+	                </th:block>
+	                <th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="7">등록된 코드가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+		<div class="info-button-box">
+            <a th:href="@{/systemmng/groupcode}" class="is-basic-button">이전</a>
+        </div>		
+		<form id="searchForm" name="searchForm" th:action="@{/systemmng/groupcode/subcode/{grpcdId}(grpcdId=${tcCdGrp.grpcdId})}">
+		    <input type="hidden" name="pageNo" value="1">
+		</form>
+		<div th:insert="tags/paging/paging :: pagingFragment"></div>
+	</th:block>
+</html>
+<script>
+	// 하위코드 등록
+	function codeSave(grpcdId){
+		new ModalBuilder().init('하위코드 등록').ajaxBody(__contextPath__ +"/systemmng/groupcode/subcode/save/"+grpcdId).footer(3,'등록',function(button, modal){
+			fetch(__contextPath__+"/systemmng/groupcode/subcode",{
+				method: "POST",
+				body: new FormData($("#codeSaveForm")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == 200){
+                    new ModalBuilder().init().successBody('코드 등록이 완료되었습니다.').footer(4,'확인',function(button, modal){
+                    	modal.close();
+						window.location.reload();
+                    }).open();
+                } 
+			})
+			modal.close();
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+	
+	// 그룹코드로 이동
+// 	$("#toGroupCodeList").on('click', function(){
+// 		location.href= __contextPath__+"/systemmng/code/group";
+// 	})
+	
+	// 그룹코드 수정 기획서 반영
+// 	function groupCodeUpdate(grpcdId){
+// 		fetch(__contextPath__ + "/systemmng/groupcode",{
+// 			method: "PUT",
+// 			body: new FormData($("#groupCodeUpdateForm")[0])
+// 		})
+// 		.then(response => response.json())
+// 		.then(result => {
+// 			if(result.code == '200'){
+// 				new ModalBuilder().init().successBody('코드 등록이 완료되었습니다.').footer(4,'확인',function(button, modal){
+// 					location.href = __contextPath__ + "/systemmng/groupcode/" + grpcdId;
+// 				}).open();
+// 			}
+// 		})
+// 	}
+	
+	// 하위 코드 수정
+	function codeUpdate(cdId, grpcdId) {
+	    new ModalBuilder().init('관리코드 상세정보').ajaxBody("/systemmng/groupcode/subcode/"+grpcdId+"/update?cdId=" + cdId).footer(1, '수정하기', function (button, modal) {
+			fetch(__contextPath__ + "/systemmng/groupcode/subcode/"+ cdId+"/update",{
+				method: "PUT",
+				body: new FormData($("#codeUpdateForm")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == '200'){
+					new ModalBuilder().init().successBody('코드 등록이 완료되었습니다.').footer(4, '확인', function (button, modal) {
+	                    location.href = __contextPath__ + "/systemmng/groupcode/subcode/" + grpcdId;
+	                }).open();
+				}
+			})
+	    }).open();
+	}
+	
+	//하위 코드 삭제 기획서 반영
+// 	function deleteCode(cdId, grpcdId){
+// 		fetch(__contextPath__ + "/systemmng/groupcode/subcode/delete/" + cdId,{
+// 			method: "DELETE"
+// 		})
+// 		.then(response => response.json())
+// 		.then(result => {
+// 			if(result.code == '200'){
+// 				new ModalBuilder().init().successBody('관리코드가 삭제되었습니다.').footer(4, '확인', function (button, modal) {
+//                     location.href = __contextPath__ + "/systemmng/groupcode/" + grpcdId;
+//                 }).open();
+// 			}
+// 		})
+// 	}
+	
+	//하위코드 상세
+// 	function lowerCodeDetail(){
+// 		new ModalBuilder().init('하위코드 상세').ajaxBody(__contextPath__ +"/systemmng/groupcode/subcode/update").footer(3,'변경',function(button, modal){
+// 			modal.close();
+// 		}, '취소', function(button, modal){
+// 			modal.close();
+// 		}).open();		
+// 	}
+</script>

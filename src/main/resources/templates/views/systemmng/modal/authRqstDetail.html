@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="authRqstUpdateForm" name="authRqstUpdateForm">
+			<input type="hidden" id="authId" th:value="${tmAuthRqstInfo.authId}">
+			<input type="hidden" id="userId" th:value="${tmAuthRqstInfo.userId}">
+			<div>
+				<table class="modal-table">
+					<tr>
+						<th>ID</th>
+						<td th:text="${tmAuthRqstInfo.userId}">USERID</td>
+						<th>이름</th>
+						<td th:text="${tmAuthRqstInfo.userNm}">USERNAME</td>
+					</tr>
+					<tr>
+						<th>소속</th>
+						<td th:text="${tmAuthRqstInfo.bffltdNm}">RDA</td>
+						<th>연락처</th>
+						<td th:text="${tmAuthRqstInfo.userTel}">USERPHONE</td>
+					</tr>
+					<tr>
+						<th>이메일</th>
+						<td th:text="${tmAuthRqstInfo.userEmail}">USEREMAIL</td>
+						<th>신청권한</th>
+						<td th:text="${tmAuthRqstInfo.authgrpNm}">USER권한</td>
+					</tr>
+					<tr>
+						<th>신청사유</th>
+						<td th:text="${tmAuthRqstInfo.rqstRsn}">USER신청사유</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

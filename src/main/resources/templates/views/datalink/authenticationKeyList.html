@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+      <th:block layout:fragment="content">
+      	<div class="is-box">
+	      	<form id="searchForm" name="searchForm" action="/datalink/authentication" method="get">
+	      		<div class="list-search-wrap">
+					<div class="list-search-box">
+						<select class="select-list-box" name="searchType">
+							<option>발급상태</option>
+						</select>
+						<input type="text" class="input-text" placeholder="이메일을 입력하세요.">
+						<button type="submit" id="searchBtn" class="is-key-button">검색</button>
+					</div>		
+	      		</div>
+			</form>
+			<div id="listTableContainer">
+				<div id="totalList">총 <span id="totalCount"></span>건의 검색 결과를 찾았습니다.</div>
+				<table id="listTable">
+					<thead>
+		                <tr>
+		                    <th>번호</th>
+		                    <th>이메일</th>
+		                    <th>인증키</th>
+		                    <th>발급상태</th>
+		                    <th>만료일</th>
+		                </tr>
+					</thead>
+					<tbody>
+						<tr class="table-link" onclick="generatingKey();">
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+							<td>TEST</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+<!-- 			<div th:insert="tags/paging/paging :: pagingFragment"></div> -->
+      	</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	function generatingKey(){
+		new ModalBuilder().init("인증키 요청 상세", "1000").ajaxBody(__contextPath__+"/datalink/authentication/detail").footer(3,"메일 전송",function(button,modal){
+			modal.close();
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+</script>

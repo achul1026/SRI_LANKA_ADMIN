@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="menuDetailForm" name="menuDetailForm">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>메뉴명 <span class="required">*</span></th>
+							<td>
+								<select id="menuNm" name="menuNm" class="select-list-box" onchange="updateMenuCd()">
+								    <option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}" th:selected="${item.cdNm} == ${tcMenuMng.menuNm}">노출</option>
+								</select>
+								<input type="hidden" id="menuCd" name="menuCd"/>
+							</td>
+							<th>메뉴 URL 패턴 <span class="required">*</span></th>
+							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" th:value="${tcMenuMng.uppermenuUrlpttrn}" placeholder="예) /system/**"></td>
+						</tr>
+						<tr>
+							<th>메뉴 URL <span class="required">*</span></th>
+							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" th:value="${tcMenuMng.menuUrlpttrn}" placeholder="예) /system/main"></td>
+							<th>메뉴 설명</th>
+							<td><input type="text" id="menuDescr" name="menuDescr" th:value="${tcMenuMng.menuDescr}" placeholder="메뉴 설명을 입력하세요."></td>
+						</tr>
+						<tr>
+							<th>메뉴 순서</th>
+							<td><input type="text" id="menuSqno" name="menuSqno" th:value="${tcMenuMng.menuSqno}" placeholder="메뉴 순서를 입력하세요."></td>
+		 					<th>노출여부</th>
+							<td class="text-left">
+								<select id="useYn" name="useYn" class="select-list-box">
+									<option th:selected="${tcMenuMng.useYn == 'Y'}" value="Y">노출</option>
+									<option th:selected="${tcMenuMng.useYn == 'N'}" value="N">비노출</option>
+								</select>
+							</td>
+						</tr>
+						<tr th:if="${#strings.isEmpty(tcMenuMng.uppermenuCd)}">
+							<th>기본 메뉴 여부</th>
+							<td class="text-left">
+								<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
+									<option th:selected="${tcMenuMng.bscmenuYn == 'Y'}" value="Y">Y</option>
+									<option th:selected="${tcMenuMng.bscmenuYn == 'N'}" value="N">N</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

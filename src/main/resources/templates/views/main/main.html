@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div id="mapContainer">
+			<div id="map"></div>
+		</div>
+		<button type="button" id="sideBarButton">
+			<img th:src="@{images/white_arrow2.png}" alt="arrow">
+		</button>
+		<div class="is-box" style="position:relative; width:200px;">
+			<div>테스트박스입니다.</div>
+			<div>
+				<label>
+					<input type="checkbox" id="TEST_VDS"/>
+					<span>VDS</span>
+				</label>
+			</div>
+			<input type="button" class="is-key-button" id="dashboardSearch" value="찾기"/>
+		</div>
+	</th:block>
+</html>
+<script>
+	const body = document.body
+	body.classList.add('dashboard');
+	document.getElementById('header').remove();
+	
+	(async () => {
+		let mapgl = await mapboxGl();
+		
+		//sidebar control
+		const sideBarButton = document.getElementById('sideBarButton');
+		sideBarButton.addEventListener('click', () => {
+			const sideBar = document.getElementById('sideBar');
+			const mainContent = document.getElementById('mainContent');
+			if(body.classList.contains('sidebarActive')){
+				body.classList.remove('sidebarActive');
+			} else {
+				body.classList.add('sidebarActive')
+			}
+	        setTimeout(() => {
+	        	mapgl.resize();
+	        }, 400);
+		})
+	})();
+</script>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">하자이력 상세정보</h3>
+        </div>
+        <div>
+			<div id="infoTableWrap">
+				<table id="infoTable">
+					<tr>
+						<th>시설물 ID</th>
+						<td>들어갈정보</td>
+						<th>시설물 유형</th>
+						<td>들어갈정보</td>
+					</tr>
+					<tr>
+						<th>설치위치</th>
+						<td>들어갈정보</td>
+						<th>하자 발생 일시</th>
+						<td>들어갈정보</td>
+					</tr>
+					<tr>
+						<th>하자 보수 일시</th>
+						<td>들어갈정보</td>
+						<th>하자 보수 작업 내용</th>
+						<td>들어갈정보</td>
+					</tr>
+					<tr>
+						<th>처리여부</th>
+						<td>들어갈정보</td>
+						<th>시공자</th>
+						<td>들어갈정보</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+                <a th:href="@{/facilityequipmng/facility/history/update}" class="is-key-button">수정하기</a>
+                <a th:href="@{/facilityequipmng/facility/history}" class="is-basic-button">취소</a>
+            </div>			
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+</script>

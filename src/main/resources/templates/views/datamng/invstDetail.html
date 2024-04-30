@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+			<div class="is-box">
+		        <div class="flex-between">
+		            <h3 id="infoTitle">조사 상세 정보</h3>
+		            <input type="button" id="surveyInfoChangeButton" class="is-key-button" value="설문보기" th:data-exmnmng-id="${invstInfo.exmnmngId}" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'"/>
+		        </div>
+				<div class="infoTableWrap survey-info-list active">
+					<table class="infoTable survey-save-table">
+						<tr>
+							<th>조사 종류</th>
+							<td th:text="${invstInfo.exmnType.getName()}"></td>
+							<th>조사명</th>
+							<td th:text="${invstInfo.exmnNm}"></td>
+						</tr>
+						<tr>
+							<th>조사 담당자</th>
+							<td th:text="${invstInfo.exmnpicId}"></td>
+							<th>조사형태</th>
+							<td th:text="${invstInfo.exmnDiv}"></td>
+						</tr>
+						<tr>
+							<th>조사 기간</th>
+							<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}"></td>
+							<th>조사 시간</th>
+							<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH:mm')}"></td>
+						</tr>
+						<tr>
+							<th>조사 인원</th>
+							<td th:text="${invstInfo.exmnNop}"></td>
+							<th>캘린더 색상</th>			
+							<td id="radioColorSet">
+				            	<span class="radio-color-box">
+									<th:block th:each="item,status : ${colorTypeCd}">
+										<label th:class="${item.getCode()}" th:classappend="${item eq invstInfo.colrCd} ? 'active'"><input type="radio" th:value="${item}" name="colorType" th:checked="${item eq invstInfo.colrCd} ? 'checked'"/></label>
+									</th:block>
+				            	</span>							
+							</td>	
+						</tr>
+						<tr>
+							<th class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">조사 목표 개수</th>
+							<td class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'" th:text="${invstInfo.goalCnt}"></td>
+							<th>조사 지역</th>
+							<td colspan="3" th:text="${invstInfo.exmnLc}"></td>
+						</tr>
+						<tr>
+							<th>좌표</th>
+							<td id="coordinateDetail" th:text="${invstInfo.lat} +','+ ${invstInfo.lon}"></td>
+							<th>좌표반경(m)</th>
+							<td th:text="${invstInfo.exmnRange}"></td>
+						</tr>
+						<tr id="tableMap">
+							<th>위치</th>
+							<td colspan="3">
+								<span id="detailMap">
+									<span id="map"></span>
+								</span>
+							</td>
+						</tr>						
+					</table>
+				</div>
+				<!-- 설문조사 -->
+				<th:block th:if="${invstInfo.exmnType.getType() eq 'survey'}">
+					<div id="infoTableWrap" class="survey-quest-list">
+						<th:block th:each="item : ${exmnMngSrvyList}">
+							<div class="quest-container" th:data-sctn-ordr="${item.sectSqno}" th:data-sctn-type="${item.sectType}" th:data-sctn-id="${item.sectId}">
+								<div class="quest-wrap">
+									<div class="quest-title-wrap">
+										<h4 class="quest-title" th:text="${item.sectTitle}"></h4>
+										<div class="quest-sub-title" th:text="${item.sectSubtitle}"></div>
+									</div>
+									<div class="quest-grid-box">
+										<th:block th:each="qstnItem : ${item.tmSrvyQstnList}">
+											<div class="quest-box">
+												<div class="flex-center">
+													<h5 class="quest-box-title" th:text="'Q'+${qstnItem.qstnSqno}+'.'"></h5>
+													<span class="quest-name" th:data-qstn-type="${qstnItem.qstnTypeCd}" th:data-qstn-ordr="${qstnItem.qstnSqno}" th:data-qstn-id="${qstnItem.qstnId}" th:text="${qstnItem.qstnTitle}"></span>
+													<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC001'}">
+														<span class="quest-type">(주관식)</span>
+													</th:block>
+												</div>
+												<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC002'}">
+													<div class="list-answer">
+														<ul class="all-answer">
+															<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+																<li class="option-list">
+																	<input type="radio" class="survey-ex-radio" disabled/>
+																	<input type="text" class="answ-content" th:data-answ-id="${ansItem.ansId}" th:data-answ-sort="${ansItem.ansSqno}" th:value="${ansItem.ansCnts}" readonly>
+																</li>
+															</th:block>
+														</ul>
+													</div>
+												</th:block>
+												<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC003'}">
+													<div class="list-answer">
+														<ul class="all-answer">
+															<li class="option-list option-checkd-input-box">
+																<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+																	<span class="mr8 answ-content" th:data-answ-sort="${ansItem.ansSqno}" th:text="${ansItem.ansCnts}"></span>
+																</th:block>
+															</li>
+														</ul>
+													</div>
+												</th:block>
+											</div>
+										</th:block>
+									</div>
+								</div>
+							</div>
+						</th:block>
+					</div>
+				</th:block>				
+			</div>
+			<!-- 조사방향 -->
+			<th:block th:if="${invstInfo.exmnType.getType() eq 'traffic'}">
+				<div id="surveyDirectionBox" class="is-box mt24">
+					<div>
+						<h3 class="info-title">조사 방향</h3>
+					</div>
+					<div class="infoTableWrap">
+						<table class="infoTable">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>From</th>
+									<th>To</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${tmExmnDrctList}">
+									<td class="text-center" th:text="${item.drctSqno}"></td>
+									<td class="text-center" th:text="${item.startlcNm}"></td>
+									<td class="text-center" th:text="${item.endlcNm}"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+		        </div>				
+			</th:block>
+			<div class="info-button-box">
+				<a th:href="@{/datamng/invst}" class="is-basic-button">이전 페이지</a>
+				<th:block th:if="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'}">
+					<!-- <a href="javascript:void(0)" class="is-key-button" th:onclick="deleteInvstInfo([[${invstInfo.exmnmngId}]]);">삭제</a> -->
+					<input type="button" class="is-key-button overLapping" th:onclick="deleteInvstInfo([[${invstInfo.exmnmngId}]]);" value="삭제"/>
+					<a th:href="@{/datamng/invst/{exmnmngId}/update(exmnmngId=${invstInfo.exmnmngId})}" id="invstUpdateBtn" class="is-key-button">수정</a>
+				</th:block>
+            </div>
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+
+	const changeButton = document.getElementById('surveyInfoChangeButton');
+	changeButton.addEventListener('click', () => {
+		const infoList = document.querySelector('.survey-info-list');
+		const questList = document.querySelector('.survey-quest-list');
+		const invstUpdateBtn = document.getElementById('invstUpdateBtn');
+		const exmnmngId = changeButton.dataset.exmnmngId;
+		if(infoList.classList.contains('active')){
+			infoList.classList.remove('active');
+			questList.classList.add('active');
+			changeButton.value = '정보보기';
+			invstUpdateBtn.setAttribute('href', "/datamng/invst/survey/question/"+exmnmngId+"/update");
+		} else {
+			questList.classList.remove('active');
+			infoList.classList.add('active');			
+			changeButton.value = '설문보기';
+			invstUpdateBtn.setAttribute('href', "/datamng/invst/"+exmnmngId+"/update");
+		}
+	})
+	
+	//mapboxGl(lon, lat, 좌표반경)
+	const lat 		= [[${invstInfo.lat}]];
+	const lon 		= [[${invstInfo.lon}]];
+	const exmnRange = [[${invstInfo.exmnRange}]];
+	mapboxGl(lon, lat, exmnRange);
+</script>

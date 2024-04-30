@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="groupCodeUpdateForm">
+			<input type="hidden" name="grpcdId" th:value="${tcCdGrp.grpcdId}">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>공통 코드</th>
+							<td><input type="text" name="grpCd" th:value="${tcCdGrp.grpCd}"/></td>
+							<th>사용여부</th>
+							<td>
+								<select class="select-list-box" name="useYn">
+									<option th:value="${tcCdGrp.useYn}" th:selected="${tcCdGrp.useYn} == 'Y'">사용</option>
+									<option th:value="${tcCdGrp.useYn}" th:selected="${tcCdGrp.useYn} == 'N'">미사용</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>공통 코드명</th>
+							<td colspan="3"><input type="text" name="grpcdNm" th:value="${tcCdGrp.grpcdNm}"/></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

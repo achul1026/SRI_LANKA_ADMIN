@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div id="mapContainer">
+			<div id="map"></div>
+		</div>
+		<button type="button" id="sideBarButton"><</button>
+	</th:block>
+</html>
+<script>
+	const body = document.body;
+	body.classList.add('dashboard');
+	document.getElementById('header').remove();
+	
+	(async () => {
+		let mapgl = await mapboxGl(79.88617717550125,6.9218463186791155);
+		
+		const sideBarButton = document.getElementById('sideBarButton');
+		sideBarButton.addEventListener('click', () => {
+			const sideBar = document.getElementById('sideBar');
+			const mainContent = document.getElementById('mainContent');
+			if(body.classList.contains('sidebarActive')){
+				body.classList.remove('sidebarActive');
+			} else {
+				body.classList.add('sidebarActive')
+			}
+	        setTimeout(() => {
+	        	mapgl.resize();
+	        }, 400);
+		})
+	})();
+</script>

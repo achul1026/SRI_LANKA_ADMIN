@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+ 		<div id="listSelectButtonBox">
+			<a th:href="@{/facilityequipmng/facility}" class="is-basic-button">상태관리</a>
+			<a th:href="@{/facilityequipmng/facility/history}" class="is-key-button">하자이력</a>
+			<a th:href="@{/facilityequipmng/facility/info}" class="is-basic-button">정보관리</a>
+		</div>
+		<div class="list-search-wrap">
+			<div class="list-search-box">
+				<span>장비ID</span>
+				<input type="text" class="input-text" placeholder="검색어를 입력해주세요.">
+				<div class="inline-block">
+					<label class="mr8">하자발생 기간</label>
+					<input type="text" class="input-text startPicker" placeholder="날짜를 선택해주세요." id="dp1707804594247">
+					<span>~</span>
+					<input type="text" class="input-text endPicker" placeholder="날짜를 선택해주세요." id="dp1707804594248">
+				</div>				
+				<input type="button" class="is-key-button" value="검색"/>
+			</div>		
+		</div>
+		<div id="listTableContainer">
+			<div id="totalList">총 <span id="totalCount"></span>건의 검색 결과를 찾았습니다.</div>
+			<table id="listTable">
+				<thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>ID</th>
+	                    <th>
+	                    	<select class="table-filter">
+	                    		<option value="01" selected>시설물 유형</option>
+	                    	</select>
+	                    </th>
+	                    <th>하자발생일시</th>
+	                    <th>
+	                    	<select class="table-filter" id="">
+	                    		<option value="" selected>처리여부</option>
+	                    	</select>	                    
+	                    </th>
+	                    <th>하자보수일시</th>
+	                    <th>시공자</th>
+	                </tr>
+				</thead>
+				<tbody>
+                	<tr class="table-link" th:onclick="|location.href='@{/facilityequipmng/facility/history/detail}'|">
+                		<td class="tableTotal">1</td>
+                		<td>TAB0001</td>
+                		<td>신호등</td>
+                		<td>정상</td>
+                		<td>2024-02-02</td>
+                		<td>000.000.00.00</td>
+                		<td>000.000.00.00</td>
+                	</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- <div th:insert="tags/paging/paging :: pagingFragment"></div> -->
+	</th:block>
+</html>
+<script type="text/javascript">
+
+	/* 
+	필터 나중에 데이터 있을때 다시
+	$('#equipType').on('change', function(){
+		let test = $(this).closest('#listTable').find('tbody').children('tr').length;
+		if($(this).val() == "02") {
+			$(this).closest('#listTable').find('tbody').children('tr').remove();
+		} else if($(this).val() == "03") {
+			$(this).closest('#listTable').find('tbody').children('tr').remove();
+		} else {
+			$(this).closest('#listTable').find('tbody').children('tr').
+		}
+		$('.tableTotal').text(test);
+	}) 
+	*/
+		
+</script>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+	<th:block layout:fragment="modalContent">
+		<form id="siteSave" name="siteSave">
+		<input type="hidden" name="brdTypeCd" value="news">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>사이트명</th>
+							<td><input type="text" name="siteNm" placeholder="사이트명을 입력하세요."></td>
+						</tr>
+						<tr>
+							<th>분류</th>
+							<td>
+								<select name="siteTypeCd">
+									<option value="교통관련기관">교통관련기관</option>
+									<option value="해외교통사이트">해외교통사이트</option>
+									<option value="교통정보제공사이트">교통정보제공사이트</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th>사이트 URL</th>
+							<td><input type="text" name="siteUrl" placeholder="사이트 URL을 입력하세요."></td>
+						</tr>
+						<tr>
+							<th>노출여부</th>
+							<td>
+								<select name="useYn">
+									<option value="Y">노출</option>
+									<option value="N">미노출</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

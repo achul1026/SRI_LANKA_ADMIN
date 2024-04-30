@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 id="infoTitle">조사 설문 등록</h3>
+	            <input type="hidden" id="exmnmngId" th:value="${srvyInvstInfo.exmnmngId}">
+	        </div>
+	        <div id="infoTableWrap">
+		       	<th:block th:if="${srvyInvstInfo.exmnType.getCode() eq 'ETC003'}" >
+		       		<th:block th:insert="tags/datamng/surveyQuestionAxleload :: questionAxleloadFragment"></th:block>
+		        </th:block>
+		       	<th:block th:if="${srvyInvstInfo.exmnType.getCode() eq 'ETC004'}" >
+		       		<th:block th:insert="tags/datamng/surveyQuestionLaborside :: questionLaborsideFragment"></th:block>
+		        </th:block>
+		       	<th:block th:if="${srvyInvstInfo.exmnType.getCode() eq 'ETC005'}" >
+		       		<th:block th:insert="tags/datamng/surveyQuestionOd :: questionOdFragment"></th:block>
+		        </th:block>
+	        </div>
+	    </div>
+		<div class="info-button-box">
+            <a th:href="@{/datamng/invst/{exmnmngId}(exmnmngId=${srvyInvstInfo.exmnmngId})}" id="" class="is-basic-button">이전 페이지</a>
+            <input type="button" class="is-key-button overLapping" onclick="saveInvstMngSurveySctn();" value="등록"/>
+            <a th:href="@{/datamng/invst}" class="is-basic-button">취소</a>
+        </div>
+	</th:block>
+</html>

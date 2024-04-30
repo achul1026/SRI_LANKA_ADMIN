@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container">
+			<div class="list-search-box">
+				<input type="text" class="input-text modal-input-text" placeholder="조사원을 입력해주세요.">
+				<input type="button" class="is-key-button" value="검색">
+			</div>
+			<table class="list-table mt16">
+				<thead>
+					<tr>
+						<th>선택</th>
+						<th>지역</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input id="investigatoSelect" type="radio"></td>
+						<td><label for="investigatoSelect">조사원 검색 한 내용</label></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</th:block>
+</html>

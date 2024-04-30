@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="list-search-wrap">
+			<form id="searchForm" name="searchForm" th:action="@{/systemmng/user}">
+				<input type="hidden" name="pageNo" value="1">
+				<div class="list-search-box">
+					<select name="searchType" class="select-list-box">
+						<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
+						<option value="userId" th:selected="${searchInfo.searchType} == 'userId'">ID</option>
+						<option value="userNm" th:selected="${searchInfo.searchType} == 'userNm'">이름</option>
+						<option value="userTel" th:selected="${searchInfo.searchType} == 'userTel'">연락처</option>
+						<option value="userEmail" th:selected="${searchInfo.searchType} == 'userEmail'">이메일</option>
+					</select>
+					<input type="text" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
+					<button type="submit" class="is-key-button">검색</button>
+				</div>		
+			</form>
+		</div>
+		<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
+		<div id="listTableContainer">
+			<table id="listTable">
+				<thead>
+	                <tr>
+	                    <th>번호</th>
+	                    <th>ID</th>
+	                    <th>이름</th>
+	                    <th>연락처</th>
+	                    <th>이메일</th>
+	                    <th>상태</th>
+	                    <th>등록일</th>
+	                </tr>
+				</thead>
+				<tbody>
+	                <th:block th:if="${totalCnt > 0}">
+		                <tr class="table-link" th:each="item,status : ${userList}" th:onclick="|location.href='@{/systemmng/user/{userId}(userId=${item.userId})}'|">
+		                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></p>
+		                    <td th:text="${item.userAccountId}"></td>
+		                    <td th:text="${item.userNm}"></td>
+		                    <td th:text="${item.userTel}"></td>
+		                    <td th:text="${item.userEmail}"></td>
+		                    <td th:text="${item.userSttsCd.name}"></td>
+		                    <td th:text="${@commonUtils.formatLocalDateTime(item.crtDt)}"></td>
+		                </tr>
+	                </th:block>
+	                <th:block th:if="${totalCnt == 0}">
+	                	<tr>
+	                		<td colspan="9">검색된 결과가 없습니다.</td>
+	                	</tr>
+	                </th:block>
+				</tbody>
+			</table>
+		</div>
+		<div th:insert="tags/paging/paging :: pagingFragment"></div>
+	</th:block>
+</html>

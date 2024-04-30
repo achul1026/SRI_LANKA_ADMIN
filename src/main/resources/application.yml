@@ -1,0 +1,54 @@
+###### spring ######
+spring:
+ devtools:
+  livereload:
+   enabled: true
+ thymeleaf:
+  cache: false
+  
+###### Database ###### 
+ datasource:
+  #driver-class-name: org.postgresql.Driver
+  #url: jdbc:postgresql://218.152.205.17:5432/srilanka
+  #username: srilanka
+  #password: bluedus1!
+  driver-class-name: org.postgresql.Driver
+  url: jdbc:postgresql://211.189.132.15:4143/LKDB
+  username: LKDB
+  password: LKDB
+  
+###### jpa properties ######
+ jpa:
+  #hibernate:
+   #ddl-auto: update
+  show-sql: true
+  properties:
+   hibernate:
+    default_schema: srlk
+    format_sql: true # SQL문 정렬하여 출력
+  database: postgresql
+  database-platform: com.sri.lanka.traffic.admin.config.postgres.PostgresSqlDialectConfig
+  open-in-view: false
+  generate-ddl: false
+  
+###### server ######    
+server:
+ port: 8080
+ servlet:
+  session:
+   persistent: false
+   
+###### srilanka ######
+srilanka:
+ developer:
+  auth:
+   role: developer 
+ auth: 
+  role: mngr
+ messages:
+  basename: messages/login/login,messages/main/main,messages/validation/validation 
+  encoding: UTF-8
+  
+###### fileUpload ######
+file.upload.path: C:\\Users\\seongMin\\Desktop\\dd\\
+file.sample.download.path: files/

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">하자이력 수정</h3>
+        </div>
+        <div>
+			<div id="infoTableWrap">
+				<table id="infoTable">
+					<tr>
+						<th>시설물 ID</th>
+						<td>들어갈정보</td>
+						<th>시설물 유형</th>
+						<td><input type="text" placeholder="들어갈내용" /></td>
+					</tr>
+					<tr>
+						<th>설치위치</th>
+						<td><input type="text" placeholder="들어갈내용" /></td>
+						<th>하자 발생 일시</th>
+						<td>
+							<input type="text" class="input-text startPicker" placeholder="기간을 설정해주세요.">
+							<span class="select-time-box mr8">
+								<select class="select-list-box select-hour startHour"></select>
+								<select class="select-list-box select-minute-unit"></select>
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<th>하자 보수 일시</th>
+						<td>
+							<input type="text" class="input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+							<span class="select-time-box mr8">
+								<select class="select-list-box select-hour endHour"></select>
+								<select class="select-list-box select-minute-unit"></select>
+							</span>						
+						</td>
+						<th>하자 보수 작업 내용</th>
+						<td><input type="text" placeholder="들어갈내용" /></td>
+					</tr>
+					<tr>
+						<th>처리여부</th>
+						<td>
+							<select class="select-list-box">
+								<option>TEST</option>
+							</select>							
+						</td>
+						<th>시공자</th>
+						<td>
+							<input type="text" placeholder="시공자 이름을 입력해주세요." />
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+                <a th:href="@{/facilityequipmng/facility/history}" class="is-key-button">수정</a>
+                <a th:href="@{/facilityequipmng/facility/history}" class="is-basic-button">취소</a>
+            </div>			
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+</script>

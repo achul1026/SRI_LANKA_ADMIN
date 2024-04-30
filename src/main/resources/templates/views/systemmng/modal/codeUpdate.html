@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="codeUpdateForm" name="codeUpdateForm">
+			<div>
+				<table class="modal-table">
+					<tr>
+						<th>공통 코드</th>
+						<td th:text="${tcCdGrp.grpCd}"></td>
+						<th>공통 코드명</th>
+						<td th:text="${tcCdGrp.grpcdNm}"></td>
+					</tr>
+					<tr>
+						<th>하위 코드</th>
+						<td><input type="text" th:value="${tcCdInfo.cd}" name="cd"/></td>
+						<th>하위 코드명</th>
+						<td><input type="text" th:value="${tcCdInfo.cdNm}" name="cdNm"/></td>
+					</tr>
+					<tr>
+						<th>사용여부</th>
+						<td class="text-left">
+							<select class="select-list-box" id="useYn" name="useYn">
+								<option value="Y" th:selected="${tcCdInfo.useYn == 'Y'}">Y</option>
+								<option value="N" th:selected="${tcCdInfo.useYn == 'N'}">N</option>
+							</select>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>

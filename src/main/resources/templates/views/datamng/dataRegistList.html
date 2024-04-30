@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="screen-division menu-container">
+			<div class="is-box menu-tree-box">
+				<div class="scroll">
+					<div class="division-box">
+						<div class="division-title-box division-not-active on">
+							<span class="division-title">전체</span>
+							<span class="division-title-arrow right-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+						</div>
+					</div>
+					<div class="division-box">
+						<div class="division-title-box">
+							<span class="division-title">RDA Road Side OD Survey Sheet</span>
+							<span class="division-title-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+						</div>
+						<ul class="division-menu">
+							<li>
+								<a href="javascript:void(0)">Passenger Vehides</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+							<li>
+								<a href="javascript:void(0)">Goods Vehides</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+							<li>
+								<a href="javascript:void(0)">Route Buses</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+							<li>
+								<a href="javascript:void(0)">Manual Classified Counts (MCC)</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+						</ul>
+					</div>					
+					<div class="division-box">
+						<div class="division-title-box">
+							<span class="division-title">Manual Classified Counting Survey Sheet</span>
+							<span class="division-title-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+						</div>
+						<ul class="division-menu">
+							<li>
+								<a href="javascript:void(0)">Colombo</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+							<li>
+								<a href="javascript:void(0)">Nittambuwa</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+							<li>
+								<a href="javascript:void(0)">Awissawella</a>
+								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+							</li>
+						</ul>
+					</div>
+					<div class="division-box">
+						<div class="division-title-box division-not-active">
+							<span class="division-title">ADT DATA</span>
+							<span class="division-title-arrow right-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+						</div>
+					</div>					
+				</div>
+			</div>		
+			<div class="is-box menu-table-list-box">
+				<div class="list-search-wrap">
+					<div class="list-search-box">
+						<select class="select-list-box">
+							<option>관리기관</option>
+						</select>
+						<input type="text" class="input-text" placeholder="데이터명을 입력해주세요.">
+						<input type="button" class="is-key-button" value="검색"/>
+					</div>		
+				</div>
+				<div id="listTableContainer">
+					<div class="list-save-box">
+						<div id="totalList">총 <span id="totalCount">123213</span>건의 검색 결과를 찾았습니다.</div>
+						<div>
+							<input type="button" class="is-key-button" onclick="dataRegist()" value="데이터 등록">
+						</div>
+					</div>			
+					<table id="listTable">
+						<thead>
+			                <tr>
+			                    <th>번호</th>
+			                    <th>분류</th>
+			                    <th>데이터명</th>
+			                    <th>관리기관</th>
+			                    <th>관리자</th>
+			                    <th>첨부파일</th>
+			                    <th>등록일</th>
+			                </tr>
+						</thead>
+						<tbody>
+			                <tr class="table-link" onclick="dataDetail()">
+			                	<td>1</td>
+			                	<td>분류</td>
+			                	<td>데이터명</td>
+			                	<td>관리기관</td>
+			                	<td>관리자</td>
+			                	<td>첨부파일</td>
+			                	<td>등록일</td>
+			                </tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</th:block>
+</html>
+<script>
+	// 데이터 등록
+	function dataRegist(){
+		new ModalBuilder().init("데이터 등록").ajaxBody(__contextPath__+"/datamng/dataregist/save").footer(3,'등록',function(button, modal){
+			fetch(__contextPath__+"/datamng/dataregist/save",{
+				method: "POST",
+				body: new FormData($("#dataRegistSave")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == '200'){
+					new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+						modal.close();
+						window.location.reload();
+					}).open();
+				} else {
+					new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+						modal.close();
+					}).open();
+				}
+			})
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+	
+	// 데이터 상세
+	function dataDetail(){
+		new ModalBuilder().init("데이터 상세").ajaxBody(__contextPath__+"/datamng/dataregist/update").footer(3,'수정',function(button, modal){
+			fetch(__contextPath__+"/datamng/dataregist/update",{
+				method: "PUT",
+				body: new FormData($("#dataRegistUpdate")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+								if(result.code == '200'){
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+										window.location.reload();
+									}).open();
+								} else {
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+									}).open();
+								}
+				
+			})
+		}, '삭제', function(button, modal){
+			fetch(__contextPath__+"/datamng/dataregist/delete",{
+				method: "DELETE",
+				body: new FormData($("#dataRegistUpdate")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+								if(result.code == '200'){
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+										window.location.reload();
+									}).open();
+								} else {
+									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+										modal.close();
+									}).open();
+								}
+				
+			})
+		}).open();
+	}
+</script>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">기본 정보</h3>
+        </div>
+		<div class="list-table-container">
+			<div class="list-search-wrap mt48">
+				<div class="list-search-box">
+					<input type="text" class="input-text" placeholder="조사명을 검색해주세요." style="margin:0 8px 0 0;">
+					<input type="button" id="invstListButton" class="is-key-button" value="검색"/>					
+				</div>			
+			</div>		
+			<div class="mt16">
+				<table class="list-table">
+					<thead>
+		                <tr>
+		                    <th>조사명</th>
+		                    <th>조사 기간</th>
+		                    <th>조사 시간</th>
+		                    <th>캘린더 색상</th>
+		                </tr>
+					</thead>
+					<tbody>
+		                <tr>
+				            <td>조사 검색해서 찾은 내용</td>
+				            <td>조사 검색해서 찾은 기간</td>
+				            <td>조사 검색해서 찾은 시간</td>
+				            <td id="radioColorSet">
+				            	<span class="radio-color-box">
+					            	<span>
+										<label><input type="radio" value="1" name="colorSelcet"/></label>
+										<label><input type="radio" value="2" name="colorSelcet"/></label>
+										<label><input type="radio" value="3" name="colorSelcet"/></label>
+										<label><input type="radio" value="4" name="colorSelcet"/></label>
+										<label><input type="radio" value="5" name="colorSelcet"/></label>
+										<label><input type="radio" value="6" name="colorSelcet"/></label>
+										<label><input type="radio" value="7" name="colorSelcet"/></label>
+										<label><input type="radio" value="8" name="colorSelcet"/></label>
+										<label><input type="radio" value="9" name="colorSelcet"/></label>
+										<label><input type="radio" value="10" name="colorSelcet"/></label>
+					            	</span>
+									<input type="button" class="input-reset" value="저장"/>				            
+				            	</span>
+				            </td>
+		      			</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div id="invstTableContainer">
+	        <div>
+            	<h3 class="info-title">조사원/일정 등록</h3>
+        	</div>
+			<div id="infoTableWrap">
+				<form id="">
+					<table id="infoTable">
+						<tr>
+							<th>조사 기간</th>
+							<td>
+								<input type="text" class="input-text startPicker" placeholder="날짜를 선택해주세요.">
+								<span>~</span>
+								<input type="text" class="input-text endPicker" placeholder="날짜를 선택해주세요.">
+							</td>
+							<th>조사 시간</th>
+							<td>
+								<span class="select-time-box mr8">
+									<select class="select-list-box select-hour startHour"></select>
+									<select class="select-list-box select-minute startMinute"></select>
+								</span>
+								~
+								<span class="select-time-box ml8">
+									<select class="select-list-box select-hour endHour"></select>
+									<select class="select-list-box select-minute endMinute"></select>							
+								</span>							
+							</td>
+							<th>조사원 등록</th>
+							<td>
+								<input type="button" id="interiorInvst" class="is-key-button" value="내부 조사원"/>
+								<input type="button" id="externalInvst" class="is-key-button" value="일반 조사원"/>
+							</td>
+						</tr>
+					</table>
+				</form>
+				<div id="invstTable">
+					<div class="table-total-title">
+						<div id="totalList">총 조사원<span id="totalCount">6</span>명</div>			       	
+						<div><input type="button" class="input-reset" value="조사코드 자동생성"/></div>					
+					</div>
+					<table class="list-table">
+						<thead>
+			                <tr>
+			                    <th>번호</th>
+			                    <th>ID</th>
+			                    <th>이름</th>
+			                    <th>연락처</th>
+			                    <th>이메일</th>
+			                    <th>소속</th>
+			                    <th>권한</th>
+			                    <th>조사코드</th>
+			                </tr>
+						</thead>
+						<tbody>
+			                <tr>
+					            <td>1</td>
+					            <td>inki Moon12</td>
+					            <td>문인기</td>
+					            <td>inkiMoon@gmail.com</td>
+					            <td>010-5555-5555</td>
+					            <td>도로 교통</td>
+					            <td>운영자</td>
+					            <td>DC1HBG</td>
+			      			</tr>
+						</tbody>
+					</table>				
+				</div>
+			</div> 
+		</div>
+		<div class="info-button-box">
+            <a th:href="@{/systemmng/code/group}" class="is-key-button">삭제</a>
+            <a th:href="@{/systemmng/code/group}" id="" class="is-basic-button">취소</a>
+        </div>		
+	</th:block>
+</html>
+<script>
+	$('#radioColorSet input').on('change', function(){
+		let radioChecked = $(this).is(':checked');
+		if(radioChecked == true) {
+			$(this).parent().siblings().removeClass('active');
+			$(this).parent().addClass('active');
+		}
+	})
+	
+	$('#invstListButton').on('click', function(){
+	    new ModalBuilder().init('조사 찾기').ajaxBody('/datamng/schedule/invst/list').footer(1, '등록하기', function (button, modal) {}).open();	
+	})
+	
+	$('#interiorInvst').on('click', function(){
+	    new ModalBuilder().init('내부 조사원 등록').ajaxBody('/datamng/schedule/invst/interior/save').footer(1, '등록하기', function (button, modal) {}).open();	
+	})
+	
+	$('#externalInvst').on('click', function(){
+	    new ModalBuilder().init('외부 조사원 등록').ajaxBody('/datamng/schedule/invst/external/save').footer(1, '등록하기', function (button, modal) {}).open();	
+	})
+</script>

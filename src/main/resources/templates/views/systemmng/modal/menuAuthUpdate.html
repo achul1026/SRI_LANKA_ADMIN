@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="modal-group-detail-wrap">
+			<ul>
+				<li class="modal-group-detail-box">
+					<span>소속</span>
+					<span>RDA</span>
+				</li>
+				<li class="modal-group-detail-box">
+					<span>그룹유형</span>
+					<span>교통 데이터 관리자</span>
+				</li>
+				<li class="modal-group-detail-box">
+					<span>소속 인원 수</span>
+					<span>10명</span>
+				</li>
+			</ul>
+		</div>
+		<div class="modal-auth-tree-wrap scroll">
+			<div class="modal-auth-title">
+				<span><img th:src="@{/images/auth_group.png}" alt="auth"></span>
+				<div>권한 상세 설정</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">데이터 모니터링</span>
+					
+					<!-- 데이터 모니터링은 화살표 없어야합니다 -->
+					<!-- <span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span> -->				
+				</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">데이터 통계</span>
+					<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+				</div>
+				<div class="modal-auth-depth2-box">
+					<ul>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">GIS 시각화 통계/분석</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">통계 대시보드</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">데이터 관리</span>
+					<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+				</div>
+				<div class="modal-auth-depth2-box">
+					<ul>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 현황 및 이력</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 업무 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 위치 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">데이터 연계</span>
+					<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+				</div>
+				<div class="modal-auth-depth2-box">
+					<ul>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 현황 및 이력</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 업무 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 위치 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">시스템 관리</span>
+					<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+				</div>
+				<div class="modal-auth-depth2-box">
+					<ul>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 현황 및 이력</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 업무 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 위치 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="modal-auth-check-box">
+				<div class="modal-auth-depth1-box">
+					<input type="checkbox" class="depth1-all-checked"/>
+					<span class="modal-auth-depth1">정부포털 관리</span>
+					<span class="modal-auth-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>				
+				</div>
+				<div class="modal-auth-depth2-box">
+					<ul>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 현황 및 이력</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 업무 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+						<li class="auth-detph2">
+							<input type="checkbox" class="depth2-all-checked"/>
+							<span class="modal-auth-depth2">조사 위치 관리</span>
+							<ul class="modal-auth-depth3-box">
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>조회</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>등록</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>수정</span>		
+								</li>
+								<li>
+									<input type="checkbox" class="depth3-checked"/>
+									<span>삭제</span>		
+								</li>
+							</ul>							
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</th:block>
+</html>
+<script>
+	$('.modal-auth-depth1-box span').on('click', function(){
+		$(this).parent().toggleClass('active');
+	    $(this).parent().siblings('.modal-auth-depth2-box').stop().slideToggle(300);
+	})
+	
+	$('.modal-auth-depth2').on('click', function(){
+		$(this).parent().toggleClass('active');
+	    $(this).next().stop().slideToggle(300);
+	})
+	
+	//depth1 check
+	const depth1CheckBox = document.querySelectorAll('.depth1-all-checked');
+	depth1CheckBox.forEach(depth1 => {
+		depth1.addEventListener('change', () => {
+			const closest = depth1.closest('.modal-auth-check-box');
+			const parent = depth1.closest('.modal-auth-depth1-box');
+			const parentSiblings = parent.querySelector('.modal-auth-depth1');
+			const inputItem = closest.querySelectorAll('input[type="checkbox"]');
+			
+			//하위메뉴 노출
+			if(!parent.classList.contains('active')) parentSiblings.click();
+			
+			//depth1 checkbox 누르면 하위 메뉴 checkbox true, false
+			if(depth1.checked == true){
+				inputItem.forEach(input => input.checked = true);
+			} else {
+				inputItem.forEach(input => input.checked = false);
+				parentSiblings.click();
+			}
+		})
+	})
+	
+	//depth2 check
+	const depth2CheckBox = document.querySelectorAll('.depth2-all-checked');
+	depth2CheckBox.forEach(depth2 => {
+		depth2.addEventListener('change', () => {
+			const depth1 = depth2.closest('.modal-auth-check-box').querySelector('.depth1-all-checked');
+			const parent = depth2.closest('li');
+			const siblingsTitle = parent.querySelector('.modal-auth-depth2');
+			const inputItem = parent.querySelectorAll('input[type="checkbox"]');
+			const closest = depth2.closest('.modal-auth-depth2-box');
+			const siblingsInput = closest.querySelectorAll('.depth2-all-checked');
+			
+			//상위메뉴 체크
+			const allUnchecked = Array.from(siblingsInput).every(checkbox => !checkbox.checked);
+			if(allUnchecked){
+				depth1.click();
+			} else {
+				depth1.checked = !allUnchecked;
+			}
+			
+			//하위메뉴 노출
+			if(!parent.classList.contains('active')) siblingsTitle.click();
+			
+			//depth2 checkbox 누르면 하위 메뉴 checkbox true, false
+			if(depth2.checked == true){
+				inputItem.forEach(input => input.checked = true);
+			} else {
+				inputItem.forEach(input => input.checked = false);
+				siblingsTitle.click();
+			}
+		})
+	})
+	
+	//depth3 click
+	const depth3Check = document.querySelectorAll('.depth3-checked');
+	depth3Check.forEach(depth3 => {
+		depth3.addEventListener('change', () => {
+			const depth1 = depth3.closest('.modal-auth-check-box').querySelector('.depth1-all-checked');
+			const depth2 = depth3.closest('.auth-detph2');
+			const depth2CheckBox = depth2.querySelector('.depth2-all-checked');
+			const siblingsInput = depth2.querySelectorAll('.depth3-checked');
+			const allUnchecked = Array.from(siblingsInput).every(checkbox => !checkbox.checked);
+			
+			//상위메뉴 체크
+			if(allUnchecked){
+				depth2CheckBox.click();
+			} else {
+				depth2CheckBox.checked = !allUnchecked;
+				depth1.checked = !allUnchecked;
+			}
+		})
+	})
+	
+</script>

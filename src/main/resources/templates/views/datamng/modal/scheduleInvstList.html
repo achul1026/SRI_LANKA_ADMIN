@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px">
+			<div class="list-search-box" style="text-align:left;">
+				<select class="select-list-box">
+					<option>test</option>
+				</select>
+				<input type="text" class="input-text modal-input-text" placeholder="조사명을 입력해주세요.">
+				<input type="button" class="is-key-button" value="검색">
+			</div>
+			<table class="list-table mt16">
+				<thead>
+					<tr>
+						<th>선택</th>
+						<th>조사명</th>
+						<th>조사담당자</th>
+						<th>조사기간</th>
+						<th>조사등록자</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input id="regionSelect" type="radio"></td>
+						<td><label for="regionSelect">Colombo 바즈지역 출근시간 MCC조사</label></td>
+						<td>[교통부서] inki Moon</td>
+						<td>2023-12-13 ~ 2023-12-16</td>
+						<td>문인기</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</th:block>
+</html>

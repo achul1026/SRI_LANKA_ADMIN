@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<form id="menuSaveForm" name="menuSaveForm">
+			<input type="hidden" id="uppermenuCd" name="uppermenuCd">
+			<div>
+				<table class="modal-table">
+					<tbody>
+						<tr>
+							<th>메뉴명 <span class="required">*</span></th>
+							<td>
+								<select id="menuNm" name="menuNm" class="select-list-box" onchange="menuCdUpdate()">
+									<option>선택</option>
+									<option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}">노출</option>
+								</select>
+								<input type="hidden" id="menuCd" name="menuCd"/>
+							</td>
+							<th>메뉴 URL 패턴 <span class="required">*</span></th>
+							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" placeholder="예) /system/**"></td>
+						</tr>
+						<tr>
+							<th>메뉴 URL <span class="required">*</span></th>
+							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" placeholder="예) /system/main"></td>
+							<th>메뉴 설명</th>
+							<td><input type="text" id="menuDescr" name="menuDescr" placeholder="메뉴 설명을 입력하세요."></td>
+						</tr>
+						<tr>
+							<th>메뉴 순서</th>
+							<td><input type="text" id="menuSqno" name="menuSqno" placeholder="메뉴 순서를 입력하세요."></td>
+							<th>노출여부</th>
+							<td class="text-left">
+								<select id="useYn" name="useYn" class="select-list-box">
+									<option value="Y">노출</option>
+									<option value="N">비노출</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<th:block th:if="${uppermenuCd eq 'ALL'}">
+								<th>기본 메뉴 여부</th>
+								<td class="text-left">
+									<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
+										<option value="Y">Y</option>
+										<option value="N">N</option>
+									</select>
+								</td>
+							</th:block>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+	</th:block>
+</html>
+<script>
+	function menuCdUpdate(){
+		// 'menuNm' 셀렉트 박스에서 선택된 옵션의 'data-cd' 속성 값을 가져옵니다.
+	    var menuNmSelect = document.getElementById('menuNm');
+	    var selectedOption = menuNmSelect.options[menuNmSelect.selectedIndex];
+	    var selectedCd = selectedOption.getAttribute('data-cd');
+
+	    // 'menuCd' 인풋 박스의 값을 업데이트합니다.
+	    document.getElementById('menuCd').value = selectedCd;
+	}
+</script>
