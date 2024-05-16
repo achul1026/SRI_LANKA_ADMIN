@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class TcMenuAuthDTO {
 	
-	private String authId;
+	private String authgrpId;
 	private String menuId;
 	private String menuCd;
 	private String uppermenuCd;

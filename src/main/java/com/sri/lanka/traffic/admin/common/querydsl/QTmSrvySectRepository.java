@@ -14,4 +14,15 @@ public class QTmSrvySectRepository {
 	private final JPAQueryFactory queryFactory;
 
 	private QTmSrvySect tmSrvySect = QTmSrvySect.tmSrvySect;
+	
+	/**
+	  * @Method Name : deleteByIdArr
+	  * @작성일 : 2024. 5. 7.
+	  * @작성자 : NK.KIM
+	  * @Method 설명 : 부문 삭제
+	  * @param qstnIdArr
+	  */
+	public void deleteByIdArr(String[] sectIdArr) {
+		queryFactory.delete(tmSrvySect).where(tmSrvySect.sectId.in(sectIdArr)).execute();
+	}
 }

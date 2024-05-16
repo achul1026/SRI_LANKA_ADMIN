@@ -25,6 +25,7 @@ import com.sri.lanka.traffic.admin.common.enums.GroupCode;
 import com.sri.lanka.traffic.admin.common.enums.MenuType;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuMngRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcMenuAuthRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcMenuMngRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
 import com.sri.lanka.traffic.admin.config.authentication.Authority;
@@ -48,6 +49,9 @@ public class DevMenuMngController {
 
 	@Autowired
 	private QTcCdInfoRepository qTcCdInfoRepository;
+	
+	@Autowired
+	private TcMenuAuthRepository tcMenuAuthRepository;
 
 	/**
 	 * @Method Name : menuListNew
@@ -158,7 +162,7 @@ public class DevMenuMngController {
 	 * @Method Name : subMenuDelete
 	 * @작성일 : 2024. 1. 11.
 	 * @작성자 : SM.KIM
-	 * @Method 설명 : 개발자 서브메뉴 삭제
+	 * @Method 설명 : 개발자 메뉴 삭제
 	 * @param menuId
 	 * @return
 	 */
@@ -173,6 +177,8 @@ public class DevMenuMngController {
 				tcMenuMngRepository.delete(subMenu);
 			}
 		}
+		
+		tcMenuAuthRepository.deleteAllByMenuId(menuId); 
 
 		tcMenuMngRepository.delete(newTcMenuMng);
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "메뉴 정보가 삭제 되었습니다.");

@@ -1,12 +1,13 @@
 package com.sri.lanka.traffic.admin.common.dto.invst;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.sri.lanka.traffic.admin.common.entity.TmSrvyAns;
+import com.sri.lanka.traffic.admin.common.entity.TmSrvyInfo;
 import com.sri.lanka.traffic.admin.common.entity.TmSrvyQstn;
 import com.sri.lanka.traffic.admin.common.entity.TmSrvySect;
 import com.sri.lanka.traffic.admin.common.enums.code.QstnTypeCd;
-import com.sri.lanka.traffic.admin.common.enums.code.SectTypeCd;
 
 import lombok.Data;
 
@@ -14,16 +15,20 @@ import lombok.Data;
 public class TmSrvySectSaveDTO {
 	
 	private List<TmSrvySectSaveInfo> tmSrvySectList;
-	private String exmnmngId;
+	private String srvyId;
+	private String srvyTitle;
+	private String srvyType;
+	private LocalDateTime startDt;
+	private LocalDateTime endDt;
 	
 	@Data
 	public static class TmSrvySectSaveInfo {
 		
-		private String exmnmngId;
+		private String srvyId;
 		private String sectId;
 		private String sectTitle;
 		private String sectSubtitle;
-		private SectTypeCd sectTypeCd; // ex) 가구실태,개인실태,교통 통해
+		private String sectTypeCd; // ex) 가구실태,개인실태,교통 통해
 		private Integer sectSqno;
 		private List<TmSrvyQstnSaveInfo> tmSrvyQstnList;
 		
@@ -67,7 +72,7 @@ public class TmSrvySectSaveDTO {
 		public TmSrvySect toEntity(){
             return TmSrvySect.builder()
             					.sectId(sectId)
-            					.exmnmngId(exmnmngId)
+            					.srvyId(srvyId)
             					.sectTitle(sectTitle)
             					.sectSubtitle(sectSubtitle)
             					.sectType(sectTypeCd)
@@ -75,5 +80,16 @@ public class TmSrvySectSaveDTO {
             					.build();
 		}
 	}
+	
+	public TmSrvyInfo toEntity(){
+        return TmSrvyInfo.builder()
+        					.srvyId(srvyId)
+        					.srvyTitle(srvyTitle)
+        					.srvyType(srvyType)
+        					.startDt(startDt)
+        					.endDt(endDt)
+        					.build();
+	}
+	
 	
 }

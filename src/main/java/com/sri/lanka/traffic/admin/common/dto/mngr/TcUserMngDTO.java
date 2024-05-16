@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 public class TcUserMngDTO extends CommonDTO {
 	
 	private String usermngId;
-	private String authId;
+	private String authgrpId;
 	private String userId;
 	private String userPswd;
 	private String userBffltd;
@@ -23,7 +23,7 @@ public class TcUserMngDTO extends CommonDTO {
 	private String userNm;
 	private String userAuth;
 	private String userTel;
-	private String authNm;
+	private String authgrpNm;
 	private String bffltdNm;
 	private String deptNm;
 	

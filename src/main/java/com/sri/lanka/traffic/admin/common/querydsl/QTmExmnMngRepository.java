@@ -18,6 +18,7 @@ import com.sri.lanka.traffic.admin.common.entity.QTcCdInfo;
 import com.sri.lanka.traffic.admin.common.entity.QTcUserMng;
 import com.sri.lanka.traffic.admin.common.entity.QTmExmnMng;
 import com.sri.lanka.traffic.admin.common.entity.QTmExmnPollster;
+import com.sri.lanka.traffic.admin.common.entity.QTmSrvyInfo;
 import com.sri.lanka.traffic.admin.common.entity.TmExmnMng;
 import com.sri.lanka.traffic.admin.common.enums.code.ExmnScheduleSttsCd;
 import com.sri.lanka.traffic.admin.common.enums.code.ExmnSttsCd;
@@ -35,6 +36,7 @@ public class QTmExmnMngRepository {
 
 	private QTmExmnMng tmExmnMng 	= QTmExmnMng.tmExmnMng;
 	private QTcUserMng tcUserMng 	= QTcUserMng.tcUserMng;
+	private QTmSrvyInfo tmSrvyInfo 	= QTmSrvyInfo.tmSrvyInfo; 
 	private QTcCdInfo  tcCdInfo 	= QTcCdInfo.tcCdInfo;
 	private QTmExmnPollster tmExmnPollster = QTmExmnPollster.tmExmnPollster;
 
@@ -175,18 +177,32 @@ public class QTmExmnMngRepository {
 													TmExmnMngDTO.class, 
 													tmExmnMng.exmnmngId, 
 													tmExmnMng.usermngId,
+													tmSrvyInfo.srvyId,
+													tmSrvyInfo.srvyTitle,
 													tcCdInfo.cdNm.as("mngrBffltd"), 
 													tcUserMng.userNm, 
 													tmExmnMng.exmnNm, 
+													tmExmnMng.exmnLc, 
+													tmExmnMng.colrCd, 
 													tmExmnMng.exmnType,
 													tmExmnMng.exmnpicId, 
+													tmExmnMng.laneCnt, 
 													tmExmnMng.startDt, 
 													tmExmnMng.endDt,
+													tmExmnMng.exmnDiv,
+													tmExmnMng.exmnNop,
+													tmExmnMng.partcptCd,
+													tmExmnMng.goalCnt,
+													tmExmnMng.lat,
+													tmExmnMng.lon,
+													tmExmnMng.exmnRange,
+													tmExmnMng.sttsCd,
 													tmExmnMng.registId)
 												)
 											.from(tmExmnMng)
 											.leftJoin(tcUserMng).on(tmExmnMng.usermngId.eq(tcUserMng.usermngId))
 											.leftJoin(tcCdInfo).on(tcUserMng.userBffltd.eq(tcCdInfo.cd))
+											.leftJoin(tmSrvyInfo).on(tmExmnMng.srvyId.eq(tmSrvyInfo.srvyId))
 											.where(tmExmnMng.exmnmngId.eq(exmmngId))
 											.fetchOne();
 		

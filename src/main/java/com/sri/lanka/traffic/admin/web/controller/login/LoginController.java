@@ -26,7 +26,9 @@ import com.sri.lanka.traffic.admin.common.entity.TcUserMng;
 import com.sri.lanka.traffic.admin.common.enums.GroupCode;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcUserMngRepository;
+import com.sri.lanka.traffic.admin.support.exception.CommonException;
 import com.sri.lanka.traffic.admin.support.exception.CommonResponse;
+import com.sri.lanka.traffic.admin.support.exception.ErrorCode;
 import com.sri.lanka.traffic.admin.web.service.systemmng.TcUserMngService;
 
 
@@ -86,26 +88,30 @@ public class LoginController {
 	 */
 	@PostMapping("/join/save")
 	public @ResponseBody CommonResponse<?> join(@Valid TcUserMng tcUserMng, BindingResult bindingResult) {
+		FieldError error;
+		Object[] arguments;
+		String errorMsg;
+		String msgTrgt;
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		// validation
 		if(bindingResult.hasErrors()) {
 			// 에러 발생 시
-			FieldError error = bindingResult.getFieldError();
-			Object[] arguments = error.getArguments();
+			error = bindingResult.getFieldError();
+			arguments = error.getArguments();
 			
-			String errorMsg = messageSource.getMessage(error.getDefaultMessage(), arguments, LocaleContextHolder.getLocale());
-			String msgTrgt = error.getField();
-			
-			Boolean userIdDuplicate = tcUserMngRepository.existsByUserId(tcUserMng.getUserId());
-			if (userIdDuplicate) {
-				// 예외처리
-				msgTrgt = "mngrAccountId";
-				errorMsg = "Duplicate User Id";
-				return CommonResponse.ResponseCodeAndMessage(9999,  msgTrgt + "/" + errorMsg);
-			}
+			errorMsg = messageSource.getMessage(error.getDefaultMessage(), arguments, LocaleContextHolder.getLocale());
+			msgTrgt = error.getField();
 			
 			return CommonResponse.ResponseCodeAndMessage(9999, msgTrgt + "/" + errorMsg);
+		}
+		
+		Boolean userIdDuplicate = tcUserMngRepository.existsByUserId(tcUserMng.getUserId());
+		if (userIdDuplicate) {
+			// 예외처리
+			msgTrgt = "userId";
+			errorMsg = "Duplicate User Id";
+			return CommonResponse.ResponseCodeAndMessage(9999,  msgTrgt + "/" + errorMsg);
 		}
 		
 		tcUserMngService.saveTcUserMng(tcUserMng);
@@ -137,7 +143,7 @@ public class LoginController {
 		TcUserMng newTcUserMng = tcUserMngRepository.findByUserEmail(tcUserMng.getUserEmail());
 		if (!newTcUserMng.getUserEmail().equals(tcUserMng.getUserEmail())
 				|| !newTcUserMng.getUserNm().equals(tcUserMng.getUserNm())) {
-			// 예외처리
+			throw new CommonException(ErrorCode.EMPTY_DATA, "There is no matching ID");
 		}
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 200);
@@ -172,7 +178,7 @@ public class LoginController {
 		TcUserMng newTcUserMng = tcUserMngRepository.findByUserEmail(tcUserMngDTO.getUserEmail());
 		if (!newTcUserMng.getUserEmail().equals(tcUserMngDTO.getUserEmail())
 				|| !newTcUserMng.getUserId().equals(tcUserMngDTO.getUserId())) {
-			// 예외처리
+			throw new CommonException(ErrorCode.EMPTY_DATA, "There is no matching ID");
 		}
 		
 		Map<String, Object> result = new HashMap<String, Object>();
@@ -219,9 +225,7 @@ public class LoginController {
 	@GetMapping("/login/find/id/result")
 	public String loginIdFindResult(Model model, @RequestParam String userEmail) {
 		TcUserMng newTcUserMng = tcUserMngRepository.findByUserEmail(userEmail);
-		
 		model.addAttribute("userId", newTcUserMng.getUserId());
-		
 		return "views/login/modal/idFindResult";
 	}
 }

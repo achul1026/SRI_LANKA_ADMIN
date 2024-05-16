@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 id="infoTitle">조사 설문 등록</h3>
+	        </div>
+	        <div id="infoTableWrap">
+				<table id="listTable" class="mt16 mb16">
+					<thead>
+						<tr>
+							<th>조사 유형</th>
+							<th>설문명</th>
+							<th>조사 기간(년)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<select class="select-list-box" id="srvyType">
+									<th:block th:each="item : ${srvyTypeCd}">
+										<option th:text="${item.cdNm}" th:value="${item.cd}"></option>
+									</th:block>
+								</select>
+							</td>
+							<td>
+								<input type="text" id="srvyTitle" class="input-table-text surveyValue" placeholder="설문명을 입력해주세요."/>
+							</td>
+							<td>
+								<select id="startDt" class="dateYear scroll select-list-box"></select>
+								<span>~</span>
+								<select id="endDt" class="dateYear scroll select-list-box"></select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="questSurveyList">
+					<div id="questDefaultBox" class="quest-add-box text-right">
+						<input type="button" class="is-key-button" onclick="questSectionAdd();" value="섹션 추가"/>
+					</div>
+				</div>
+	        </div>
+	    </div>
+		<div class="info-button-box">
+            <input type="button" class="is-key-button overLapping" onclick="saveInvstMngSurveySctn();" value="등록"/>
+            <a th:href="@{/datamng/survey}" class="is-basic-button">취소</a>
+        </div>
+	</th:block>
+</html>
+<script>
+	dateYearSet();
+</script>

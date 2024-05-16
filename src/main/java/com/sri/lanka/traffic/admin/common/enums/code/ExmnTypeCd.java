@@ -8,21 +8,23 @@ import lombok.Getter;
 @Getter
 public enum ExmnTypeCd implements CommonEnumType<String> {
 	
-	MCC("ETC001","MCC 조사", "traffic"),
-	TM("ETC002","TM 조사", "traffic"),
-	AXLELOAD("ETC003","AXLELOAD 조사", "survey"),
-	LABORSIDE("ETC004","노측 면접 조사", "survey"),
-	OD("ETC005","OD 조사", "survey"),
+	MCC("ETC001","MCC 조사", "traffic","true"),
+	TM("ETC002","TM 조사", "traffic","true"),
+	LABORSIDE("ETC003","노측 면접 조사", "survey","false"),
+	OD("ETC004","OD 조사", "survey","false"),
+	AXLELOAD("ETC005","AXLELOAD 조사", "survey","true"),
 	;
 	
 	private String code; 
 	private String name;
-
 	private String type;
-	ExmnTypeCd(String code, String name, String type) {
+	private String hasDrct;
+	
+	ExmnTypeCd(String code, String name, String type, String hasDrct) {
 		this.code = code;
 		this.name = name;
 		this.type = type;
+		this.hasDrct = hasDrct;
 	}
 	
 	@Override

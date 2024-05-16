@@ -17,4 +17,9 @@ public interface TmSrvyAnsRepository extends JpaRepository<TmSrvyAns, String>{
 	  * @return
 	  */
 	List<TmSrvyAns> findAllByQstnIdOrderByAnsSqnoAsc(String qstnId);
+
+	List<TmSrvyAns> findAllByQstnId(String qstnId);
+
+	void deleteAllByQstnId(String qstnId);
+
 }

@@ -1,0 +1,116 @@
+    <div id="scheduleHistoryContainer" class="none">
+    	<div class="is-box">
+    		<div class="flex-between">
+	            <h3 class="info-title">조사 현황 및 일정 상세</h3>
+	            <div>
+	            	<input type="button" class="is-key-button" onclick="detailView();" value="상세 보기"/>
+	            </div>
+        	</div>
+        	<div class="histroy-flex-box">
+	        	<div class="is-box history-chart-box">
+	        		<div class="text-center">
+	        			<span>조사 기간</span>
+	        			<span id="startHistoryDate">2024-05-09</span>
+	        			<span>~</span>
+	        			<span id="endHistoryDate">2024-06-10</span>
+	        		</div>
+	        		<div class="history-chart">
+		        		<div class="chart-title text-center">노측면접조사</div>
+			        	<div class="chart" id="historyChart"></div>
+	        		</div>
+	        		<div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 목표 개수</span><span id="surveyTotalNumber">150</span></div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt">목표 달성 개수</span><span id="surveyTargetNumber">150</span></div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt">목표 미달성 개수</span><span id="surveyNonTargetNumber">150</span></div>
+	        		</div>
+	        	</div>
+	        	<div class="is-box history-table-box">
+					<table id="listTable">
+						<thead>
+			                <tr>
+			                    <th>번호</th>
+			                    <th>조사날짜</th>
+			                    <th>조사 등록 개수</th>
+			                    <th>조사 누적 개수</th>
+			                </tr>
+						</thead>
+						<tbody id="invstListTbody">
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+							<tr>
+								<td>1</td>
+								<td>2024-06-13</td>
+								<td>7개</td>
+								<td>16개</td>
+							</tr>
+						</tbody>
+					</table>
+					<div>
+						<ul id="pagination">
+							<li class="page-item"><a href="javascript:pageMove('1')" class="first"><i id="pageLeftArrow"></i></a></li>
+							<li class="page-item"><a href="javascript:pageMove('1')" class="active page-number">1</a></li>
+							<li class="page-item"><a href="javascript:pageMove('1')" class="last"><i id="pageRightArrow"></i></a></li>
+						</ul>
+					</div>										        		
+	        	</div>
+        	</div>
+    	</div>
+    </div>

@@ -55,7 +55,7 @@
 								<th>이름</th>
 								<td th:text="${userInfo.userNm}">홍길동</td>
 								<th>권한</th>
-								<td th:text="${userInfo.authNm == null ? '일반사용자' : userInfo.authNm}">일반사용자</td>
+								<td th:text="${userInfo.authgrpNm}">일반사용자</td>
 							</tr>	
 							<tr>
 								<th>권한 요청</th>
@@ -76,7 +76,6 @@
 		</form>
 		<div class="info-button-box">
             <a href="javascript:void(0)" id="myinfoUpdateBtn" class="is-key-button">저장</a>
-            <a href="javascript:void(0)" class="is-basic-button">취소</a>
         </div>
 	</th:block>
 </html>
@@ -101,6 +100,7 @@
 			.then(response => response.json())
 			.then(result => {
 				if(result.code == '200'){
+					modal.close();
 					new ModalBuilder().init().successBody(result.message).footer(4,'확인',function(button, modal){
 						modal.close();
                     	location.href= __contextPath__+"/mypage";
@@ -180,7 +180,7 @@
 	//권한 신청
 	document.getElementById('authButton').addEventListener('click', () => {
 		new ModalBuilder().init('권한 신청', '1100').ajaxBody("/mypage/auth").footer(3,'신청',function(button, modal){
-			new ModalBuilder().init().alertBody("저장 하시겠습니까?").footer(3,'등록',function(button, modal){
+			new ModalBuilder().init().alertBody("신청 하시겠습니까?").footer(3,'확인',function(button, modal){
 				fetch(__contextPath__+"/mypage/auth",{
 					method: "POST",
 					body: new FormData($("#authRequstForm")[0])
@@ -188,6 +188,7 @@
 				.then(response => response.json())
 				.then(result => {
 					if(result.code == '200'){
+						modal.close();
 						new ModalBuilder().init().successBody(result.message).footer(4,'확인',function(button, modal){
 							modal.close();
 							window.location.reload();
@@ -203,7 +204,7 @@
 	});
 	
 	//비밀번호 변경
-	document.getElementById('myPagePwUpdateButton').addEventListener('click', () => {
+// 	document.getElementById('myPagePwUpdateButton').addEventListener('click', () => {
 		
-	});
+// 	});
 </script>

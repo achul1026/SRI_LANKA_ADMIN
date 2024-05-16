@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDTO;
 import com.sri.lanka.traffic.admin.common.dto.bffltd.BffltdAuthGrpDTO;
@@ -12,7 +13,6 @@ import com.sri.lanka.traffic.admin.common.dto.bffltd.BffltdAuthGrpDTO.AuthGrpInf
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.menu.TcAuthGrpMenuDTO;
 import com.sri.lanka.traffic.admin.common.entity.QTcAuthGrp;
-import com.sri.lanka.traffic.admin.common.entity.QTcAuthMng;
 import com.sri.lanka.traffic.admin.common.entity.QTcCdGrp;
 import com.sri.lanka.traffic.admin.common.entity.QTcCdInfo;
 import com.sri.lanka.traffic.admin.common.entity.QTcMenuAuth;
@@ -30,8 +30,6 @@ public class QTcAuthGrpRepository {
 	private final JPAQueryFactory queryFactory;
 
 	private QTcAuthGrp tcAuthGrp = QTcAuthGrp.tcAuthGrp;
-	
-	private QTcAuthMng tcAuthMng = QTcAuthMng.tcAuthMng;
 	
 	private QTcCdInfo tcCdInfo = QTcCdInfo.tcCdInfo;
 	
@@ -56,11 +54,11 @@ public class QTcAuthGrpRepository {
 		List<TcAuthGrpDTO> result = queryFactory.select(Projections.bean(TcAuthGrpDTO.class
 																		,tcAuthGrp.authgrpId
 																		,tcAuthGrp.authgrpNm
-																		,tcCdInfo.cdNm.as("bffltdNm")
-																		,tcAuthGrp.useYn))
+																		,tcAuthGrp.authgrpDescr
+																		,tcCdInfo.cdNm.as("bffltdNm")))
 												.from(tcAuthGrp)
 												.leftJoin(tcCdInfo).on(tcAuthGrp.bffltdCd.eq(tcCdInfo.cd))
-												.offset(paging.getOffsetCount()).limit(paging.getLimitCount())
+												.offset(paging.getOffsetCount()).limit(paging.getLimitCount()).orderBy(tcAuthGrp.registDt.desc())
 												.fetch();
 		return result;
 	}
@@ -90,8 +88,8 @@ public class QTcAuthGrpRepository {
 	  */
 	public TcAuthGrpDTO getAuthInfo(String authgrpId) {
 		TcAuthGrpDTO result = queryFactory
-				.select(Projections.bean(TcAuthGrpDTO.class, tcAuthGrp.authgrpId, tcAuthGrp.authgrpNm
-						, tcCdInfo.cdNm.as("bffltdNm"), tcAuthGrp.useYn))
+				.select(Projections.bean(TcAuthGrpDTO.class, tcAuthGrp.authgrpId, tcAuthGrp.authgrpNm, tcAuthGrp.authgrpDescr
+						, tcCdInfo.cdNm.as("bffltdNm")))
 				.from(tcAuthGrp).leftJoin(tcCdInfo).on(tcAuthGrp.bffltdCd.eq(tcCdInfo.cd))
 				.where(tcAuthGrp.authgrpId.eq(authgrpId))
 				.fetchOne();
@@ -122,7 +120,7 @@ public class QTcAuthGrpRepository {
 																					, tcAuthGrp.authgrpId
 																					, tcAuthGrp.authgrpNm))
 												.from(tcAuthGrp)
-												.where(tcAuthGrp.bffltdCd.eq(bffltdList.getBffltdCd()))
+												.where(tcAuthGrp.bffltdCd.eq(bffltdList.getBffltdCd()).and(tcAuthGrp.bscauth_yn.eq("N")))
 												.fetch()
 												));
 		}
@@ -142,12 +140,10 @@ public class QTcAuthGrpRepository {
 		List<TcAuthGrpMenuDTO> result = queryFactory.select(Projections.bean(TcAuthGrpMenuDTO.class
 																			, tcAuthGrp.authgrpId
 																			, tcAuthGrp.authgrpNm
-																			, tcAuthMng.authId
-																			, tcAuthMng.authDescr
+																			, tcAuthGrp.authgrpDescr
 																			))
-												    .from(tcAuthMng)
-												    .leftJoin(tcAuthGrp).on(tcAuthGrp.authgrpId.eq(tcAuthMng.authgrpId))
-												    .where(tcAuthGrp.bffltdCd.eq(tcUserMng.getUserBffltd()))
+												    .from(tcAuthGrp)
+												    .where(tcAuthGrp.bffltdCd.eq(tcUserMng.getUserBffltd()).and(tcAuthGrp.bscauth_yn.eq("N")))
 												    .fetch();
 
 //	    if (result != null) {
@@ -184,5 +180,71 @@ public class QTcAuthGrpRepository {
 //	    }
 		return result;
 	}
+	
+	/**
+	 * @Method Name : getAuthRqstList
+	 * @작성일 : 2024. 1. 10.
+	 * @작성자 : NK.KIM
+	 * @Method 설명 : 요청 권한 목록 조회
+	 * @param commonDTO
+	 * @param paging
+	 * @return
+	 */
+	public List<TcAuthGrpDTO> getAuthRqstList(SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+
+		List<TcAuthGrpDTO> result = queryFactory
+				.select(Projections.bean(TcAuthGrpDTO.class, tcAuthGrp.authgrpId, tcAuthGrp.authgrpNm
+										, tcAuthGrp.authgrpDescr, tcAuthGrp.registDt, tcAuthGrp.updtDt
+										, tcCdInfo.cdNm.as("bffltdNm")))
+				.from(tcAuthGrp).where(searchOption(searchCommonDTO.getSearchType(), searchCommonDTO.getSearchContent()))
+				.leftJoin(tcCdInfo).on(tcAuthGrp.bffltdCd.eq(tcCdInfo.cd))
+				.offset(paging.getOffsetCount()).limit(paging.getLimitCount()).orderBy(tcAuthGrp.registDt.desc()).fetch();
+
+		return result;
+	}
+	
+	/**
+	 * @Method Name : getTotalCountByAuthRqst
+	 * @작성일 : 2024. 1. 10.
+	 * @작성자 : NK.KIM
+	 * @Method 설명 : 요청 권한 목록 개수 조회
+	 * @param commonDTO
+	 * @return
+	 */
+	public Long getTotalCountByAuthRqst(SearchCommonDTO searchCommonDTO) {
+
+		Long count = queryFactory.select(tcAuthGrp.count()).from(tcAuthGrp)
+				.where(searchOption(searchCommonDTO.getSearchType(), searchCommonDTO.getSearchContent())).fetchOne();
+
+		return count;
+	}
+	
+	/**
+	 * @Method Name : searchOption
+	 * @작성일 : 2024. 1. 10.
+	 * @작성자 : NK.KIM
+	 * @Method 설명 : 검색 조건
+	 * @param searchType
+	 * @param searchContent
+	 * @return
+	 */
+	private BooleanExpression searchOption(String searchType, String searchContent) {
+		BooleanExpression result = null;
+		if (!CommonUtils.isNull(searchType) && !CommonUtils.isNull(searchContent)) {
+
+			if ("authgrpNm".equals(searchType)) {
+				result = QRepositorySupport.containsKeyword(tcAuthGrp.authgrpNm, searchContent);
+			} else if ("authgrpDescr".equals(searchType)) {
+				result = QRepositorySupport.containsKeyword(tcAuthGrp.authgrpDescr, searchContent);
+			} else {
+				result = QRepositorySupport.containsKeyword(tcAuthGrp.authgrpNm, searchContent)
+						.or(QRepositorySupport.containsKeyword(tcAuthGrp.authgrpDescr, searchContent));
+			}
+		}
+		return result;
+	}
+
+
+
 
 }

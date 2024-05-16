@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container">
+			<div class="list-search-box">
+				<input type="text" class="input-text modal-input-text" placeholder="설문 유형을 검색해주세요.">
+				<input type="button" class="is-key-button" value="검색">
+			</div>
+			<table class="list-table mt16">
+				<thead>
+					<tr>
+						<th>선택</th>
+						<th>섹션명</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="item : ${sectTypeCd}">
+						<td>
+							<input th:id="${item.cd}" name="modalSectType" type="radio" th:value="${item.cd}">
+						</td>
+						<td>
+							<label th:for="${item.cd}" th:text="${item.cdNm}"></label>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</th:block>
+</html>

@@ -24,10 +24,9 @@
 			<div class="modal-auth-title">
 				<span><img th:src="@{/images/auth_group.png}" alt="auth"></span>
 				<div>권한 상세 설정</div>
-				<input type="hidden" id="authId" th:value="${tcAuthMng.authId}" />
-				<input type="hidden" id="authNm" th:value="${tcAuthMng.authNm}" />
-				<input type="hidden" id="authDescr" th:value="${tcAuthMng.authDescr}" />
-				<input type="hidden" id="authgrpId" th:value="${tcAuthMng.authgrpId}" />
+				<input type="hidden" id="authgrpId" th:value="${tcAuthGrp.authgrpId}" />
+<!-- 				<input type="hidden" id="authgrpNm" th:value="${tcAuthGrp.authgrpNm}" /> -->
+<!-- 				<input type="hidden" id="authgrpDescr" th:value="${tcAuthGrp.authgrpDescr}" /> -->
 			</div>
 			<th:block th:each="item : ${authMenuInfo.authMenuList}">
 				<div class="modal-auth-check-box">

@@ -17,22 +17,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthMngDTO;
+import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDTO;
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserRqstAuthDTO;
 import com.sri.lanka.traffic.admin.common.entity.TcAuthGrp;
-import com.sri.lanka.traffic.admin.common.entity.TcAuthMng;
+import com.sri.lanka.traffic.admin.common.entity.TcCdInfo;
 import com.sri.lanka.traffic.admin.common.enums.AuthType;
+import com.sri.lanka.traffic.admin.common.enums.GroupCode;
 import com.sri.lanka.traffic.admin.common.enums.code.RqstSttsCd;
-import com.sri.lanka.traffic.admin.common.querydsl.QTcAuthMngRepository;
+import com.sri.lanka.traffic.admin.common.querydsl.QTcAuthGrpRepository;
+import com.sri.lanka.traffic.admin.common.querydsl.QTcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuMngRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmAuthRqstRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcAuthGrpRepository;
-import com.sri.lanka.traffic.admin.common.repository.TcAuthMngRepository;
 import com.sri.lanka.traffic.admin.common.util.PagingUtils;
 import com.sri.lanka.traffic.admin.config.authentication.Authority;
 import com.sri.lanka.traffic.admin.support.exception.CommonResponse;
-import com.sri.lanka.traffic.admin.web.service.developer.DevAuthMngService;
 import com.sri.lanka.traffic.admin.web.service.systemmng.AuthRqstMngService;
 
 @Controller
@@ -40,28 +40,22 @@ import com.sri.lanka.traffic.admin.web.service.systemmng.AuthRqstMngService;
 public class AuthRqstMngController {
 
 	@Autowired
-	QTcAuthMngRepository qTcAuthMngRepository;
-
-	@Autowired
 	QTcMenuMngRepository qTcMenuMngRepository;
-
-	@Autowired
-	DevAuthMngService authMngService;
 	
 	@Autowired
 	QTmAuthRqstRepository qTmAuthRqstRepository;
+	
+	@Autowired
+	QTcAuthGrpRepository qTcAuthGrpRepository;
+	
+	@Autowired
+	QTcCdInfoRepository qTcCdInfoRepository;
 	
 	@Autowired
 	TcAuthGrpRepository tcAuthGrpRepository;
 	
 	@Autowired
 	AuthRqstMngService authRqstMngService;
-
-	@Autowired
-	TcAuthMngRepository tcAuthMngRepository;
-	
-	@Autowired
-	DevAuthMngService devAuthMngService;
 	
 	/**
 	 * @Method Name : authListPage
@@ -81,7 +75,7 @@ public class AuthRqstMngController {
 		
 		paging.setTotalCount(totalCnt);
 		
-		List<TcAuthGrp> authGrpsList = tcAuthGrpRepository.findAll();
+		List<TcAuthGrp> authGrpsList = tcAuthGrpRepository.findAllByBscauthYnNotYN("Y");
 
 		model.addAttribute("rqstAuthList", rqstAuthList);
 		model.addAttribute("authGrpsList", authGrpsList);
@@ -115,17 +109,17 @@ public class AuthRqstMngController {
 	  * @작성자 : SM.KIM
 	  * @Method 설명 : 시스템관리 요청 권한 관리 승인 또는 반려
 	  * @param model
-	  * @param authId
+	  * @param authgrpId
 	  * @param authrqstId
 	  * @param isApproval
 	  * @return
 	  */
 	@Authority(authType = AuthType.UPDATE)
 	@PostMapping
-	public @ResponseBody CommonResponse<?> authRqstApprovalProcess(Model model, @RequestParam String authId
+	public @ResponseBody CommonResponse<?> authRqstApprovalProcess(Model model, @RequestParam String authgrpId
 																	, @RequestParam String userId, @RequestParam String authrqstId
 																	, @RequestParam boolean isApproval) {
-		authRqstMngService.setUserAuth(authId, userId, authrqstId, isApproval);
+		authRqstMngService.setUserAuth(authgrpId, userId, authrqstId, isApproval);
 		
 		String message = isApproval ? "요청 승인 성공" : "요청 거절 성공";
 		Map<String, Object> result = new HashMap<>();
@@ -147,12 +141,16 @@ public class AuthRqstMngController {
 	public String authSetting(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
 		paging.setLimitCount(3);
 		paging.setPageSize(3);
-		List<TcAuthMngDTO> authList = qTcAuthMngRepository.getAuthList(searchCommonDTO, paging);
 		
-		long totalCnt = qTcAuthMngRepository.getTotalCount(searchCommonDTO);
+		List<TcAuthGrpDTO> authList = qTcAuthGrpRepository.getAuthRqstList(searchCommonDTO, paging);
+		
+		long totalCnt = qTcAuthGrpRepository.getTotalCountByAuthRqst(searchCommonDTO);
 		
 		paging.setTotalCount(totalCnt);
 		
+		List<TcCdInfo> bffltdList = qTcCdInfoRepository.getTcCdInfoListByGrpCd(GroupCode.BFFLTD_CD.getCode());
+		
+		model.addAttribute("bffltdList", bffltdList);
 		model.addAttribute("authList", authList);
 		model.addAttribute("totalCnt", totalCnt);
 		model.addAttribute("paging", paging);
@@ -173,15 +171,17 @@ public class AuthRqstMngController {
 	public @ResponseBody CommonResponse<?> authAsynchronousSetting(SearchCommonDTO searchCommonDTO, PagingUtils paging) {
 		paging.setLimitCount(3);
 		paging.setPageSize(3);
-		List<TcAuthMngDTO> authList = qTcAuthMngRepository.getAuthList(searchCommonDTO, paging);
+		List<TcAuthGrpDTO> authList = qTcAuthGrpRepository.getAuthList(searchCommonDTO, paging);
+		List<TcCdInfo> bffltdList = qTcCdInfoRepository.getTcCdInfoListByGrpCd(GroupCode.BFFLTD_CD.getCode());
 		
-		long totalCnt = qTcAuthMngRepository.getTotalCount(searchCommonDTO);
+		long totalCnt = qTcAuthGrpRepository.getTotalCountByAuthRqst(searchCommonDTO);
 		
 		paging.setTotalCount(totalCnt);
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		
 		result.put("authList", authList);
+		result.put("bffltdList", bffltdList);
 		result.put("totalCnt", totalCnt);
 		result.put("paging", paging);
 		
@@ -199,8 +199,9 @@ public class AuthRqstMngController {
 	  */
 	@Authority(authType = AuthType.CREATE)
 	@PostMapping("/setting")
-	public @ResponseBody CommonResponse<?> authSave(Model model, TcAuthMng tcAuthMng) {
-		devAuthMngService.saveAuthByAuthGrp(null, tcAuthMng);
+	public @ResponseBody CommonResponse<?> authSave(Model model, TcAuthGrp tcAuthGrp) {
+		
+		authRqstMngService.saveAuthGrp(tcAuthGrp);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("code", 200);
@@ -213,19 +214,19 @@ public class AuthRqstMngController {
 	  * @작성일 : 2024. 4. 26.
 	  * @작성자 : SM.KIM
 	  * @Method 설명 : 시스템관리 요청 관한 관리 권한 수정
-	  * @param authId
+	  * @param authgrpId
 	  * @param tcAuthMng
 	  * @return
 	  */
 	@Authority(authType = AuthType.UPDATE)
-	@PutMapping("/setting/{authId}")
-	public @ResponseBody CommonResponse<?> authUpdate(@PathVariable String authId, TcAuthMng tcAuthMng) {
+	@PutMapping("/setting/{authgrpId}")
+	public @ResponseBody CommonResponse<?> authUpdate(@PathVariable String authgrpId, TcAuthGrp tcAuthGrp) {
 		
-		tcAuthMngRepository.save(tcAuthMng);
+		tcAuthGrpRepository.save(authRqstMngService.setAuthgrp(authgrpId, tcAuthGrp));
 		
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("code", 200);
-		result.put("authId", authId);
+		result.put("authgrpId", authgrpId);
 		return CommonResponse.successToData(result, "권한이 수정 되었습니다.");
 	}
 	
@@ -234,14 +235,14 @@ public class AuthRqstMngController {
 	  * @작성일 : 2024. 4. 26.
 	  * @작성자 : SM.KIM
 	  * @Method 설명 : 시스템관리 요청 권한 관리 권한 삭제
-	  * @param authId
+	  * @param authgrpId
 	  * @param tcAuthMng
 	  * @return
 	  */
 	@Authority(authType = AuthType.DELETE)
-	@DeleteMapping("/setting/{authId}")
-	public @ResponseBody CommonResponse<?> authDelete(@PathVariable String authId, TcAuthMng tcAuthMng) {
-		authMngService.deleteAuth(authId);
+	@DeleteMapping("/setting/{authgrpId}")
+	public @ResponseBody CommonResponse<?> authDelete(@PathVariable String authgrpId, TcAuthGrp tcAuthGrp) {
+		authRqstMngService.deleteAuth(authgrpId);
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "권한이 삭제 되었습니다.");
 	}
 

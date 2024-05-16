@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserMngSaveDTO;
-import com.sri.lanka.traffic.admin.common.entity.TcAuthMng;
+import com.sri.lanka.traffic.admin.common.entity.TcAuthGrp;
 import com.sri.lanka.traffic.admin.common.entity.TcCdInfo;
 import com.sri.lanka.traffic.admin.common.entity.TcUserMng;
 import com.sri.lanka.traffic.admin.common.enums.AuthType;
@@ -28,7 +28,7 @@ import com.sri.lanka.traffic.admin.common.enums.MenuType;
 import com.sri.lanka.traffic.admin.common.enums.code.AthrztSttsCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcUserMngRepository;
-import com.sri.lanka.traffic.admin.common.repository.TcAuthMngRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcAuthGrpRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcUserMngRepository;
 import com.sri.lanka.traffic.admin.common.util.LoginMngrUtils;
 import com.sri.lanka.traffic.admin.common.util.PagingUtils;
@@ -45,12 +45,12 @@ public class MngrMngController {
 
 	@Autowired
 	TcUserMngService tcUserMngService;
+	
+	@Autowired
+	TcAuthGrpRepository tcAuthGrpRepository;
 
 	@Autowired
 	QTcUserMngRepository qTcUserMngRepository;
-
-	@Autowired
-	TcAuthMngRepository tcAuthMngRepository;
 
 	@Autowired
 	QTcCdInfoRepository qTcCdInfoRepository;
@@ -78,6 +78,7 @@ public class MngrMngController {
 		List<TcCdInfo> bffltdList = qTcCdInfoRepository.getTcCdInfoListByGrpCd(GroupCode.BFFLTD_CD.getCode());
 
 		model.addAttribute("sttsCds", AthrztSttsCd.values());
+		model.addAttribute("loginUser", LoginMngrUtils.getTcUserMngInfo());
 		model.addAttribute("bffltdList", bffltdList);
 		model.addAttribute("userList", userList);
 		model.addAttribute("totalCnt", totalCnt);
@@ -98,7 +99,7 @@ public class MngrMngController {
 	@Authority(authType = AuthType.READ, menuType = MenuType.SAVE)
 	@GetMapping("/save")
 	public String mngrSavePage(Model model) {
-		List<TcAuthMng> authList = tcAuthMngRepository.findAll();
+		List<TcAuthGrp> authList = tcAuthGrpRepository.findAll();
 		List<TcCdInfo> bffltdList = qTcCdInfoRepository.getTcCdInfoListByGrpCd(GroupCode.BFFLTD_CD.getCode());
 
 		model.addAttribute("authList", authList);

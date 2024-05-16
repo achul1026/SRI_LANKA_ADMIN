@@ -34,6 +34,7 @@ public class AuthenticationService implements UserDetailsService {
         	authenticationEntity.setUserId(result.getUserId());
         	authenticationEntity.setUserAuth(result.getUserAuth());
         	authenticationEntity.setUserPswd(result.getUserPswd());
+        	authenticationEntity.setUserBffltd(result.getUserBffltd());
         	
         }else{
             throw new UsernameNotFoundException(username);

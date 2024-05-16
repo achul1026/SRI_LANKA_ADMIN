@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.sri.lanka.traffic.admin.common.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +23,26 @@ import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectUpdateDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectUpdateDTO.TmSrvySectUpdateInfo;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectUpdateDTO.TmSrvySectUpdateInfo.TmSrvyQstnUpdateInfo;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectUpdateDTO.TmSrvySectUpdateInfo.TmSrvyQstnUpdateInfo.TmSrvyAnsUpdateInfo;
+import com.sri.lanka.traffic.admin.common.entity.TmExmnDrct;
+import com.sri.lanka.traffic.admin.common.entity.TmExmnMng;
+import com.sri.lanka.traffic.admin.common.entity.TmExmnPollster;
+import com.sri.lanka.traffic.admin.common.entity.TmSrvyAns;
+import com.sri.lanka.traffic.admin.common.entity.TmSrvyInfo;
+import com.sri.lanka.traffic.admin.common.entity.TmSrvyQstn;
+import com.sri.lanka.traffic.admin.common.entity.TmSrvySect;
 import com.sri.lanka.traffic.admin.common.enums.code.ExmnSttsCd;
 import com.sri.lanka.traffic.admin.common.enums.code.QstnTypeCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnDrctRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnMngRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnPollsterRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmSrvyAnsRepository;
+import com.sri.lanka.traffic.admin.common.querydsl.QTmSrvyQstnRepository;
+import com.sri.lanka.traffic.admin.common.querydsl.QTmSrvySectRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnDrctRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnMngRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnPollsterRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmSrvyAnsRepository;
+import com.sri.lanka.traffic.admin.common.repository.TmSrvyInfoRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmSrvyQstnRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmSrvySectRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
@@ -79,6 +88,9 @@ public class InvstMngService {
 	TmSrvyAnsRepository tmSrvyAnsRepository;
 	
 	@Autowired
+	TmSrvyInfoRepository tmSrvyInfoRepository;
+	
+	@Autowired
 	QTmSrvyAnsRepository qTmSrvyAnsRepository;
 	
 	@Autowired
@@ -86,6 +98,12 @@ public class InvstMngService {
 	
 	@Autowired
 	QTmExmnMngRepository qTmExmnMngRepository;
+	
+	@Autowired
+	QTmSrvyQstnRepository qTmSrvyQstnRepository;
+	
+	@Autowired
+	QTmSrvySectRepository qTmSrvySectRepository;
 	
 	/**
 	  * @Method Name : saveTrfcInvst
@@ -96,14 +114,13 @@ public class InvstMngService {
 	  * @param sriTrfcInvst
 	  */
 	@Transactional
-	public void saveInvstInfo(TmExmnMngSaveDTO tmExmnMngSaveDTO) {
+	public void saveInvstInfo(TmExmnMngSaveDTO tmExmnMngSaveDTO) throws CommonException  {
 		try {
-			
 			//교통 조사는 설문지가 없으므로 상태값 작성 완료
 			TmExmnMng tmExmnMng = tmExmnMngSaveDTO.getTmExmnMng(); 
-			ExmnSttsCd exmnSttsCd = ExmnSttsCd.INVEST_WRITING;
+			ExmnSttsCd exmnSttsCd = ExmnSttsCd.INVEST_WRITE_COMPLETED;
 			
-			if("traffic".equals(tmExmnMng.getExmnType().getType())){
+			if("true".equals(tmExmnMng.getExmnType().getHasDrct())){
 				
 				// 방향 값이 비어있을 경우 또는 중복되는 경우
 				List<TmExmnDrct> tmExmnDrctList = tmExmnMngSaveDTO.getTmExmnDrctList();
@@ -127,7 +144,6 @@ public class InvstMngService {
 				    }
 				}
 				
-				exmnSttsCd = ExmnSttsCd.INVEST_WRITE_COMPLETED;
 				tmExmnDrctList.forEach(x -> x.setExmnmngId(tmExmnMng.getExmnmngId()));
 				tmExmnDrctRepository.saveAll(tmExmnDrctList);
 			}
@@ -186,7 +202,7 @@ public class InvstMngService {
 				tmExmnDrctRepository.saveAll(tmExmnDrctList);
 			}
 			
-			if(tmExmnMngUpdateDTO.getDeleteDrctArray().length > 0) {
+			if(!CommonUtils.isNull(tmExmnMngUpdateDTO.getDeleteDrctArray()) && tmExmnMngUpdateDTO.getDeleteDrctArray().length > 0) {
 				qTmExmnDrctRepository.deleteByIdArr(tmExmnMngUpdateDTO.getDeleteDrctArray());
 			}
 		}catch (Exception e) {
@@ -204,20 +220,19 @@ public class InvstMngService {
 	@Transactional
 	public void saveSrvyInvstQstn(TmSrvySectSaveDTO tmSrvySectSaveDTO) {
 		
-		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(tmSrvySectSaveDTO.getExmnmngId());
-		
-		if (!invstInfo.isPresent()) {
-			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
-		}
-		
 		if(CommonUtils.isNull(tmSrvySectSaveDTO)) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Survey section data is empty");
 		}
 		
 		try {
+			String srvyId = CommonUtils.getUuid();
+			tmSrvySectSaveDTO.setSrvyId(srvyId);
+			tmSrvyInfoRepository.save(tmSrvySectSaveDTO.toEntity());
+			
 			for(TmSrvySectSaveInfo tmSrvySectInfo : tmSrvySectSaveDTO.getTmSrvySectList()) {
 				String sectId = CommonUtils.getUuid();
 				tmSrvySectInfo.setSectId(sectId);
+				tmSrvySectInfo.setSrvyId(srvyId);
 				tmSrvySectRepository.save(tmSrvySectInfo.toEntity());
 				
 				if(!CommonUtils.isNull(tmSrvySectInfo.getTmSrvyQstnList())) {
@@ -238,24 +253,38 @@ public class InvstMngService {
 			}// end for SrvySctnList
 			
 			//조사 상태 수정
-			invstInfo.get().setSttsCd(ExmnSttsCd.INVEST_WRITE_COMPLETED);
-			tmExmnMngRepository.save(invstInfo.get());
+//			invstInfo.get().setSttsCd(ExmnSttsCd.INVEST_WRITE_COMPLETED);
+//			tmExmnMngRepository.save(invstInfo.get());
 			
 		}catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new CommonException(ErrorCode.ENTITY_SAVE_FAILED, "Survey range save failed");
 		}
 		
 	}
 	
+	/**
+	  * @Method Name : updateSrvyInvstQstn
+	  * @작성일 : 2024. 5. 7.
+	  * @작성자 : NK.KIM
+	  * @Method 설명 : 설문 양식 수정
+	  * @param tmSrvySectUpdateDTO
+	  * @param exmnmngId
+	  */
 	@Transactional
-	public void updateSrvyInvstQstn(TmSrvySectUpdateDTO tmSrvySectUpdateDTO,String exmnmngId) {
+	public void updateSrvyInvstQstn(TmSrvySectUpdateDTO tmSrvySectUpdateDTO,String srvyId) {
 		
-		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
+		Optional<TmSrvyInfo> survyInfo = tmSrvyInfoRepository.findById(srvyId);
 		
-		if (!invstInfo.isPresent()) {
+		if (!survyInfo.isPresent()) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
 		}
+		
+		//설문 정보 저장
+		survyInfo.get().setSrvyTitle(tmSrvySectUpdateDTO.getSrvyTitle());
+		survyInfo.get().setSrvyType(tmSrvySectUpdateDTO.getSrvyType());
+		survyInfo.get().setStartDt(tmSrvySectUpdateDTO.getStartDt());
+		survyInfo.get().setEndDt(tmSrvySectUpdateDTO.getEndDt());
+		tmSrvyInfoRepository.save(survyInfo.get());
 		
 		if(CommonUtils.isNull(tmSrvySectUpdateDTO)) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Survey section data is empty");
@@ -287,12 +316,23 @@ public class InvstMngService {
 				}// null check SrvyQstnList
 			}// end for SrvySctnList
 			
+			//답변정보삭제
 			if(tmSrvySectUpdateDTO.getDeleteAnsArray().length > 0) {
 				qTmSrvyAnsRepository.deleteByIdArr(tmSrvySectUpdateDTO.getDeleteAnsArray());
 			}
-			
+			//질문정보삭제
+			if(tmSrvySectUpdateDTO.getDeleteQstnArray().length > 0) {
+				qTmSrvyAnsRepository.deleteByQstnIdArr(tmSrvySectUpdateDTO.getDeleteQstnArray());
+				qTmSrvyQstnRepository.deleteByIdArr(tmSrvySectUpdateDTO.getDeleteQstnArray());
+			}
+			//부문 삭제
+			if(tmSrvySectUpdateDTO.getDeleteSectArray().length > 0) {
+				String[] deleteQstnIdArr = qTmSrvyQstnRepository.getQstnIdArrBySectIdArr(tmSrvySectUpdateDTO.getDeleteSectArray());
+				qTmSrvyAnsRepository.deleteByQstnIdArr(deleteQstnIdArr);
+				qTmSrvyQstnRepository.deleteByIdArr(deleteQstnIdArr);
+				qTmSrvySectRepository.deleteByIdArr(tmSrvySectUpdateDTO.getDeleteSectArray());
+			}
 		}catch (Exception e) {
-			System.out.println(e.getMessage());
 			throw new CommonException(ErrorCode.ENTITY_SAVE_FAILED, "Survey save failed");
 		}
 		
@@ -304,12 +344,12 @@ public class InvstMngService {
 	  * @작성일 : 2024. 3. 25.
 	  * @작성자 : NK.KIM
 	  * @Method 설명 : 설문지 목록 조회
-	  * @param exmnmngId
+	  * @param srvyId
 	  * @return
 	  */
-	public TmSrvySectDetailDTO getSrvySectInfo(String exmnmngId){
+	public TmSrvySectDetailDTO getSrvySectInfo(String srvyId){
 		TmSrvySectDetailDTO tmSrvySectDetailDTO = new TmSrvySectDetailDTO();
-		List<TmSrvySect> dbTmSrvySectList = tmSrvySectRepository.findAllByExmnmngIdOrderBySectSqnoAsc(exmnmngId);
+		List<TmSrvySect> dbTmSrvySectList = tmSrvySectRepository.findAllBySrvyIdOrderBySectSqnoAsc(srvyId);
 		//설문 항목 목록 호출
 		if(!CommonUtils.isNull(dbTmSrvySectList)) {
 			
@@ -331,7 +371,8 @@ public class InvstMngService {
 					for(TmSrvyQstnInfo tmSrvyQstnInfo : tmSrvySectInfo.getTmSrvyQstnList()) {
 						QstnTypeCd qstnTypeCd = tmSrvyQstnInfo.getQstnTypeCd();
 						//답변은 RADIO or CHECKBOX
-						if(QstnTypeCd.RADIO.equals(qstnTypeCd) || QstnTypeCd.CHECKBOX.equals(qstnTypeCd)) {
+						if(QstnTypeCd.RADIO.equals(qstnTypeCd) || QstnTypeCd.CHECKBOX.equals(qstnTypeCd)
+								|| QstnTypeCd.SELECTBOX.equals(qstnTypeCd)) {
 							//설문 답변 목록 호출
 							List<TmSrvyAns> dbTmSrvyAnsList = tmSrvyAnsRepository.findAllByQstnIdOrderByAnsSqnoAsc(tmSrvyQstnInfo.getQstnId());
 							if(!CommonUtils.isNull(dbTmSrvyAnsList)) {
@@ -408,7 +449,7 @@ public class InvstMngService {
 			//설문 조사 인경우
 			if("survey".equals(invstInfo.get().getExmnType().getType())){
 				//설문지 답변/질문/부문 테이블 삭제
-				List<TmSrvySect> tmSrvySectList = tmSrvySectRepository.findAllByExmnmngIdOrderBySectSqnoAsc(exmnmngId);
+				List<TmSrvySect> tmSrvySectList = tmSrvySectRepository.findAllBySrvyIdOrderBySectSqnoAsc(exmnmngId);
 				if(!CommonUtils.isListNull(tmSrvySectList)){
 					for(TmSrvySect tmSrvySect : tmSrvySectList){
 						List<TmSrvyQstn> tmSrvyQstnList = tmSrvyQstnRepository.findAllBySectIdOrderByQstnSqnoAsc(tmSrvySect.getSectId());
@@ -444,6 +485,27 @@ public class InvstMngService {
 		}catch (Exception e) {
 			throw new CommonException(ErrorCode.ENTITY_DELETE_FAILED, "Examination delete failed");
 		}
+	}
+
+	@Transactional
+	public void deleteSurvey(String srvyId) {
+		 // 섹션 조회
+		List<TmSrvySect> sects = tmSrvySectRepository.findAllBySrvyId(srvyId);
+		for(TmSrvySect sect : sects) {
+			// 질문 조회
+			List<TmSrvyQstn> qstns = tmSrvyQstnRepository.findAllBySectId(sect.getSectId());
+					
+			for(TmSrvyQstn qstn : qstns) {
+				// 답변 삭제
+            	tmSrvyAnsRepository.deleteAllByQstnId(qstn.getQstnId());
+	            // 질문 삭제
+            	tmSrvyQstnRepository.deleteAllByQstnId(qstn.getQstnId());
+	        }
+	        // 섹션 삭제
+	        tmSrvySectRepository.deleteAllBySectId(sect.getSectId());
+	    }
+	    // 설문조사 정보 삭제
+		tmSrvyInfoRepository.deleteAllBySrvyId(srvyId);
 	}
 
 }

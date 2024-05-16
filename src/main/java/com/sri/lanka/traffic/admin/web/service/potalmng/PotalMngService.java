@@ -47,6 +47,7 @@ public class PotalMngService {
 		String mngrId = LoginMngrUtils.getUserId();
 		Optional<TlBbsInfo> newTlBbsInfo = tlBbsInfoRepository.findById(id);
 		if (newTlBbsInfo.isPresent()) {
+			if (!CommonUtils.isNull(tlBbsInfo.getBbsType())) newTlBbsInfo.get().setBbsType(tlBbsInfo.getBbsType());
 			if (!CommonUtils.isNull(tlBbsInfo.getBbsTitle())) newTlBbsInfo.get().setBbsTitle(tlBbsInfo.getBbsTitle());
 			if (!CommonUtils.isNull(tlBbsInfo.getBbsCnts())) newTlBbsInfo.get().setBbsCnts(tlBbsInfo.getBbsCnts());
 			if (!CommonUtils.isNull(tlBbsInfo.getDspyYn())) newTlBbsInfo.get().setDspyYn(tlBbsInfo.getDspyYn());

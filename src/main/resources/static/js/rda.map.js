@@ -16,7 +16,7 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 	    mapboxgl.accessToken = 'pk.eyJ1IjoidGFleXUiLCJhIjoiY2xpbzVzcWphMDVlZzNlbndxbzQ4a20zMCJ9.Zy8tFFyQruKS8zQKTh3wKA';
 	    map = window.map = new mapboxgl.Map({
 	        container: 'map',
-	        style:  'mapbox://styles/mapbox/streets-v12',
+	        style: 'mapbox://styles/mapbox/streets-v12',
 	        zoom: 15,
 			center:[lng, lat],
 	    });
@@ -45,8 +45,8 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 		const coordinate = document.getElementById('coordinate');
 	    
 	    //조사위치 등록
-	    const mapLoactionSave = document.getElementById('mapLoactionSave');
-	    if(mapLoactionSave){
+	    const mapLocationSave = document.getElementById('mapLocationSave');
+	    if(mapLocationSave){
 		    map.on('click', function(e){
 				const lngLat = e.lngLat;
 				locationLng = e.lngLat.lng;
@@ -63,6 +63,12 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 					el.style.width = '26px'
 					el.style.height = '36px'
 					markerSet(el, locationLng, locationLat);
+					
+					if(map.getLayer('circle')) {
+						map.removeLayer('circle');
+					    map.removeSource('circle');
+					}
+					
 					
 					document.getElementById('surveyMapLocation').value = surveyMapLocation;
 					}, '취소', function(button, modal){
@@ -91,23 +97,10 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 				},
 				paint: {
 					'fill-color':'#B1B1B1',
-					'fill-opacity': 0.5
+					'fill-opacity': 0.3
 				}
 			})
 			
-			//좌표반경 입력하면 기존에 찍었던 마커 다시 찍어주기
-			if(coordinate) {
-				if(coordinate.value !== ''){
-				    //조사해야할곳위치		
-				    const el = document.createElement('img')
-					el.src = RDA_ENV.MARKERS[0].locationUrl
-					el.style.width = '26px'
-					el.style.height = '36px'
-					marker = new mapboxgl.Marker(el)
-					.setLngLat([locationLng, locationLat])
-		    		.addTo(map);
-				}
-			}
 			resolve(map);
 		})
 		
@@ -147,8 +140,6 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 function markerSet(el, lng, lat){
 	if(marker) {
 		const range = document.getElementById('exmnRange');
-    	mapRemove();
-    	mapboxGl(locationLng, locationLat);
 		marker.remove();
 		marker = null;
 		marker = new mapboxgl.Marker(el)
@@ -168,6 +159,36 @@ function mapRemove(){
 		map = null;
 	}
 }
+
+function layerCircle(){
+	const coordInateValue = document.getElementById('coordinate').value;
+	const locationCircleValue = document.getElementById('exmnRange').value;
+	if(coordInateValue !== ''){		
+		if(locationCircleValue !== '') {
+			if(map.getLayer('circle')) {
+				map.removeLayer('circle');
+			    map.removeSource('circle');
+			}			
+			const turfJs = turf.circle([locationLng, locationLat], locationCircleValue, {units:'meters'});
+			map.addLayer({
+				id:'circle',
+				type: 'fill',
+				source: {
+					type:'geojson',
+					data: turfJs
+				},
+				paint: {
+					'fill-color':'#B1B1B1',
+					'fill-opacity': 0.3
+				}
+			})		 	
+		} else {
+			new ModalBuilder().init().alertBody('좌표 반경을 입력해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+		}
+	} else {
+		new ModalBuilder().init().alertBody('조사 위치를 등록해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();				
+	}
+}			
 
 
 function testFacilityMarkerSet(){

@@ -223,6 +223,9 @@ input[type="radio"]:checked {
 	/* font-weight:500; */
 	border-bottom:1px solid #bebebe;
 }
+#listTable tr.active td, .list-table tr.active td {
+	background-color:#ededed;
+}
 .table-link:hover {
 	cursor:pointer;
 }
@@ -492,6 +495,24 @@ input[type="radio"]:checked {
 	padding-bottom:5px;
 	border-radius: 50%;
   	background-color: var(--key-color) !important;
+}
+
+.datepicker-days {
+
+   display: none ;
+
+}
+
+.datepicker-months {
+
+   display: none ;
+
+}
+
+.datepicker-years {
+
+   display: block ;
+
 }
 
 /* mapbox */

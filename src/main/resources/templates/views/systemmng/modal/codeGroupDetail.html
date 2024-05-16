@@ -15,8 +15,8 @@
 							<th>사용여부</th>
 							<td>
 								<select class="select-list-box" name="useYn">
-									<option th:value="${tcCdGrp.useYn}" th:selected="${tcCdGrp.useYn} == 'Y'">사용</option>
-									<option th:value="${tcCdGrp.useYn}" th:selected="${tcCdGrp.useYn} == 'N'">미사용</option>
+									<option value="Y" th:selected="${tcCdGrp.useYn} == 'Y'">사용</option>
+									<option value="N" th:selected="${tcCdGrp.useYn} == 'N'">미사용</option>
 								</select>
 							</td>
 						</tr>

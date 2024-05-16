@@ -16,6 +16,10 @@ public class TlSrvyRslt {
 
     private String exmnrsltId; //조사 결과 아이디
     
+    private String startlcNm; //시작위치 명
+    
+    private String endlcNm; //종료위치 명
+    
     private LocalDate exmnstartDt; //조사 기간 시작 일시
     
     private LocalDate exmnendDt; //조사 기간 종료 일시

@@ -12,12 +12,13 @@ import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserAuthMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserMngDTO;
 import com.sri.lanka.traffic.admin.common.entity.QTcAuthGrp;
-import com.sri.lanka.traffic.admin.common.entity.QTcAuthMng;
 import com.sri.lanka.traffic.admin.common.entity.QTcCdInfo;
 import com.sri.lanka.traffic.admin.common.entity.QTcUserMng;
 import com.sri.lanka.traffic.admin.common.enums.code.AthrztSttsCd;
+import com.sri.lanka.traffic.admin.common.enums.code.UserTypeCd;
 //import com.sri.lanka.traffic.admin.common.enums.code.MngrSttsCd;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
+import com.sri.lanka.traffic.admin.common.util.LoginMngrUtils;
 import com.sri.lanka.traffic.admin.common.util.PagingUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,6 @@ public class QTcUserMngRepository {
 	private final JPAQueryFactory queryFactory;
 
 	private QTcUserMng tcUserMng = QTcUserMng.tcUserMng;
-
-	private QTcAuthMng tcAuthMng = QTcAuthMng.tcAuthMng;
 
 	private QTcCdInfo bffltdCd = QTcCdInfo.tcCdInfo;
 	
@@ -48,19 +47,25 @@ public class QTcUserMngRepository {
 	 * @return
 	 */
 	public List<TcUserMngDTO> getTcUserList(SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+		
+		LoginMngrDTO loginUser = LoginMngrUtils.getTcUserMngInfo();
+		if (!(loginUser.getUserType() == UserTypeCd.SUPER) && !(loginUser.getUserBffltd().equals("BFC001"))) {
+			searchCommonDTO.setSearchTypeCd(loginUser.getUserBffltd());
+		}
 
 		List<TcUserMngDTO> result = queryFactory
 				.select(Projections.bean(TcUserMngDTO.class, tcUserMng.usermngId, tcUserMng.userId,
 						tcUserMng.userPswd, tcUserMng.userBffltd, tcUserMng.userEmail, tcUserMng.userType,
 						tcUserMng.athrztStts, tcUserMng.userNm, tcUserMng.userAuth, tcUserMng.userTel, tcUserMng.registDt,
-						tcAuthMng.authNm, bffltdCd.cdNm.as("bffltdNm")))
-				.from(tcUserMng).leftJoin(tcAuthMng).on(tcUserMng.authId.eq(tcAuthMng.authId)).leftJoin(bffltdCd)
-				.on(tcUserMng.userBffltd.eq(bffltdCd.cd))
-				.where(searchOption(searchCommonDTO.getSearchContent()),
-						QRepositorySupport.containsKeyword(tcUserMng.userBffltd,
-								searchCommonDTO.getSearchTypeCd()),
-						QRepositorySupport.toEqExpression(tcUserMng.athrztStts,
-								AthrztSttsCd.getEnums(searchCommonDTO.getSearchSttsCd())))
+						tcAuthGrp.authgrpNm,
+						bffltdCd.cdNm.as("bffltdNm")))
+				.from(tcUserMng)
+				.leftJoin(tcAuthGrp).on(tcUserMng.authgrpId.eq(tcAuthGrp.authgrpId))
+				.leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
+				.where(
+						searchOption(searchCommonDTO.getSearchContent()),
+						QRepositorySupport.containsKeyword(tcUserMng.userBffltd,searchCommonDTO.getSearchTypeCd()),
+						QRepositorySupport.toEqExpression(tcUserMng.athrztStts,AthrztSttsCd.getEnums(searchCommonDTO.getSearchSttsCd())))
 				.offset(paging.getOffsetCount()).limit(paging.getLimitCount()).orderBy(tcUserMng.registDt.desc()).fetch();
 
 		return result;
@@ -76,8 +81,9 @@ public class QTcUserMngRepository {
 	 */
 	public Long getTotalCount(SearchCommonDTO searchCommonDTO) {
 
-		Long count = queryFactory.select(tcUserMng.countDistinct()).from(tcUserMng).leftJoin(tcAuthMng)
-				.on(tcUserMng.authId.eq(tcAuthMng.authId)).leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
+		Long count = queryFactory.select(tcUserMng.countDistinct()).from(tcUserMng)
+				.leftJoin(tcAuthGrp).on(tcUserMng.authgrpId.eq(tcAuthGrp.authgrpId))
+				.leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
 				.where(searchOption(searchCommonDTO.getSearchContent()),
 						QRepositorySupport.containsKeyword(tcUserMng.userBffltd,
 								searchCommonDTO.getSearchTypeCd()),
@@ -115,11 +121,12 @@ public class QTcUserMngRepository {
 	 */
 	public TcUserMngDTO getTcUserInfo(String usermngId) {
 		TcUserMngDTO result = queryFactory
-				.select(Projections.bean(TcUserMngDTO.class, tcUserMng.usermngId, tcUserMng.authId, tcUserMng.userId,
+				.select(Projections.bean(TcUserMngDTO.class, tcUserMng.usermngId, tcUserMng.authgrpId, tcUserMng.userId,
 						tcUserMng.userPswd, tcUserMng.userBffltd, tcUserMng.userEmail, tcUserMng.userType,
 						tcUserMng.athrztStts, tcUserMng.userNm, tcUserMng.userAuth, tcUserMng.userTel, tcUserMng.registDt,
-						tcAuthMng.authNm, bffltdCd.cdNm.as("bffltdNm"), deptCd.cdNm.as("deptNm")))
-				.from(tcUserMng).leftJoin(tcAuthMng).on(tcUserMng.authId.eq(tcAuthMng.authId))
+						tcAuthGrp.authgrpNm,
+						bffltdCd.cdNm.as("bffltdNm"), deptCd.cdNm.as("deptNm")))
+				.from(tcUserMng).leftJoin(tcAuthGrp).on(tcUserMng.authgrpId.eq(tcAuthGrp.authgrpId))
 				.leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
 				.leftJoin(deptCd).on(tcUserMng.userDept.eq(deptCd.cd))
 				.where(tcUserMng.usermngId.eq(usermngId))
@@ -136,8 +143,8 @@ public class QTcUserMngRepository {
 	 * @return
 	 */
 	public LoginMngrDTO getTcUserInfoByUserId(String userId) {
-		LoginMngrDTO result = queryFactory.select(Projections.bean(LoginMngrDTO.class, tcUserMng.usermngId, tcUserMng.authId,
-				tcUserMng.userId, tcUserMng.userPswd, tcUserMng.userAuth, tcUserMng.userType,
+		LoginMngrDTO result = queryFactory.select(Projections.bean(LoginMngrDTO.class, tcUserMng.usermngId, tcUserMng.authgrpId,
+				tcUserMng.userId, tcUserMng.userPswd, tcUserMng.userAuth, tcUserMng.userType, tcUserMng.userBffltd,
 				tcUserMng.athrztStts, tcUserMng.userNm)).from(tcUserMng).where(tcUserMng.userId.eq(userId))
 				.fetchOne();
 		return result;
@@ -159,8 +166,7 @@ public class QTcUserMngRepository {
 										, tcUserMng.userNm, tcUserMng.userTel, tcUserMng.userEmail
 						))
 				.from(tcAuthGrp)
-				.innerJoin(tcAuthMng).on(tcAuthGrp.authgrpId.eq(tcAuthMng.authgrpId))
-				.innerJoin(tcUserMng).on(tcAuthMng.authId.eq(tcUserMng.authId))
+				.innerJoin(tcUserMng).on(tcAuthGrp.authgrpId.eq(tcUserMng.authgrpId))
 				.leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
 				.where(tcAuthGrp.authgrpId.eq(authgrpId),searchOption(searchCommonDTO.getSearchContent()))
 				.offset(paging.getOffsetCount()).limit(paging.getLimitCount()).orderBy(tcUserMng.registDt.desc())
@@ -183,8 +189,8 @@ public class QTcUserMngRepository {
 			searchContent = searchCommonDTO.getSearchContent();
 		}
 		Long count = queryFactory.select(tcUserMng.countDistinct()).from(tcAuthGrp)
-				.innerJoin(tcAuthMng).on(tcAuthGrp.authgrpId.eq(tcAuthMng.authgrpId))
-				.innerJoin(tcUserMng).on(tcAuthMng.authId.eq(tcUserMng.authId))
+//				.innerJoin(tcAuthMng).on(tcAuthGrp.authgrpId.eq(tcAuthMng.authgrpId))
+				.innerJoin(tcUserMng).on(tcAuthGrp.authgrpId.eq(tcUserMng.authgrpId))
  				.leftJoin(bffltdCd).on(tcUserMng.userBffltd.eq(bffltdCd.cd))
 				.where(tcAuthGrp.authgrpId.eq(authgrpId),searchOption(searchContent))
 				.fetchOne();

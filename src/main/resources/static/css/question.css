@@ -42,6 +42,7 @@
 	margin-bottom:16px;
 }
 .quest-title {
+	display:flex;
 	font-size:20px;
 }
 .quest-sub-title {
@@ -96,7 +97,7 @@
 }
 .sortable-handle span {
 	display:inline-block;
-	width:28px;
+	width:23px;
 	height:16px;
 	margin:0 auto;
 	background: url('/images/sortable.png') no-repeat center center / cover;
@@ -319,4 +320,108 @@
 }
 
 
+.survey-loaction-box select {
+	margin-right:6px;
+	background: url(../images/join_select_arrow.png) no-repeat 95% 50%;
+    background-size: 10px 7px;
+}
+.survey-loaction-box select:nth-last-child(1) {
+	margin-right:0;
+}
 
+#scheduleContainer.active #scheduleDetailContainer {
+	display:none;
+}
+#scheduleContainer.active #scheduleHistoryContainer{
+	display:block !important;
+}
+
+.histroy-flex-box {
+	display:flex;
+	gap:16px;
+	margin-top:16px;
+}
+.history-chart-box {
+	width:30%;
+	height:458px;
+}
+.history-table-box {
+	flex:1;
+}
+.survey-history-txt-box {
+	display:flex;
+	justify-content:space-between;
+	margin-bottom:4px;
+}
+.survey-history-txt-box:nth-last-child(1) {
+	margin-bottom:0;
+}
+.survey-history-txt {
+	display:inline-block;
+	width:160px;
+}
+.history-date-box {
+	/* text-align:right; */
+	margin-bottom:16px;
+}
+/* chart */
+.history-chart {
+	margin: 16px 0;
+}
+.chart-title {
+	font-size:14px;
+	font-weight:600;
+	color:var(--key-color);
+}
+.chart {
+    width:50%;
+    margin: 16px auto 0 auto;
+}
+.chart-box {
+    position:relative;
+}
+.percent {
+	position:absolute;
+	top:50%;
+	left:50%;
+	font-size:24px;
+	transform:translate(-50%, -50%);
+}
+.units-box {
+	display:flex;
+	justify-content:center;
+	margin-top:8px;
+}
+.history-tc-box {
+	width:30%;
+	height:414px;
+}
+
+.tcTiemWrap {
+	width:100%;
+	border:1px solid #e9e9e9;
+	border-radius:5px;
+	margin:0 auto;
+}
+.tcTimeInner {
+	height:180px;
+	padding:16px;
+	overflow-y:auto;
+}
+.tc-time-box {
+	display:inline-block;
+	width:14%;
+	padding:0 6px;
+	font-size:14px;
+	text-align:center;
+}
+.tc-time-box:nth-last-child(1){
+	margin-right:0;
+}
+.tc-time {
+	margin-bottom:6px;
+}
+.history-date-box .list-search-box .select-list-box {
+	background: #ededed url(../images/join_select_arrow.png) no-repeat 97% 50%;
+    background-size: 10px 7px;	
+}

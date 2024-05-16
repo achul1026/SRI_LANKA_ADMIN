@@ -4,166 +4,186 @@
       layout:decorate="~{layout/layout}">
       
 	<th:block layout:fragment="content">
-        <div class="is-box">
-        	<div>
-	            <h3 class="info-title">කාලසටහනේ විස්තර</h3>
-        	</div>
-			<div class="infoTableWrap">
-				<input type="hidden" id="exmnmngId" th:value="${invstInfo.exmnmngId}">
-				<table class="infoTable survey-save-table">
-					<tr>
-						<th>조사명</th>
-						<td th:text="${invstInfo.exmnNm}"></td>
-						<th>캘린더 색상</th>
-						<td><span id="scheduleColor" th:class="${invstInfo.colrCd.getCode()}"></span></td>
-					</tr>
-					<tr>
-						<th>조사 종류</th>
-						<td th:text="${invstInfo.exmnType.getName()}"></td>
-						<th>조사 담당자</th>
-						<td th:text="${invstInfo.exmnpicId}"></td>
-					</tr>
-					<tr>
-						<th>조사 기간</th>
-						<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}"></td>					
-						<th>조사 시간</th>
-						<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH:mm')}"></td>
-					</tr>
-					<tr>
-						<th>조사 형태</th>
-						<td th:text="${invstInfo.exmnDiv}"></td>
-						<th>조사 인원</th>
-						<td th:text="${invstInfo.exmnNop}"></td>						
-					</tr>
-					<tr>
-						<th class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">조사 목표 개수</th>
-						<td class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'" th:text="${invstInfo.goalCnt}"></td>						
-						<th>조사 지역</th>
-						<td th:text="${invstInfo.exmnLc}"></td>														
-					</tr>
-					<tr>
-						<th>좌표</th>
-						<td id="coordinateDetail" th:text="${invstInfo.lat} +','+ ${invstInfo.lon}"></td>					
-						<th>좌표 반경(m)</th>
-						<td>
-							<span class="locationCircle">
-								<input type="text" id="exmnRange" class="input-table-text" th:value="${invstInfo.exmnRange}" />
-								<input type="button" id="mapCircleUpdate" class="is-key-button overLapping" value="저장" th:onclick="updateExmnRange([[${exmnmngId}]]);"/>
-							</span>
-						</td>
-					</tr>
-					<tr>
-						<th>ස්ථානය</th>
-						<td colspan="3">
-							<span id="detailMap">
-								<span id="map"></span>
-							</span>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		<!-- 조사방향 -->
-		<th:block th:if="${invstInfo.exmnType.getType() eq 'traffic'}">
-			<div id="surveyDirectionBox" class="is-box mt24">
-				<div>
-					<h3 class="info-title">조사 방향</h3>
-				</div>
-				<div class="infoTableWrap">
-					<table class="infoTable">
-						<thead>
+		<div id="scheduleContainer">
+			<div id="scheduleDetailContainer">
+		        <div class="is-box">
+		        	<div class="flex-between">
+			            <h3 class="info-title">조사 현황 및 일정 상세</h3>
+			            <div>
+			            	<input type="button" class="is-key-button" onclick="historyView();" value="이력 보기"/>
+			            </div>
+		        	</div>
+					<div class="infoTableWrap">
+						<input type="hidden" id="exmnmngId" th:value="${invstInfo.exmnmngId}">
+						<table class="infoTable survey-save-table">
 							<tr>
-								<th>번호</th>
-								<th>From</th>
-								<th>To</th>
+								<th>조사 종류</th>
+								<td th:text="${invstInfo.exmnType.getName()}"></td>
+								<th>조사명</th>
+								<td th:text="${invstInfo.exmnNm}"></td>
 							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="item : ${tmExmnDrctList}">
-								<td class="text-center" th:text="${item.drctSqno}"></td>
-								<td class="text-center" th:text="${item.startlcNm}"></td>
-								<td class="text-center" th:text="${item.endlcNm}"></td>
+							<tr>
+								<th>조사 담당자</th>
+								<td th:text="${invstInfo.exmnpicId}"></td>
+								<th>조사 형태</th>
+								<td th:text="${invstInfo.exmnDiv}"></td>
 							</tr>
-						</tbody>
-					</table>
+							<tr th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
+								<th>설문 양식</th>
+								<td th:text="${invstInfo.srvyTitle}"></td>
+								<th class="survey-objectives">조사 목표 개수</th>
+								<td class="survey-objectives" th:text="${invstInfo.goalCnt}"></td>
+							</tr>
+							<tr>
+								<th>조사 기간</th>
+								<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}"></td>					
+								<th>조사 시간</th>
+								<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH:mm')}"></td>
+							</tr>
+							<tr>
+								<th>조사 인원</th>
+								<td th:text="${invstInfo.exmnNop}"></td>						
+								<th>캘린더 색상</th>
+								<td><span id="scheduleColor" th:class="${invstInfo.colrCd.getCode()}"></span></td>
+							</tr>
+							<tr>
+								<th>조사 지역</th>
+								<td th:text="${invstInfo.exmnLc}"></td>	
+								<th class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">도로 차선 수</th>			
+								<td th:text="${invstInfo.laneCnt}" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'"></td>	
+							</tr>
+							<tr th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+								<th>좌표</th>
+								<td id="coordinateDetail" th:text="${invstInfo.lat} +','+ ${invstInfo.lon}"></td>					
+								<th>좌표 반경(m)</th>
+								<td>
+									<span class="locationCircle">
+										<input type="text" id="exmnRange" class="input-table-text" th:value="${invstInfo.exmnRange}" />
+										<input type="button" id="mapCircleUpdate" class="is-key-button overLapping" value="저장" th:onclick="updateExmnRange([[${exmnmngId}]]);"/>
+									</span>
+								</td>
+							</tr>
+							<tr id="tableMap" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+								<th>ස්ථානය</th>
+								<td colspan="3">
+									<span id="detailMap">
+										<span id="map"></span>
+									</span>
+								</td>
+							</tr>
+						</table>
+					</div>
 				</div>
-	        </div>				
-		</th:block>		
-		<div class="is-box mt24">
-			<div>
-				<h3 class="info-title">කාලසටහනේ විස්තර</h3>	
-			</div>
-			<div class="infoTableWrap">
-				<div class="survey-update">
-					<div class="flex-center">
-						<span>총 조사원</span>
-						<img th:src="@{/images/investigator.png}" alt="user" class="survey-user-img"/>							 
-						<strong id="totalCount" th:text="${invstInfo.exmnNop}"></strong>
+				<!-- 조사방향 -->
+				<th:block th:if="${invstInfo.exmnType.getHasDrct() eq 'true'}">
+					<div id="surveyDirectionBox" class="is-box mt24">
+						<div>
+							<h3 class="info-title">조사 방향</h3>
+						</div>
+						<div class="infoTableWrap">
+							<table class="infoTable">
+								<thead>
+									<tr>
+										<th>번호</th>
+										<th>From</th>
+										<th>To</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item : ${tmExmnDrctList}">
+										<td class="text-center" th:text="${item.drctSqno}"></td>
+										<td class="text-center" th:text="${item.startlcNm}"></td>
+										<td class="text-center" th:text="${item.endlcNm}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+			        </div>				
+				</th:block>		
+				<div class="is-box mt24">
+					<div>
+						<h3 class="info-title">කාලසටහනේ විස්තර</h3>	
 					</div>
-					<div class="survey-button-box">
-						<input type="text" class="input-text" id="partcptCd" th:value="${invstInfo.partcptCd}" readonly/>
-						<input type="button" class="is-key-button" id="partcptCdBtn" th:data-exist-partcptcd="${invstInfo.partcptCd ne null ? true : false}" th:value="${invstInfo.partcptCd ne null ? '조사코드 수정' : '조사코드 생성'}" th:onclick="partcptCdSave([[${invstInfo.exmnmngId}]]);"/>
-					</div>
-				</div>			
-				<table class="infoTable">
-					<thead>
-						<tr>
-							<th>번호</th>
-							<th>이름</th>
-							<th>연락처</th>
-							<th>이메일</th>
-							<th>역할</th>
-							<th>등록/추가/삭제</th>
-						</tr>
-					</thead>
-					<tbody id="surveyorAppendBox">
-						<th:block th:if="${tmExmnPollsterList != null}">
-							<tr th:data-surveyor="${status.index+1}" class="surveyorAppendItem addSurveyor" th:each="item,status : ${tmExmnPollsterList}" th:data-pollster-id="${item.pollsterId}">
-								<td class="surveyorNumber" th:text="${status.index+1}"></td>
-								<td><input type="text" class="input-table-text surveyorName" name="pollsterNm" th:value="${item.pollsterNm}" readonly=""></td>
-								<td><input type="tel" class="input-table-text surveyorPhone" name="pollsterTel" th:value="${item.pollsterTel}" readonly=""></td>
-								<td><input type="email" class="input-table-text surveyorMail" name="pollsterEmail" th:value="${item.pollsterEmail}" readonly=""></td>
-								<td class="text-center">
-									<span class="surveyor-role add-role" th:data-pollster-type="${item.pollsterType}" th:text="${item.pollsterType.getName}"></span>
-									<span class="surveyor-role-select none">
-										<select class="select-list-box">
+					<div class="infoTableWrap">
+						<div class="survey-update">
+							<div class="flex-center">
+								<span>총 조사원</span>
+								<img th:src="@{/images/investigator.png}" alt="user" class="survey-user-img"/>							 
+								<strong id="totalCount" th:text="${invstInfo.exmnNop}"></strong>
+							</div>
+							<div class="survey-button-box">
+								<input type="text" class="input-text" id="partcptCd" th:value="${invstInfo.partcptCd}" readonly/>
+								<input type="button" class="is-key-button" id="partcptCdBtn" th:data-exist-partcptcd="${invstInfo.partcptCd ne null ? true : false}" th:value="${invstInfo.partcptCd ne null ? '조사코드 수정' : '조사코드 생성'}" th:onclick="partcptCdSave([[${invstInfo.exmnmngId}]]);"/>
+							</div>
+						</div>			
+						<table class="infoTable">
+							<thead>
+								<tr>
+									<th>번호</th>
+									<th>이름</th>
+									<th>연락처</th>
+									<th>이메일</th>
+									<th>역할</th>
+									<th>등록/추가/삭제</th>
+								</tr>
+							</thead>
+							<tbody id="surveyorAppendBox">
+								<th:block th:if="${tmExmnPollsterList != null}">
+									<tr th:data-surveyor="${status.index+1}" class="surveyorAppendItem addSurveyor" th:each="item,status : ${tmExmnPollsterList}" th:data-pollster-id="${item.pollsterId}">
+										<td class="surveyorNumber" th:text="${status.index+1}"></td>
+										<td><input type="text" class="input-table-text surveyorName" name="pollsterNm" th:value="${item.pollsterNm}" readonly=""></td>
+										<td><input type="tel" class="input-table-text surveyorPhone" name="pollsterTel" th:value="${item.pollsterTel}" readonly=""></td>
+										<td><input type="email" class="input-table-text surveyorMail" name="pollsterEmail" th:value="${item.pollsterEmail}" readonly=""></td>
+										<td class="text-center">
+											<span class="surveyor-role add-role" th:data-pollster-type="${item.pollsterType}" th:text="${item.pollsterType.getName}"></span>
+											<span class="surveyor-role-select none">
+												<select class="select-list-box">
+													<option value="MEMBER">팀원</option>
+													<option value="LEADER">팀장</option>
+												</select>
+											</span>
+										
+										</td>
+										<td class="text-center">
+											<span class="surveyor-button-box">
+												<input type="button" class="is-key-button" onclick="listModify(this);" value="수정">
+												<input type="button" class="is-danger-button" th:onclick="listRemove(this,[[${item.pollsterId}]]);" value="삭제">
+											</span>
+											<span class="surveyor-update-button-box none">
+												<input type="button" class="is-key-button" onclick="listUpdate(this);" value="저장">
+												<input type="button" class="is-basic-button" onclick="listCancel(this);" value="취소">
+											</span>
+										</td>
+									</tr>
+								</th:block>
+							</tbody>
+							<tbody id="surveyorAppendUpdateBox">
+								<tr class="surveyorAppendItem">
+									<td></td>
+									<td><input type="text" id="surveyorName" class="input-table-text surveyorName" placeholder="이름을 입력해주세요."/></td>
+									<td><input type="tel" id="surveyorPhone" class="input-table-text surveyorPhone" placeholder="연락처를 입력해주세요."/></td>
+									<td><input type="email" id="surveyorMail" class="input-table-text surveyorMail" placeholder="이메일을 입력해주세요."/></td>
+									<td class="text-center">
+										<select class="select-list-box" id="surveyorRole">
 											<option value="MEMBER">팀원</option>
 											<option value="LEADER">팀장</option>
-										</select>
-									</span>
-								
-								</td>
-								<td class="text-center">
-									<span class="surveyor-button-box">
-										<input type="button" class="is-key-button" onclick="listModify(this);" value="수정">
-										<input type="button" class="is-danger-button" th:onclick="listRemove(this,[[${item.pollsterId}]]);" value="삭제">
-									</span>
-									<span class="surveyor-update-button-box none">
-										<input type="button" class="is-key-button" onclick="listUpdate(this);" value="저장">
-										<input type="button" class="is-basic-button" onclick="listCancel(this);" value="취소">
-									</span>
-								</td>
-							</tr>
-						</th:block>
-					</tbody>
-					<tbody id="surveyorAppendUpdateBox">
-						<tr class="surveyorAppendItem">
-							<td></td>
-							<td><input type="text" id="surveyorName" class="input-table-text surveyorName" placeholder="이름을 입력해주세요."/></td>
-							<td><input type="tel" id="surveyorPhone" class="input-table-text surveyorPhone" placeholder="연락처를 입력해주세요."/></td>
-							<td><input type="email" id="surveyorMail" class="input-table-text surveyorMail" placeholder="이메일을 입력해주세요."/></td>
-							<td class="text-center">
-								<select class="select-list-box" id="surveyorRole">
-									<option value="MEMBER">팀원</option>
-									<option value="LEADER">팀장</option>
-								</select>							
-							</td>
-							<td class="text-center"><input type="button" id="surveyorSaveButton" onclick="listAdd(this);" class="is-key-button" value="추가하기"/></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-        </div>
+										</select>							
+									</td>
+									<td class="text-center"><input type="button" id="surveyorSaveButton" onclick="listAdd(this);" class="is-key-button" value="추가하기"/></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+		        </div>
+	        </div>
+	        <div id="historyDiv"></div>
+<!--	       	<th:block th:if="${invstInfo.exmnType.getType() eq 'traffic'}" >-->
+<!--	       		<th:block th:insert="tags/datamng/scheduleTrafficDetail :: scheduleTrafficFragment"></th:block>-->
+<!--	        </th:block>-->
+<!--	       	<th:block th:if="${invstInfo.exmnType.getType() eq 'survey'}" >-->
+<!--	       		<th:block th:insert="tags/datamng/scheduleSurveyDetail :: scheduleSurveyFragment"></th:block>-->
+<!--	        </th:block>-->
+		</div>
 		<div class="info-button-box">
 			<a th:href="@{/datamng/schedule}" class="is-basic-button">이전 페이지</a>
 			<th:block th:if="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'}">
@@ -172,8 +192,51 @@
         </div>
 	</th:block>
 </html>
-<script type="text/javascript">
+<script th:inline="javascript">
+
+	//container view toggle
+	let container = document.getElementById('scheduleContainer');
+	//chart
+	const exmnType 		= [[${invstInfo.exmnType.getType()}]];
 	
+	historyView = () => {
+		const exmnmngId = document.getElementById('exmnmngId').value;
+		let url = __contextPath__ + "/datamng/schedule/traffic/"+exmnmngId+"/history";
+		if(exmnType === 'survey') {
+			url = __contextPath__ + "/datamng/schedule/survey/"+exmnmngId+"/history";
+		}
+		fetch(url)
+		.then((response) => {
+	    	return response.text();
+	  	})
+	  	.then((html) => {
+			document.querySelector("#historyDiv").innerHTML = html;
+			container.classList.add('active');
+			if(exmnType === 'survey'){
+				chartCustom("historyChart", "#FF8636", 90, 150);
+			}
+	  	});
+	}
+	detailView = () => {
+		container.classList.remove('active');
+	}
+	
+	
+	//tablaDate
+	 tableTcDate = (_this) => {
+		 const tcDate = document.getElementById('tcDate');
+		 const date = _this.querySelector('.table-tc-date').value;
+		 
+		 tcDate.textContent = date;
+		 
+		 //table event
+		 const allTr = _this.closest('table').querySelectorAll('tr');
+		 const tr = _this.closest('tr');
+		 allTr.forEach(tr => {
+			 tr.classList.remove('active');
+		 })
+		 tr.classList.add('active');
+	 }
 	
 	const lat 		= [[${invstInfo.lat}]];
 	const lon 		= [[${invstInfo.lon}]];

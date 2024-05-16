@@ -46,7 +46,7 @@
 				                    <td th:text="${item.userTel}"></td>
 				                    <td th:text="${item.userEmail}"></td>
 				                    <td th:text="${item.bffltdNm}"></td>
-				                    <td th:text="${item.authNm}"></td>
+				                    <td th:text="${item.authgrpNm}"></td>
 				                </tr>
 			                </th:block>
 			                <th:block th:if="${totalCnt == 0}">
@@ -66,7 +66,7 @@
 	function asynchronousSearchList(){
 		let paramData = $("#searchForm").serialize();
 		$(".modal-container").remove();
-		new ModalBuilder().init('조사 담당자 등록').ajaxBody("/datamng/invst/mngr",paramData).footer(1,'등록',function(button, modal){
+		new ModalBuilder().init('조사 담당자 등록').ajaxBody("/datamng/invst/modal/mngr",paramData).footer(1,'등록',function(button, modal){
 			let mngrId, mngrNmValue;
 			const mngrChecked 		= document.querySelector('.mngrCheckBox:checked');
 			const modalUsermngId 	= mngrChecked.value;

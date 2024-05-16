@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 id="infoTitle">조사 설문 등록</h3>
+	        </div>
+	        <div id="infoTableWrap">
+				<table id="listTable" class="mt16 mb16">
+					<thead>
+						<tr>
+							<th>조사 유형</th>
+							<th>설문명</th>
+							<th>조사 기간</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td th:text="${surveyInfo.srvyTypeNm}"></td>
+							<td th:text="${surveyInfo.srvyTitle}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(surveyInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(surveyInfo.endDt,'YYYY-MM-dd')}"></td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="questSurveyList">
+					<th:block th:each="item : ${exmnMngSrvyList}">
+						<div class="quest-container" th:data-sctn-ordr="${item.sectSqno}" th:data-sctn-type="${item.sectType}" th:data-sctn-id="${item.sectId}">
+							<div class="quest-wrap">
+								<div class="quest-title-wrap">
+									<h4 class="quest-title" th:text="${item.sectTitle}"></h4>
+									<div class="quest-sub-title" th:text="${item.sectSubtitle}"></div>
+								</div>
+								<div class="quest-grid-box">
+									<th:block th:each="qstnItem : ${item.tmSrvyQstnList}">
+										<div class="quest-box">
+											<div class="quest-title-box">
+												<span class="quest-number" th:text="'Q'+${qstnItem.qstnSqno}+'.'"></span>
+												<span class="quest-name" th:data-qstn-type="${qstnItem.qstnTypeCd}" th:data-qstn-ordr="${qstnItem.qstnSqno}" th:data-qstn-id="${qstnItem.qstnId}" th:text="${qstnItem.qstnTitle}">
+												</span>
+											</div>
+											<!-- 주관식 / 시간 / 위치 / 날짜 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getType() eq 'SINGLE'}">
+												<div class="list-answer">
+													<div class="quest-view-item">
+														<span class="quest-view-img"><img th:src="${qstnItem.qstnTypeCd.getImgPath()}" alt="short"></span>
+														<span class="quest-view-text" th:text="${qstnItem.qstnTypeCd.getDesc()}"></span>
+													</div>
+												</div>
+											</th:block>
+											<!-- 라디오 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC002'}">
+												<div class="list-answer">
+													<ul class="all-answer">
+														<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+															<li class="option-list">
+																<input type="radio" class="survey-ex-radio" disabled/>
+																<input type="text" class="answ-content" th:data-answ-id="${ansItem.ansId}" th:data-answ-sort="${ansItem.ansSqno}" th:value="${ansItem.ansCnts}" readonly>
+															</li>
+														</th:block>
+													</ul>
+												</div>
+											</th:block>
+											<!-- 체크박스 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC003'}">
+												<div class="list-answer">
+													<ul class="all-answer">
+														<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+															<li class="option-list">
+																<input type="checkbox" class="survey-ex-radio" disabled/>
+																<input type="text" class="answ-content" th:data-answ-id="${ansItem.ansId}" th:data-answ-sort="${ansItem.ansSqno}" th:value="${ansItem.ansCnts}" readonly>
+															</li>
+														</th:block>
+													</ul>
+												</div>
+											</th:block>
+											<!-- 드롭다운 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC006'}">
+												<select class="select-list-box">
+													<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+														<option th:text="${ansItem.ansCnts}"></option>
+													</th:block>
+												</select>
+											</th:block>
+										</div>
+									</th:block>
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</div>
+	        </div>
+	    </div>
+		<div class="info-button-box">
+            <a th:href="@{/datamng/survey/{srvyId}/update (srvyId=${surveyInfo.srvyId})}" class="is-key-button">수정</a>
+            <input type="button" class="is-key-button overLapping" th:onclick="deleteInvstMngSurveySctn([[${surveyInfo.srvyId}]]);" value="삭제"/>
+            <a th:href="@{/datamng/survey}" class="is-basic-button">취소</a>
+        </div>
+	</th:block>
+</html>

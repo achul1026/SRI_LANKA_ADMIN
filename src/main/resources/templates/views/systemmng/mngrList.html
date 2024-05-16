@@ -18,10 +18,12 @@
 							<option value="userTel" th:selected="${searchInfo.searchType} == 'userTel'">연락처</option>
 							<option value="userEmail" th:selected="${searchInfo.searchType} == 'userEmail'">이메일</option>
 						</select> -->
-						<select class="select-list-box" name="searchTypeCd">
-							<option value="">소속</option>
-							<option th:each="item:${bffltdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${searchInfo.searchTypeCd eq item.cd}"></option>
-						</select>
+						<th:block th:if="${loginUser.userBffltd == 'BFC001'} or ${loginUser.userType.code == 'UTC001'}">
+							<select class="select-list-box" name="searchTypeCd">
+								<option value="">소속</option>
+								<option th:each="item:${bffltdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${searchInfo.searchTypeCd eq item.cd}"></option>
+							</select>
+						</th:block>
 						<select class="select-list-box ml8" name="searchSttsCd">
 							<option value="">승인상태</option>
 							<option th:each="item:${sttsCds}" th:text="${item.name}" th:value="${item.code}" th:selected="${searchInfo.searchSttsCd eq item.code}"></option>
@@ -57,7 +59,7 @@
 			                    <td th:text="${item.bffltdNm}"></td>
 			                    <!-- 
 			                    04.03 기획서 반영 주석
-			                    <td th:text="${item.authNm}"></td> -->
+			                    <td th:text="${item.authgrpNm}"></td> -->
 			                    <td th:text="${item.athrztStts.name}"></td>
 			                    <td th:text="${@commonUtils.formatLocalDateTime(item.registDt)}"></td>
 			                </tr>

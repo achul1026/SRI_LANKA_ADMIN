@@ -25,4 +25,15 @@ public class QTmSrvyAnsRepository {
 	public void deleteByIdArr(String[] ansIdArr) {
 		queryFactory.delete(tmSrvyAns).where(tmSrvyAns.ansId.in(ansIdArr)).execute();
 	}
+	
+	/**
+	  * @Method Name : deleteByQstnIdArr
+	  * @작성일 : 2024. 5. 7.
+	  * @작성자 : NK.KIM
+	  * @Method 설명 : 질문 삭제시 답변 정보 삭제
+	  * @param qstnIdArr
+	  */
+	public void deleteByQstnIdArr(String[] qstnIdArr) {
+		queryFactory.delete(tmSrvyAns).where(tmSrvyAns.qstnId.in(qstnIdArr)).execute();
+	}
 }

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px;">
+			<div class="list-search-box text-left mb8">
+				<form id="searchForm" onSubmit="return false;">
+					<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+					<div class="list-search-box">
+						<input type="text" id="searchContent" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
+						<button type="button" class="is-key-button" onclick="asynchronousSearchList();">검색</button>
+					</div>		
+				</form>
+			</div>					
+			<div class="table-wrap">
+				<div class="table-box">
+					<table class="list-table">
+						<thead>
+							<tr>
+								<th>선택</th>
+								<th>번호</th>
+								<th>조사 유형</th>
+			                    <th>설문명</th>
+			                    <th>조사 기간</th>
+			                    <th>작성자</th>
+							</tr>
+						</thead>
+						<tbody id="surveyListTbody">
+							<th:block th:if="${totalCnt > 0}">
+				                <tr class="table-link" onclick="checkedSet(this)" th:each="item,status : ${surveyList}">
+									<td><input type="radio" class="surveyCheckBox" name="surveyList" th:value="${item.srvyId}"></td>
+				                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+				                    <td th:text="${item.srvyTypeNm}"></td> 
+				                    <td class="srvyTitle" th:text="${item.srvyTitle}"></td>
+				                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'YYYY-MM-dd')}"
+				                    th:data-startDt="${@commonUtils.formatLocalDateTime(item.startDt,'YYYY-MM-dd')}" 
+				                    th:data-endDt="${@commonUtils.formatLocalDateTime(item.endDt,'YYYY-MM-dd')}"></td>
+				                    <td th:text="${item.registId}"></td>
+				                </tr>
+			                </th:block>
+			                <th:block th:if="${totalCnt == 0}">
+			                	<tr>
+			                		<td colspan="8">검색된 결과가 없습니다.</td>
+			                	</tr>
+			                </th:block>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="pagingDiv">
+			<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	function asynchronousSearchList(pageNo = '0'){
+		if(pageNo === '0'){
+			pageNo = document.getElementById('asynchronousPageNo').value;
+		}
+		
+		const selectElement = document.querySelector("#searchType");
+		const selectedValue = selectElement.options[selectElement.selectedIndex].value;
+		const searchContent = document.getElementById('searchContent').value;
+
+		const params = new URLSearchParams();
+		params.append("pageNo", pageNo);
+		params.append("searchTypeCd", selectedValue);
+		params.append("searchContent", searchContent);
+		
+		fetch(__contextPath__+"/datamng/invst/modal/survey/asynchronous?"+params.toString(),{
+			method: "GET"
+		})
+		.then(response => response.json())
+		.then(result => {
+							if(result.code == '200'){
+								const surveyList = result.data.surveyList;
+								//tbody 하위 tr 삭제
+								var rows = document.querySelectorAll('#surveyListTbody tr');
+								rows.forEach(function(row) {
+									row.remove();
+								});
+								
+								//paging 삭제 (id pagingDiv)
+								const pagingDiv = document.getElementById('pagingDiv');
+								const totalCnt = result.data.totalCnt;
+								const paging = result.data.paging;
+								pagingDiv.innerHTML="";
+								let srvyTrHtml = "";
+								
+								if (surveyList.length > 0){
+									//data 세팅
+									for(let [idx,item] of surveyList.entries()){
+										//tr영역 세팅
+										srvyTrHtml +=	'<tr class="table-link" onclick="checkedSet(this)">'
+								            			+'<td><input type="radio" class="surveyCheckBox" name="surveyList" value="' + item.srvyId + '"></td>'
+														+'<td>'+getRownum(paging,(idx))+'</td>'
+									                    +'<td>'+item.srvyTypeNm+'</td>'
+									                    +'<td class="srvyTitle">'+item.srvyTitle+'</td>'
+									                    +'<td data-startDt="'+item.startDt+'" data-endDt="'+item.endDt+'">'+formatDate(item.startDt)+' ~ '+formatDate(item.endDt)+'</td>'
+									                    +'<td>'+item.registId+'</td>'
+									               		+'</tr>';
+									}
+									
+									if(!isNull(paging)){
+										const pagingHtml = writePaging(paging);
+										//pagingDiv append
+										$("#pagingDiv").append(pagingHtml);
+										
+									}
+								} else {
+									//data is empty
+									srvyTrHtml += '<tr class="table-link">'
+								                    +'<td colspan="6">검색 결과가 없습니다.</td>'
+								               		+'</tr>';
+								}
+								$('#surveyListTbody').append(srvyTrHtml); 
+							}
+						}
+			)
+	}
+	
+	function formatDate(dateString) {
+	    var date = new Date(dateString);
+	    var year = date.getFullYear();
+	    var month = (1 + date.getMonth()).toString().padStart(2, '0');
+	    var day = date.getDate().toString().padStart(2, '0');
+	    return year + '-' + month + '-' + day;
+	}
+
+</script>

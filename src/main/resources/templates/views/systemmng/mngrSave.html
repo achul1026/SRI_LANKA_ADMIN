@@ -57,9 +57,9 @@
 							</td>					
 							<th>권한</th>
 							<td>
-								<select class="select-list-box" name="authId">
+								<select class="select-list-box" name="authgrpId">
 									<option value="">선택</option>
-									<option th:each="item,status : ${authList}" th:text="${item.authNm}" th:value="${item.authId}"></option>
+									<option th:each="item,status : ${authList}" th:text="${item.authgrpNm}" th:value="${item.authgrpId}"></option>
 								</select>
 							</td>
 						</tr>

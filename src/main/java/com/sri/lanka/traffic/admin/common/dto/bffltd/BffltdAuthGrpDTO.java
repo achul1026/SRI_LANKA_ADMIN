@@ -16,6 +16,5 @@ public class BffltdAuthGrpDTO {
 	public static class AuthGrpInfo {
 		private String authgrpId;
 		private String authgrpNm;
-//		private String useYn;
 	}
 }

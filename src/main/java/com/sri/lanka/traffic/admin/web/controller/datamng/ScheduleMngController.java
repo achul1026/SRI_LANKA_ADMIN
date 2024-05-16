@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
+import com.sri.lanka.traffic.admin.common.dto.invst.TlExmnRsltHistoryDTO;
+import com.sri.lanka.traffic.admin.common.dto.invst.TlExmnRsltHistorySearchDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnPollsterSaveDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleDTO;
@@ -202,19 +204,19 @@ public class ScheduleMngController {
 	@Authority(authType = AuthType.READ, menuType = MenuType.SAVE)
 	@GetMapping("/{exmnmngId}")
 	public String scheduleDetail(Model model,@PathVariable String exmnmngId) {
-		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
-		if (!invstInfo.isPresent()) {
+		TmExmnMngDTO invstInfo = qTmExmnMngRepository.getInvstInfo(exmnmngId);
+		if (CommonUtils.isNull(invstInfo)) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
 		}
 		List<TmExmnPollster> tmExmnPollsterList = tmExmnPollsterRepository.findAllByExmnmngIdOrderByRegistDtAsc(exmnmngId);
 		if(!CommonUtils.isListNull(tmExmnPollsterList)) {
 			model.addAttribute("tmExmnPollsterList",tmExmnPollsterList);
 		}
-		if(!"survey".equals(invstInfo.get().getExmnType().getType())){
+		if("true".equals(invstInfo.getExmnType().getHasDrct())){
 			List<TmExmnDrct> tmExmnDrctList = tmExmnDrctRepository.findAllByExmnmngIdOrderByDrctSqnoAsc(exmnmngId);
 			model.addAttribute("tmExmnDrctList", tmExmnDrctList);
 		}
-		model.addAttribute("invstInfo",invstInfo.get());
+		model.addAttribute("invstInfo",invstInfo);
 		return "views/datamng/scheduleDetail";
 	}
 	
@@ -256,4 +258,64 @@ public class ScheduleMngController {
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK,resultMessage);
 	}
 	
+	
+	/**
+	  * @Method Name : invstCountingHistoryPage
+	  * @작성일 : 2024. 4. 16.
+	  * @작성자 : NK.KIM
+	  * @Method 설명 : TC 조사 이력 화면
+	  * @param model
+	  * @param tlExmnRsltHistoryDTO
+	  * @return
+	  */
+	@Authority(authType = AuthType.READ)
+	@GetMapping("/traffic/{exmnmngId}/history")
+	public String invstCountingHistoryPage(Model model,@PathVariable String exmnmngId,TlExmnRsltHistorySearchDTO tlExmnRsltHistorySearchDTO) {
+		
+		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
+		if (!invstInfo.isPresent()) {
+			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
+		}
+		
+		//방향 목록
+		List<TmExmnDrct> exmnDrctList = tmExmnDrctRepository.findAllByExmnmngIdOrderByDrctSqnoAsc(exmnmngId);
+		model.addAttribute("exmnDrctList", exmnDrctList);
+		
+		//방향 파라미터가 존재하지않으면 목록의 첫번째 인덱스 값
+		if(CommonUtils.isNull(tlExmnRsltHistorySearchDTO.getExmndrctId())) {
+			tlExmnRsltHistorySearchDTO.setExmndrctId(exmnDrctList.get(0).getExmndrctId());
+		}
+		
+		//시간 정보
+		TlExmnRsltHistoryDTO tlExmnRsltHistoryDTO = scheduleMngService.getTrafficHistoryInfo(tlExmnRsltHistorySearchDTO, invstInfo.get());
+		model.addAttribute("tlExmnRsltHistoryDTO", tlExmnRsltHistoryDTO);
+		model.addAttribute("paging", tlExmnRsltHistoryDTO.getPaging());
+		
+		model.addAttribute("tlExmnRsltHistorySearchDTO", tlExmnRsltHistorySearchDTO);
+		
+		return "views/datamng/scheduleTrafficDetail"; 
+	}
+	
+	/**
+	  * @Method Name : invstSurveyHistoryPage
+	  * @작성일 : 2024. 5. 10.
+	  * @작성자 : NK.KIM
+	  * @Method 설명 : 설문 이력 화면
+	  * @param model
+	  * @param exmnmngId
+	  * @param tlExmnRsltHistorySearchDTO
+	  * @return
+	  */
+	@Authority(authType = AuthType.READ)
+	@GetMapping("/survey/{exmnmngId}/history")
+	public String invstSurveyHistoryPage(Model model,@PathVariable String exmnmngId,TlExmnRsltHistorySearchDTO tlExmnRsltHistorySearchDTO) {
+		
+		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
+		if (!invstInfo.isPresent()) {
+			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
+		}
+		
+		model.addAttribute("invstInfo", invstInfo.get());
+		return "views/datamng/scheduleSurveyDetail"; 
+	}
 }

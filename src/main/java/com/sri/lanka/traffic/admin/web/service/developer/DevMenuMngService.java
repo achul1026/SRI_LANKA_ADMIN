@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sri.lanka.traffic.admin.common.dto.menu.TcMenuMngInfoDTO;
-import com.sri.lanka.traffic.admin.common.entity.TcAuthMng;
+import com.sri.lanka.traffic.admin.common.entity.TcAuthGrp;
 import com.sri.lanka.traffic.admin.common.entity.TcMenuAuth;
 import com.sri.lanka.traffic.admin.common.entity.TcMenuMng;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuAuthRepository;
-import com.sri.lanka.traffic.admin.common.repository.TcAuthMngRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcAuthGrpRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcMenuAuthRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcMenuMngRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
@@ -25,7 +25,7 @@ public class DevMenuMngService {
 	private TcMenuMngRepository tcMenuMngRepository;
 	
 	@Autowired
-	private TcAuthMngRepository tcAuthMngRepository;
+	private TcAuthGrpRepository tcAuthGrpRepository;
 	
 	@Autowired
 	private TcMenuAuthRepository tcMenuAuthRepository;
@@ -45,18 +45,18 @@ public class DevMenuMngService {
 		
 		tcMenuMngRepository.save(tcMenuMng);
 		String menuBaseYn = tcMenuMng.getBscmenuYn() != null ? tcMenuMng.getBscmenuYn() : "N";
-		List<TcAuthMng> authList = tcAuthMngRepository.findAll();
+		List<TcAuthGrp> authList = tcAuthGrpRepository.findAll();
 		if(!CommonUtils.isNull(authList)) {
-			for(TcAuthMng authItem : authList) {
+			for(TcAuthGrp authItem : authList) {
 				TcMenuAuth tcMenuAuth = new TcMenuAuth();
-				String authId = authItem.getAuthId();
+				String authgrpId = authItem.getAuthgrpId();
 				String menuId = tcMenuMng.getMenuId();
 				
 				tcMenuAuth.setInputYn(menuBaseYn);
 				tcMenuAuth.setSrchYn(menuBaseYn);
 				tcMenuAuth.setUpdtYn(menuBaseYn);;
 				tcMenuAuth.setDelYn(menuBaseYn);
-				tcMenuAuth.setAuthId(authId);
+				tcMenuAuth.setAuthgrpId(authgrpId);
 				tcMenuAuth.setMenuId(menuId);
 				
 				tcMenuAuthRepository.save(tcMenuAuth);

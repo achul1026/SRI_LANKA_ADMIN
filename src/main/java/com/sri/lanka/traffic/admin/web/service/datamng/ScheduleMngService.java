@@ -1,6 +1,9 @@
 package com.sri.lanka.traffic.admin.web.service.datamng;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,22 +14,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sri.lanka.traffic.admin.common.dto.invst.TlExmnRsltHistoryDTO;
+import com.sri.lanka.traffic.admin.common.dto.invst.TlExmnRsltHistorySearchDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnPollsterSaveDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleDetailDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleDetailDTO.TmExmnScheduleInfo;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleStatisticsDTO;
+import com.sri.lanka.traffic.admin.common.dto.invst.TlExmnRsltHistoryDTO.TrafficHistoryTableInfo;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleStatisticsDTO.StatisticsMonthInfo;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnScheduleStatisticsDTO.StatisticsTodayInfo;
+import com.sri.lanka.traffic.admin.common.entity.TmExmnDrct;
 import com.sri.lanka.traffic.admin.common.entity.TmExmnMng;
 import com.sri.lanka.traffic.admin.common.entity.TmExmnPollster;
 import com.sri.lanka.traffic.admin.common.enums.code.ExmnSttsCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnMngRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnPollsterRepository;
+import com.sri.lanka.traffic.admin.common.repository.TlExmnRsltRepository;
+import com.sri.lanka.traffic.admin.common.repository.TmExmnDrctRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnMngRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnPollsterRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
+import com.sri.lanka.traffic.admin.common.util.PagingUtils;
 import com.sri.lanka.traffic.admin.support.exception.CommonException;
 import com.sri.lanka.traffic.admin.support.exception.ErrorCode;
 
@@ -42,6 +52,12 @@ public class ScheduleMngService {
 	
 	@Autowired
 	TmExmnMngRepository tmExmnMngRepository;
+	
+	@Autowired
+	TmExmnDrctRepository tmExmnDrctRepository;
+	
+	@Autowired
+	TlExmnRsltRepository tlExmnRsltRepository;
 	
 	@Autowired
 	QTmExmnMngRepository qTmExmnMngRepository;
@@ -258,5 +274,92 @@ public class ScheduleMngService {
 		tmExmnScheduleStatisticsDTO.setStatisticsTodayInfo(statisticsTodayInfo);
 		
 		return tmExmnScheduleStatisticsDTO;
+	}
+	
+	/**
+	  * @Method Name : getHourList
+	  * @작성일 : 2024. 4. 9.
+	  * @작성자 : SM.KIM
+	  * @Method 설명 : 조사 시간 및 방향에 따른 시간 목록 생성
+	  * @param exmnInfo
+	  * @return
+	  */
+	public TlExmnRsltHistoryDTO getTrafficHistoryInfo(TlExmnRsltHistorySearchDTO tlExmnRsltHistorySearchDTO, TmExmnMng tmExmnMng){
+		TlExmnRsltHistoryDTO tlExmnRsltHistoryDTO = new TlExmnRsltHistoryDTO();
+		List<Map<String,Object>> hourList = new ArrayList<>();
+	    
+		int startHour = Integer.parseInt(CommonUtils.formatLocalDateTime(tmExmnMng.getStartDt(), "HH"));
+	    int endHour = Integer.parseInt(CommonUtils.formatLocalDateTime(tmExmnMng.getEndDt(), "HH"));
+	    
+	    LocalDate searchDate = null;
+	    if(CommonUtils.isNull(tlExmnRsltHistorySearchDTO.getSearchDate())){
+	    	searchDate = LocalDate.now();
+	    }else {
+	    	searchDate = LocalDate.parse(tlExmnRsltHistorySearchDTO.getSearchDate(), DateTimeFormatter.ISO_DATE); 
+	    }
+	    
+	    //방향 정보
+	    Optional<TmExmnDrct> exmnDrctInfo = tmExmnDrctRepository.findById(tlExmnRsltHistorySearchDTO.getExmndrctId());
+	    
+	    //당일 교통량 조사 이력 정보 
+	    List<Map<String,Object>> dataInfoList = tlExmnRsltRepository.getTimeListForHistory(tmExmnMng.getExmnmngId(), searchDate
+	    																					, exmnDrctInfo.get().getStartlcNm(), exmnDrctInfo.get().getEndlcNm());
+		List<String> dataTimeList = dataInfoList.stream()
+												.filter(x -> x.containsKey("dataHour") && CommonUtils.isNull(x.get("lcchgRsn")))
+												.map(m -> m.get("dataHour").toString())
+												.collect(Collectors.toList());
+		int invstTotalCnt = 0;
+		int invstCompletedCnt = 0;
+	    for (int hour = startHour; hour <= endHour; hour++) {
+	    	Map<String,Object> hourInfo = new HashMap<>();
+	    	boolean isExists = false;
+	        String formattedHour = String.format("%02d:00", hour);
+	        hourInfo.put("hour", formattedHour);
+	        if(!CommonUtils.isListNull(dataTimeList) && dataTimeList.contains(formattedHour)) {
+	        	isExists = true;
+	        }
+	        hourInfo.put("isExists", isExists);
+	        hourList.add(hourInfo);
+	        invstTotalCnt++;
+	    }
+	    
+	    tlExmnRsltHistoryDTO.setHourList(hourList);
+	    tlExmnRsltHistoryDTO.setStartDt(tmExmnMng.getStartDt());
+	    tlExmnRsltHistoryDTO.setEndDt(tmExmnMng.getEndDt());
+	    tlExmnRsltHistoryDTO.setExmnDiv(tmExmnMng.getExmnDiv());
+	    tlExmnRsltHistoryDTO.setInvstTotalCnt(invstTotalCnt);
+	    
+	    if(!CommonUtils.isListNull(dataTimeList)) invstCompletedCnt = dataTimeList.size();
+	    tlExmnRsltHistoryDTO.setInvstCompletedCnt(invstCompletedCnt);
+	    
+	    int invstNotCompletedCnt = invstTotalCnt - invstCompletedCnt;
+	    tlExmnRsltHistoryDTO.setInvstNotCompletedCnt(invstNotCompletedCnt);
+	    //당일 교통량 조사 이력 정보  END
+	    
+	    //교통량 조사 이력 테이블 정보  START
+	    PagingUtils paging = new PagingUtils();
+	    paging.setLimitCount(5);
+	    
+	    List<Map<String,Object>> dataTableInfoList = tlExmnRsltRepository.getDateListForTableHistory(tmExmnMng.getExmnmngId(), exmnDrctInfo.get().getStartlcNm(), exmnDrctInfo.get().getEndlcNm()
+	    																								,paging.getOffsetCount(),paging.getLimitCount());
+	    List<TrafficHistoryTableInfo> trafficHistoryTableList = new ArrayList<>();
+	    if(!CommonUtils.isListNull(dataTableInfoList)) {
+	    	ObjectMapper mapper = new ObjectMapper();
+	    	trafficHistoryTableList = dataTableInfoList.stream()
+									                    .map(x -> mapper.convertValue(x, TrafficHistoryTableInfo.class))
+									                    .collect(Collectors.toList());
+	    	final int totalCnt = invstTotalCnt;
+	    	trafficHistoryTableList.forEach(x -> { x.setTotalCnt(totalCnt); int incompleteCnt = totalCnt - x.getCompleteCnt(); x.setIncompleteCnt(incompleteCnt);});
+	    	
+	    	long trafficHistoryTotalCnt = tlExmnRsltRepository.getDateListForTableHistoryTotalCnt(tmExmnMng.getExmnmngId(), exmnDrctInfo.get().getStartlcNm(), exmnDrctInfo.get().getEndlcNm());
+	    	paging.setPageSize(5);
+			paging.setTotalCount(trafficHistoryTotalCnt);
+			
+			tlExmnRsltHistoryDTO.setPaging(paging);
+	    }
+	    tlExmnRsltHistoryDTO.setTrafficHistoryTableList(trafficHistoryTableList);
+	    //교통량 조사 이력 테이블 정보  END
+	    
+	    return tlExmnRsltHistoryDTO;
 	}
 }

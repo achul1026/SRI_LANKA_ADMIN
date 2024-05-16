@@ -31,9 +31,9 @@ public class TcMenuAuth{
     private String delYn; //삭제 여부
     
     @ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "authId", insertable = false, updatable = false)
+	@JoinColumn(name = "authgrpId", insertable = false, updatable = false)
 	@JsonBackReference
-	private TcAuthMng tcAuthMngInfo;
+	private TcAuthGrp tcAuthGrpInfo;
 	
 	public TcMenuAuth() {}
 	

@@ -15,7 +15,11 @@ public enum GroupCode {
 	DEPT_CD("DEPT_CD","부서 코드"),
 	MAIN_MENU_CD("MAIN_MENU_CD","메인 메뉴 코드"),
 	SUB_MENU_CD("SUB_MENU_CD","하위 메뉴 코드"),
-	INVST_QSTN_TYPE("INVST_QSTN_TYPE","조사 질문 유형")
+	INVST_QSTN_TYPE("INVST_QSTN_TYPE","조사 질문 유형"),
+	SECT_TYPE_CD("SECT_TYPE_CD","설문 부문 유형 코드"),
+	SRVY_TYPE_CD("SRVY_TYPE_CD","설문 유형 코드"),
+	QSTN_TYPE_CD("QSTN_TYPE_CD","설문 질문 코드"),
+	BBS_TYPE_CD("BBS_TYPE_CD","게시글 타입 코드"),
 	;
 	
 	private String code;

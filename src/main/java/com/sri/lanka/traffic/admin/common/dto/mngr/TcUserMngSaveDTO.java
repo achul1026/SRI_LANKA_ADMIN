@@ -13,7 +13,7 @@ public class TcUserMngSaveDTO extends CommonDTO {
 	private String userId;
 	private String userPswd;
 	private String newUserPswd;
-	private String authId;
+	private String authgrpId;
 	private String userBffltd;
 	private String userEmail;
 	private AthrztSttsCd athrztStts;

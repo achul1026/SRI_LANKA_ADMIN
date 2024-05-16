@@ -16,21 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDTO;
-import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthMngDetailDTO;
+import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDetailDTO;
 import com.sri.lanka.traffic.admin.common.dto.bffltd.BffltdAuthGrpDTO;
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.menu.TcMenuMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserAuthMngDTO;
-import com.sri.lanka.traffic.admin.common.entity.TcAuthMng;
+import com.sri.lanka.traffic.admin.common.entity.TcAuthGrp;
 import com.sri.lanka.traffic.admin.common.enums.AuthType;
 import com.sri.lanka.traffic.admin.common.enums.GroupCode;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcAuthGrpRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcUserMngRepository;
-import com.sri.lanka.traffic.admin.common.repository.TcAuthMngRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcAuthGrpRepository;
 import com.sri.lanka.traffic.admin.common.util.PagingUtils;
 import com.sri.lanka.traffic.admin.config.authentication.Authority;
 import com.sri.lanka.traffic.admin.support.exception.CommonResponse;
-import com.sri.lanka.traffic.admin.web.service.developer.DevAuthMngService;
+import com.sri.lanka.traffic.admin.web.service.systemmng.AuthRqstMngService;
 
 @Controller
 @RequestMapping("/systemmng/menu")
@@ -43,10 +43,10 @@ public class MenuMngController {
 	private QTcUserMngRepository qTcUserMngRepository;
 	
 	@Autowired
-	private DevAuthMngService authMngService;
+	private AuthRqstMngService authRqstMngService;
 	
 	@Autowired
-	private TcAuthMngRepository tcAuthMngRepository;
+	private TcAuthGrpRepository tcAuthGrpRepository;
 
 	/**
 	 * @Method Name : menuList
@@ -62,19 +62,23 @@ public class MenuMngController {
 	public String menuListPage(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
 		List<BffltdAuthGrpDTO> bffltdAuthGrpList = qTcAuthGrpRepository.getBffltdAuthGrpList(GroupCode.BFFLTD_CD.getCode());
 		
-		// 리스트의 첫번째 권한 그룹 PK를 기본값으로 설정 
-		String authgrpId = bffltdAuthGrpList.get(0).getSubAuthGrpList().get(0).getAuthgrpId();
-		
-		List<TcUserAuthMngDTO> userList = qTcUserMngRepository.getUserInfoByAuthgrpId(authgrpId, searchCommonDTO, paging);
-		
-		long totalCnt = qTcUserMngRepository.getTotalCountByAuthgrpId(authgrpId, searchCommonDTO);
-		
-		paging.setTotalCount(totalCnt);
-		
-		model.addAttribute("totalCnt", totalCnt);
-		model.addAttribute("paging", paging);
-		model.addAttribute("userList", userList);
-		model.addAttribute("bffltdAuthGrpList", bffltdAuthGrpList);
+		long totalCnt = 0;
+
+	    // 리스트와 서브 리스트가 비어 있지 않은지 확인
+	    if (!bffltdAuthGrpList.isEmpty() && !bffltdAuthGrpList.get(0).getSubAuthGrpList().isEmpty()) {
+	    	// 리스트의 첫번째 권한 그룹 PK를 기본값으로 설정 
+	    	String authgrpId = bffltdAuthGrpList.get(0).getSubAuthGrpList().get(0).getAuthgrpId();
+
+	        List<TcUserAuthMngDTO> userList = qTcUserMngRepository.getUserInfoByAuthgrpId(authgrpId, searchCommonDTO, paging);
+	        totalCnt = qTcUserMngRepository.getTotalCountByAuthgrpId(authgrpId, searchCommonDTO);
+
+	        paging.setTotalCount(totalCnt);
+	        model.addAttribute("userList", userList);
+	    }
+	    model.addAttribute("bffltdAuthGrpList", bffltdAuthGrpList);
+	    model.addAttribute("totalCnt", totalCnt);
+	    model.addAttribute("paging", paging);
+	    model.addAttribute("searchInfo", searchCommonDTO);
 		return "views/systemmng/menuList";
 	}
 	
@@ -124,10 +128,10 @@ public class MenuMngController {
 		
 		long totalCnt = qTcUserMngRepository.getTotalCountByAuthgrpId(authgrpId, null);
 		
-		TcAuthMng tcAuthMng = tcAuthMngRepository.findByAuthgrpId(authgrpId).get();
-		TcAuthMngDetailDTO authMenuInfo = authMngService.getAuthInfo(tcAuthMng.getAuthId());
+		TcAuthGrp tcAuthGrp = tcAuthGrpRepository.findOneByAuthgrpId(authgrpId);
+		TcAuthGrpDetailDTO authMenuInfo = authRqstMngService.getAuthInfo(tcAuthGrp.getAuthgrpId());
 		
-		model.addAttribute("tcAuthMng", tcAuthMng);
+		model.addAttribute("tcAuthGrp", tcAuthGrp);
 		model.addAttribute("authMenuInfo", authMenuInfo);
 		model.addAttribute("authInfo", authInfo);
 		model.addAttribute("totalCnt", totalCnt);
@@ -144,9 +148,9 @@ public class MenuMngController {
 	  */
 	@Authority(authType = AuthType.CREATE)
 	@PostMapping
-	public @ResponseBody CommonResponse<?> menuGroupAuthUpdate(@RequestBody TcAuthMng tcAuthMng) {
-		authMngService.updateAuth(tcAuthMng);
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "권한이 등록 되었습니다.");
+	public @ResponseBody CommonResponse<?> menuGroupAuthUpdate(@RequestBody TcAuthGrp tcAuthGrp) {
+		authRqstMngService.updateAuth(tcAuthGrp);
+		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "권한이 설정 되었습니다.");
 	}
 
 	/**

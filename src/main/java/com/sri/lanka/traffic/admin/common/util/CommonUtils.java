@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthMngDetailDTO.TcMenuAuthInfo;
-import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthMngDetailDTO.TcMenuAuthInfo.SubAuthMenuInfo;
+import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDetailDTO.TcMenuAuthInfo;
+import com.sri.lanka.traffic.admin.common.dto.auth.TcAuthGrpDetailDTO.TcMenuAuthInfo.SubAuthMenuInfo;
 
 @Component
 public class CommonUtils {

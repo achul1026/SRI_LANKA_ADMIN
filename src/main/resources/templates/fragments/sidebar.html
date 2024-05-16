@@ -4,35 +4,37 @@
 		<aside id="sideBar">
 			<div id="sideBarWrap">
 				<div>
-					<a href="#" id="sideLogoBox">
-						<span id="logoImg"><img th:src="@{/images/logo.png}" alt="로고"></span>
-						<span id="sideTitle">RDA</span>
-					</a>
-				</div>
-				<div id="sideBarList">
-					<!-- DB 권한 메뉴 호출 START -->
- 					<th:block th:each="item : ${sideMenuList}"> 
- 						<th:block th:if="${#lists.isEmpty(item.subMenuList)}"> 
- 							<div> 
- 								<a class="side-depth1" th:href="@{/main}" th:text="${item.menuNm}"></a> 
- 							</div> 
- 						</th:block>		 
- 						<th:block th:if="${!#lists.isEmpty(item.subMenuList)}"> 
- 							<div class="sidebar-list-box"> 
- 								<div class="side-depth1"> 
- 									<span th:text="${item.menuNm}"></span> 
- 									<span class="depth1-arrow"><img th:src="@{/images/detph1_arrow.png}" alt="화살표"></span> 
- 								</div> 
- 								<ul class="side-depth2-box"> 
- 									<th:block th:each="subItem : ${item.subMenuList}">
- 										<li class="side-depth2" th:classappend="${menuDepthInfo != null and menuDepthInfo.subMenuNm eq subItem.menuNm ? 'active' : ''}"> 
- 											<a th:href="${subItem.menuUrlpttrn}" th:text="${subItem.menuNm}"></a> 
- 										</li> 
- 									<th:block> 
- 								</ul> 
- 							</div> 
- 						</th:block>		 
- 					</th:block> 
+					<div>
+						<a href="#" id="sideLogoBox">
+							<span id="logoImg"><img th:src="@{/images/logo.png}" alt="로고"></span>
+							<span id="sideTitle">RDA</span>
+						</a>
+					</div>
+					<div id="sideBarList">
+						<!-- DB 권한 메뉴 호출 START -->
+	 					<th:block th:each="item : ${sideMenuList}"> 
+	 						<th:block th:if="${#lists.isEmpty(item.subMenuList)}"> 
+	 							<div> 
+	 								<a class="side-depth1" th:href="@{/main}" th:text="${item.menuNm}"></a> 
+	 							</div> 
+	 						</th:block>		 
+	 						<th:block th:if="${!#lists.isEmpty(item.subMenuList)}"> 
+	 							<div class="sidebar-list-box"> 
+	 								<div class="side-depth1"> 
+	 									<span th:text="${item.menuNm}"></span> 
+	 									<span class="depth1-arrow"><img th:src="@{/images/detph1_arrow.png}" alt="화살표"></span> 
+	 								</div> 
+	 								<ul class="side-depth2-box"> 
+	 									<th:block th:each="subItem : ${item.subMenuList}">
+	 										<li class="side-depth2" th:classappend="${menuDepthInfo != null and menuDepthInfo.subMenuNm eq subItem.menuNm ? 'active' : ''}"> 
+	 											<a th:href="${subItem.menuUrlpttrn}" th:text="${subItem.menuNm}"></a> 
+	 										</li> 
+	 									<th:block> 
+	 								</ul> 
+	 							</div> 
+	 						</th:block>		 
+	 					</th:block> 
+					</div>
 				</div>
 				<div id="sidebarInfo">
 					<div id="sidebarInfoWrap">
@@ -51,7 +53,7 @@
 								<a href="javascript:void(0)" onclick="bookMark();">즐겨찾기</a> 
 							</li> 
 							<li class="side-depth2"> 
-								<a href="javascript:void(0)">로그아웃</a> 
+								<a th:href="@{/logout}">로그아웃</a> 
 							</li>
 						</ul>
 					</div>

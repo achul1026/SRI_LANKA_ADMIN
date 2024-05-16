@@ -8,12 +8,18 @@ window.addEventListener('load', () => {
 		parent.querySelector('.side-depth1').classList.add('notClick');
 	}
  	$('.side-depth1').not('.notClick').on('click', function(){
-		$(this).parent().siblings().not('.on').removeClass('active');
+		$(this).parent().siblings().not('.on').removeClass('active user-info-box');
 		$('#sidebarInfoWrap').removeClass('active');
-		$(this).parent().toggleClass('active');
+		$(this).parent().toggleClass('active user-info-box');
 	    $(this).parent().siblings('.sidebar-list-box').not('.on').find(".side-depth2-box").stop().slideUp(300);
 	    $('.user-info-list-box').stop().slideUp(300);
 	    $(this).next().stop().slideToggle(300);
+	    
+	    if($('.sidebar-list-box').hasClass('user-info-box')){
+			$('#sidebarInfo').addClass('active');	
+		} else {
+			$('#sidebarInfo').removeClass('active');
+		}
 	})
 	
 	//divisionActive

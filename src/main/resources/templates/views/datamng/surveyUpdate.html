@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+	        <div>
+	            <h3 id="infoTitle">조사 설문 등록</h3>
+	        </div>
+	        <div id="infoTableWrap">
+				<table id="listTable" class="mt16 mb16">
+					<input type="hidden" id="srvyId" th:value="${surveyInfo.srvyId}" />
+					<thead>
+						<tr>
+							<th>조사 유형</th>
+							<th>설문명</th>
+							<th>조사 기간</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<select class="select-list-box" id="srvyType">
+									<th:block th:each="item : ${srvyTypeCd}">
+										<option th:text="${item.cdNm}" th:selected="${surveyInfo.srvyType eq item.cd}" th:value="${item.cd}"></option>
+									</th:block>
+								</select>
+							</td>
+							<td>
+								<input type="text" id="srvyTitle" class="input-table-text surveyValue" placeholder="설문명을 입력해주세요." th:value="${surveyInfo.srvyTitle}" />
+							</td>
+							<td>
+								<input type="text" id="startDt" class="input-table-text startPicker" placeholder="날짜를 선택해주세요." th:value="${@commonUtils.formatLocalDateTime(surveyInfo.startDt,'YYYY-MM-dd')}" th:data-start-date="${@commonUtils.formatLocalDateTime(surveyInfo.startDt,'YYYY-MM-dd')}">
+								<span>~</span>
+								<input type="text" id="endDt" class="input-table-text endPicker" placeholder="날짜를 선택해주세요." th:value="${@commonUtils.formatLocalDateTime(surveyInfo.endDt,'YYYY-MM-dd')}" th:data-end-date="${@commonUtils.formatLocalDateTime(surveyInfo.endDt,'YYYY-MM-dd')}">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="questSurveyList">
+					<div id="questDefaultBox" class="quest-add-box text-right none">
+						<input type="button" class="is-key-button" onclick="questSectionAdd();" value="섹션 추가"/>
+					</div>
+					<th:block th:each="item : ${exmnMngSrvyList}">
+						<div class="quest-container" th:data-sctn-ordr="${item.sectSqno}" th:data-sctn-type="${item.sectType}" th:data-sctn-id="${item.sectId}">
+							<div class="quest-wrap">
+								<div class="quest-title-wrap">
+									<h4 class="quest-title">
+										<input type="text" class="input-reset surveyValue" th:value="${item.sectTitle}" placeholder="조사명을 입력하세요.">
+										<input type="button" class="quest-close" th:onclick="questContainerRemove(this,[[${item.sectId}]]);">
+									</h4>
+									<div class="quest-sub-title">
+										<input type="text" class="input-reset surveyValue" th:value="${item.sectSubtitle}" placeholder="조사 부제를 입력하세요.">
+									</div>
+								</div>
+								<div class="quest-grid-box sortable">
+									<th:block th:each="qstnItem : ${item.tmSrvyQstnList}">
+										<div class="quest-box sortable-box" onmouseover="mouseOverSortable(this);" onmouseleave="mouseLeaveSortable(this);">
+											<div class="sortable-handle none"><span></span></div>
+											<div class="quest-title-box">
+												<span class="quest-number" th:text="'Q'+${qstnItem.qstnSqno}+'.'"></span>
+												<span class="quest-name" th:data-qstn-type="${qstnItem.qstnTypeCd}" th:data-qstn-ordr="${qstnItem.qstnSqno}" th:data-qstn-id="${qstnItem.qstnId}">
+													<input type="text" class="surveyValue" th:value="${qstnItem.qstnTitle}" placeholder="질문 제목을 입력해주세요."/>
+												</span>
+												<select class="select-list-box" onchange="optionSelected(this);">
+													<th:block th:each="item : ${qstnTypeCd}">
+														<option th:value="${item}" th:selected="${item eq qstnItem.qstnTypeCd}" th:text="${item.getName()}"></option>
+													</th:block>
+												</select>
+												<input type="button" class="quest-close" th:onclick="questBoxRemove(this,[[${qstnItem.qstnId}]]);"/>
+											</div>
+											<!-- 주관식 / 시간 / 위치 / 날짜 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getType() eq 'SINGLE'}">
+												<div class="list-answer">
+													<div class="quest-view-item">
+														<span class="quest-view-img"><img th:src="${qstnItem.qstnTypeCd.getImgPath()}" alt="short"></span>
+														<span class="quest-view-text" th:text="${qstnItem.qstnTypeCd.getDesc()}"></span>
+													</div>
+												</div>
+											</th:block>
+											<!-- 라디오 / 체크박스 / 셀렉트박스 -->
+											<th:block th:if="${qstnItem.qstnTypeCd.getType() eq 'MULTIPLE'}">
+												<div class="list-answer">
+													<ul class="all-answer">
+														<th:block th:each="ansItem : ${qstnItem.tmSrvyAnsList}">
+															<li class="option-list">
+																<input type="text" class="answ-content" th:data-answ-id="${ansItem.ansId}" th:data-answ-sort="${ansItem.ansSqno}" th:value="${ansItem.ansCnts}" placeholder="새 옵션" />
+																<input type="button" th:onclick="optionRemove(this,[[${ansItem.ansId}]])" value="삭제">
+															</li>
+														</th:block>
+													</ul>
+													<div class="list-append">
+														<input type="button" class="mr8" onclick="optionAdd(this)" value="+ 옵션 추가">
+														<input type="button" onclick="optionEtcAdd(this)" value="+ 기타 옵션 추가">
+													</div>
+												</div>
+											</th:block>
+										</div>
+									</th:block>
+								</div>
+								<div class="quest-add-box">
+									<input type="button" class="is-key-button" onclick="questBoxAdd(this);" value="설문항목 추가"/>
+									<input type="button" class="is-key-button" onclick="questSectionAdd();" value="섹션 추가"/>
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</div>
+	        </div>
+	    </div>
+		<div class="info-button-box">
+            <a href="javascript:void(0);" class="is-key-button overLapping" onclick="updateInvstMngSurveySctn();">저장</a>
+            <a th:href="@{/datamng/survey}" class="is-basic-button">취소</a>
+        </div>
+	</th:block>
+</html>

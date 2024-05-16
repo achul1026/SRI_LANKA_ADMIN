@@ -1,0 +1,82 @@
+<div id="scheduleHistoryContainer" class="none">
+	<div class="is-box">
+		<div class="flex-between">
+            <h3 class="info-title">조사 현황 및 일정 상세</h3>
+            <div>
+            	<input type="button" class="is-key-button" onclick="detailView();" value="상세 보기"/>
+            </div>
+    	</div>
+    	<div class="histroy-flex-box">
+        	<div class="is-box history-tc-box">
+        		<div class="text-center">
+        			<span>조사 기간</span>
+        			<span id="startHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.startDt,'YYYY-MM-dd')}">2024-05-09</span>
+        			<span>~</span>
+        			<span id="endHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.endDt,'YYYY-MM-dd')}">2024-06-10</span>
+        		</div>
+        		<div class="history-chart">
+            		<div class="tcTiemWrap">
+            			<div class="tcTimeInner scroll">
+            				<div id="tcDate" class="chart-title mb16 text-center" th:text="${tlExmnRsltHistorySearchDTO.searchDate}"></div>
+            				<div class="tc-time-box" th:each="item : ${tlExmnRsltHistoryDTO.hourList}">
+								<div class="tc-time" th:text="${item.hour}"></div>
+								<div class="tc-check">
+									<img th:if="${!item.isExists}" th:src="@{/images/un_check.png}" alt="check">
+									<img th:if="${item.isExists}" th:src="@{/images/check.png}" alt="check">
+								</div>
+							</div>
+            			</div>
+        			</div>
+        		</div>
+        		<div>
+        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 근무 시간</span><span th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.endDt,'HH:mm')}"></span></div>
+        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 근무 형태</span><span th:text="${tlExmnRsltHistoryDTO.exmnDiv}"></span></div>
+        			<div class="survey-history-txt-box"><span class="survey-history-txt">총 조사 횟수</span><span th:text="|${tlExmnRsltHistoryDTO.invstTotalCnt}번|"></span></div>
+        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 완료</span><span th:text="|${tlExmnRsltHistoryDTO.invstCompletedCnt}번|">150</span></div>
+        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 미완료</span><span th:text="|${tlExmnRsltHistoryDTO.invstNotCompletedCnt}번|">150</span></div>
+        		</div>
+        	</div>
+        	<div class="is-box history-table-box">
+				<div class="list-search-wrap history-date-box">
+					<div class="list-search-box gap16">
+						<div>
+							<label>조사방향</label>
+							<select class="select-list-box" id="exmndrctId" onchange="invstHistorySearchList();">
+								<th:block th:each="item : ${exmnDrctList}">
+									<option th:selected="${item.exmndrctId eq tlExmnRsltHistorySearchDTO.exmndrctId}" th:text="|${item.startlcNm} -> ${item.endlcNm}|" th:value="${item.exmndrctId}" th:data-startlc-nm="${item.startlcNm}" th:data-endlc-nm="${item.endlcNm}"></option>
+								</th:block>
+							</select>
+						</div>
+					</div>
+				</div>						
+				<table id="listTable">
+					<thead>
+		                <tr>
+		                    <th>번호</th>
+		                    <th>조사날짜</th>
+		                    <th>총 조사 횟수</th>
+		                    <th>조사완료</th>
+		                    <th>조사 미완료</th>
+		                    <th>위치 변경 사유</th>
+		                </tr>
+					</thead>
+					<tbody id="invstListTbody">
+						<th:block th:each="item,status : ${tlExmnRsltHistoryDTO.trafficHistoryTableList}">
+							<tr class="table-link" onclick="tableTcDate(this);">
+								<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+								<td th:text="${item.invstDt}">
+									<input type="hidden" class="table-tc-date" th:value="${item.invstDt}"/>
+								</td>
+								<td th:text="|${item.totalCnt}번|"></td>
+								<td th:text="|${item.completeCnt}번|"></td>
+								<td th:text="|${item.incompleteCnt}번|"></td>
+								<td th:text="${item.lcchgRsn}"></td>
+							</tr>
+						</th:block>	
+					</tbody>
+				</table>
+				<div th:insert="tags/paging/paging :: pagingFragment"></div>									        		
+        	</div>
+    	</div>
+	</div>
+</div>

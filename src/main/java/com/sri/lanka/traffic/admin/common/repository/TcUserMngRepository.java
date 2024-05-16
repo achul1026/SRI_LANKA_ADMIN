@@ -51,12 +51,12 @@ public interface TcUserMngRepository extends JpaRepository<TcUserMng, String>{
 	Boolean existsByUserId(Object object);
 	
 	/**
-	  * @Method Name : findAllByAuthId
+	  * @Method Name : findAllByAuthgrpId
 	  * @작성일 : 2024. 1. 25.
 	  * @작성자 : NK.KIM
 	  * @Method 설명 : 관리자 목록 조회 ( 권한 pk )
-	  * @param AuthId
+	  * @param AuthgrpId
 	  * @return
 	  */
-	List<TcUserMng> findAllByAuthId(String AuthId);
+	List<TcUserMng> findAllByAuthgrpId(String AuthgrpId);
 }

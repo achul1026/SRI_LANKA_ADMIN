@@ -11,13 +11,13 @@
         				<h3 id="infoTitle">조사 업무 등록</h3>
         			</div>
         			<div class="infoTableWrap">
-						<table id="mapLoactionSave" class="infoTable survey-save-table">
+						<table id="mapLocationSave" class="infoTable survey-save-table">
 							<tr>
 								<th>조사 종류</th>
 								<td class="type-box">
 									<select class="select-list-box" id="exmnType" name="exmnType" onchange="typeOption();">
 										<th:block th:each="item : ${cmCdList}">
-											<option th:value="${item}" th:data-invst-type="${item.type}" th:text="${item.name}"></option>
+											<option th:value="${item}" th:data-invst-type="${item.type}" th:data-has-drct="${item.hasDrct}" th:data-invst-typecd="${item.code}" th:text="${item.name}"></option>
 										</th:block>
 									</select>
 								</td>
@@ -37,6 +37,23 @@
 								</td>
 								<th>조사 형태</th>
 								<td><input type="text" name="exmnDiv" class="input-table-text surveyValue" placeholder="조사 형태를 입력해주세요."></td>
+							</tr>
+							<tr class="survey-objectives none">
+								<th>설문 양식</th>
+								<td>
+									<span class="table-flex">
+										<input type="hidden" class="srvyInfo" id="srvyId" name="srvyId" />
+										<input type="text" class="srvyInfo input-table-text" id="srvyTitle" name="srvyTitle" placeholder="조사 설문지를 검색해주세요." readonly />
+										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyForm();" value="검색"/>
+									</span>
+								</td>
+								<th>조사 목표 개수</th>			
+								<td>
+									<span class="table-flex">
+										<input type="text" name="goalCnt" class="input-table-text surveyValue" value="0" oninput="inputOnlyNumber(this)" placeholder="조사 목표 개수를 입력해주세요." />
+										<span>개</span>
+									</span>							
+								</td>
 							</tr>
 							<tr>
 								<th>조사 기간</th>
@@ -76,19 +93,22 @@
 								</td>							
 							</tr>
 							<tr>
- 								<th class="survey-objectives none">조사 목표 개수</th>			
-								<td class="survey-objectives none">
-									<span class="table-flex">
-										<input type="text" name="goalCnt" class="input-table-text surveyValue" value="0" oninput="inputOnlyNumber(this)" placeholder="조사 목표 개수를 입력해주세요." />
-										<span>개</span>
-									</span>							
-								</td>
 								<th>조사 지역</th>			
-								<td colspan="3">
-									<input type="text" class="table-input-reset surveyValue" id="surveyMapLocation" name="exmnLc" readonly/>
+								<td id="tableLocationColSpan">
+									<span class="survey-objectives">
+										<input type="hidden" class="table-input-reset surveyLocationValue" id="surveyMapLocation" name="exmnLc" readonly/>
+									</span>
+									<span class="survey-loaction-box none">
+										<span class="survey-location-list"></span>
+<!-- 										<input type="hidden" name="exmnLc" class="surveyLocationValue"/> -->
+									</span>
+								</td>
+								<th class="surveyDirectionBox">도로 차선 수</th>			
+								<td class="surveyDirectionBox">
+									<input type="text" class="input-table-text surveyValue" name="laneCnt"/>
 								</td>
 							</tr>
-							<tr>
+							<tr class="surveyDirectionBox">
 								<th>좌표</th>
 								<td>
 									<input type="text" class="locationInfo table-input-reset surveyValue" id="coordinate" readonly/>
@@ -103,7 +123,7 @@
 									</span>		
 								</td>
 							</tr>
-							<tr id="tableMap">
+							<tr id="tableMap" class="surveyDirectionBox">
 								<th>ස්ථානය</th>
 								<td colspan="3" id="mapSearch">
 									<span id="detailMap">
@@ -120,7 +140,7 @@
 				</div>
 			</form>
 			<!-- 조사방향 -->
-			<div id="surveyDirectionBox" class="is-box mt24">
+			<div id="surveyDirectionBox" class="is-box mt24 surveyDirectionBox">
 				<div class="flex-between">
 					<h3 class="info-title">조사 방향</h3>
 					<input type="button" class="is-key-button" onclick="directionAdd();" value="추가하기"/>	
@@ -227,4 +247,5 @@
 		}
 	}
 	
+	locationSearch('survey-location-list');
 </script>

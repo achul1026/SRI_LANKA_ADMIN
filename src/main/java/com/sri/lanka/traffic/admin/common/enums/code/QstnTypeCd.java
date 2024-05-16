@@ -8,20 +8,28 @@ import lombok.Getter;
 @Getter
 public enum QstnTypeCd implements CommonEnumType<String> {
 	
-	SUBJECTIVE("QTC001","주관식"),
-	RADIO("QTC002","라디오"),
-	CHECKBOX("QTC003","체크박스"),
-	TIME("QTC004","시간"),
-	ADDRESS("QTC005","주소"),
-	SEARCH("QTC006","검색")
+	SUBJECTIVE("QTC001","주관식","SINGLE","/images/quest_text.png","주관식 답변란"),
+	RADIO("QTC002","라디오","MULTIPLE",null,null),
+	CHECKBOX("QTC003","체크박스","MULTIPLE",null,null),
+	TIME("QTC004","시간","SINGLE","/images/quest_time.png","Time"),
+	LOCATION("QTC005","위치","SINGLE","/images/quest_location.png","Location"),
+	SELECTBOX("QTC006","드롭다운","MULTIPLE",null,null),
+	DATE("QTC007","날짜","SINGLE","/images/quest_date.png","YYYY-MM-DD"),
+//	SEARCH("QTC008","검색","SINGLE","/images/quest_date.png","search"),//TODO::검색 이미지 필요
 	;
 	
 	private String code; 
 	private String name;
+	private String type;
+	private String imgPath;
+	private String desc;
 	
-	QstnTypeCd(String code, String name) {
+	QstnTypeCd(String code, String name, String type, String imgPath, String desc) {
 		this.code = code;
 		this.name = name;
+		this.type = type;
+		this.imgPath = imgPath;
+		this.desc = desc;
 	}
 	
 	@Override

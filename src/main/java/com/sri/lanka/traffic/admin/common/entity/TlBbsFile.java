@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.sri.lanka.traffic.admin.common.util.CommonUtils;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +16,7 @@ import lombok.EqualsAndHashCode;
 public class TlBbsFile extends CreateEntity{
 
     @Id
-    private String fileId; //파일 아이디
+    private String fileId = CommonUtils.getUuid(); //파일 아이디
 
     private String filegrpId; //파일 그룹 아이디
 

@@ -12,13 +12,13 @@
 				<form id="invstSaveForm">
 					<input type="hidden" name="sttsCd" th:value="${invstInfo.sttsCd}"/>
 					<div class="infoTableWrap">
-						<table class="infoTable survey-save-table">
+						<table id="mapLocationSave" class="infoTable survey-save-table">
 							<tr>
 								<th>조사 종류</th>
 									<td class="type-box">
 										<select class="select-list-box" id="exmnType" name="exmnType" onchange="typeOption();">
 											<th:block th:each="item : ${cmCdList}">
-												<option th:value="${item}" th:selected="${item eq invstInfo.exmnType}" th:data-invst-type="${item.type}" th:text="${item.name}"></option>
+												<option th:value="${item}" th:data-invst-type="${item.type}" th:data-invst-typecd="${item.code}" th:text="${item.name}" th:selected="${item eq invstInfo.exmnType}"></option>
 											</th:block>
 										</select>
 									</td>
@@ -38,6 +38,23 @@
 								</td>
 								<th>조사 형태</th>
 								<td><input type="text" name="exmnDiv" class="input-table-text surveyValue" placeholder="조사 형태를 입력해주세요." th:value="${invstInfo.exmnDiv}"></td>
+							</tr>
+							<tr class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
+								<th>설문 양식</th>
+								<td>
+									<span class="table-flex">
+										<input type="hidden" class="srvyInfo" id="srvyId" name="srvyId" th:value="${invstInfo.srvyId}"/>
+										<input type="text" class="srvyInfo input-table-text" id="srvyTitle" th:value="${invstInfo.srvyTitle}" placeholder="조사 설문지를 검색해주세요." readonly />
+										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyForm();" value="검색"/>
+									</span>
+								</td>
+								<th>조사 목표 개수</th>			
+								<td>
+									<span class="table-flex">
+										<input type="text" name="goalCnt" class="input-table-text surveyValue" th:value="${invstInfo.goalCnt}" placeholder="조사 목표 개수를 입력해주세요." />
+										<span>개</span>
+									</span>
+								</td>
 							</tr>
 							<tr>
 								<th>조사 기간</th>
@@ -77,19 +94,30 @@
 								</td>	
 							</tr>
 							<tr>
-								<th class="survey-objectives none">조사 목표 개수</th>			
-								<td class="survey-objectives none">
-									<span class="table-flex">
-										<input type="text" name="goalCnt" class="input-table-text surveyValue" th:value="${invstInfo.goalCnt}" placeholder="조사 목표 개수를 입력해주세요." />
-										<span>개</span>
+								<th>조사 지역</th>			
+								<td id="tableLocationColSpan">
+									<span class="surveyDirectionBox">
+										<input type="hidden" id="exmnLcValue" th:value="${invstInfo.exmnLc}"/>
+										<input type="text" class="table-input-reset surveyValue surveyLocationValue" id="surveyMapLocation" name="exmnLc" th:value="${invstInfo.exmnLc}" readonly/>
+									</span>
+									<span class="survey-loaction-box flex-between" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
+										<span id="displayExmnLc">
+											<input type="text" class="table-input-reset" th:value="${invstInfo.exmnLc}" readonly>
+											<input type="button" class="is-key-button" value="수정" onclick="displayExmnLc('update')">
+										</span>
+										<span id="updateExmnLc" class="none">
+											<span class="survey-location-list none"></span>
+											<input type="button" class="is-basic-button" value="취소" onclick="displayExmnLc('cancel')"/>
+<!-- 											<input type="hidden" name="exmnLc" class="surveyLocationValue" th:value="${invstInfo.exmnLc}"/> -->
+										</span>
 									</span>
 								</td>
-								<th>조사 지역</th>			
-								<td colspan="3">
-									<input type="text" class="locationInfo table-input-reset surveyValue" id="surveyMapLocation" name="exmnLc" th:value="${invstInfo.exmnLc}" placeholder="조사 지점을 검색해주세요." readonly />
-								</td>							
+								<th class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">도로 차선 수</th>			
+								<td class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+									<input type="text" class="input-table-text surveyValue" name="laneCnt" th:value="${invstInfo.laneCnt}"/>
+								</td>						
 							</tr>
-							<tr class="mapDetail">
+							<tr class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
 								<th>좌표</th>
 								<td>
 									<input type="text" class="locationInfo table-input-reset surveyValue" id="coordinate" th:value="|${invstInfo.lat}, ${invstInfo.lon}|" readonly />
@@ -104,7 +132,7 @@
 									</span>							
 								</td>
 							</tr>
-							<tr id="tableMap">
+							<tr id="tableMap" class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
 								<th>ස්ථානය</th>
 								<td colspan="3" id="mapSearch">
 									<span id="detailMap">
@@ -120,7 +148,7 @@
 					</div>
 				</form>
         	</div>
-			<div id="surveyDirectionBox" class="is-box mt24"  th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+			<div id="surveyDirectionBox" class="is-box mt24 surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
 				<div class="flex-between">
 					<h3 class="info-title">조사 방향</h3>
 					<input type="button" class="is-key-button" onclick="directionAdd();" value="추가하기"/>	
@@ -157,16 +185,51 @@
 	</th:block>
 </html>
 <script type="text/javascript">
-	const lat 		= [[${invstInfo.lat}]];
-	const lon 		= [[${invstInfo.lon}]];
-	const exmnRange = [[${invstInfo.exmnRange}]];
+	const lat 		= document.getElementById('lat').value;
+// 		[[${invstInfo.lat}]];
+	const lon 		= document.getElementById('lon').value;
+// 		[[${invstInfo.lon}]];
+	const exmnRange = document.getElementById('exmnRange').value;
+// 		[[${invstInfo.exmnRange}]];
+
+	const surveyType = document.getElementById('exmnType');
+	const typeValue = surveyType.value;
+	const objective = document.querySelectorAll('.survey-objectives');
+	const directionBox = document.querySelectorAll('.surveyDirectionBox');
+	const locationSelect = document.querySelector('.survey-loaction-box');
 	
+	if(typeValue == 'OD' || typeValue == 'AXLELOAD' || typeValue == 'LABORSIDE') {
+		objective.forEach(item => { 
+			item.classList.remove('none')
+			item.querySelectorAll('input').forEach(input => input.classList.add('surveyValue'));
+		});
+		directionBox.forEach(item => {
+			item.classList.add('none')
+			item.querySelectorAll('input').forEach(input => input.classList.remove('surveyValue'));
+			if(typeValue == 'AXLELOAD') {
+				document.getElementById('surveyDirectionBox').classList.remove('none');
+				locationSelect.classList.remove('none');
+			}
+		});
+		document.querySelector('.survey-loaction-box').classList.remove('none');
+		document.getElementById('tableLocationColSpan').setAttribute('colSpan', '2');
+	} else {
+		objective.forEach(item => { 
+			item.classList.add('none')
+			item.querySelectorAll('input').forEach(input => input.classList.remove('surveyValue'));
+		});
+		directionBox.forEach(item => {
+			item.classList.remove('none')
+			item.querySelectorAll('input').forEach(input => input.classList.add('surveyValue'));
+		});
+		document.querySelector('.survey-loaction-box').classList.add('none');
+		document.getElementById('tableLocationColSpan').setAttribute('colSpan', '');
+	}
 	
 	//등록했던 조사마커 담아주기
-	locationLon = lon;
+	locationLng = lon;
 	locationLat = lat;
 	mapboxGl(lon, lat, exmnRange);
-	
 
 	//캘린더 색상
 	const colorSetContainer = document.getElementById('radioColorSet');
@@ -237,6 +300,21 @@
 		if(tBodyTrAll.length == 0){
 			tBody.append(tr);
 			tr.innerHTML = html;
+		}
+	}
+	
+	locationSearch('survey-location-list');
+	
+	function displayExmnLc(display){
+		if (display === 'update') {
+			document.querySelector('.survey-location-list.none').classList.remove('none');
+			document.getElementById('displayExmnLc').classList.add('none');
+			document.getElementById('updateExmnLc').classList.remove('none');
+		} else {
+			document.querySelector('.survey-location-list').classList.add('none');
+			document.getElementById('displayExmnLc').classList.remove('none');
+			document.getElementById('updateExmnLc').classList.add('none');
+			document.querySelector('.surveyLocationValue').value = document.getElementById('exmnLcValue').value;
 		}
 	}
 </script>

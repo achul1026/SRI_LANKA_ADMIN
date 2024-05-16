@@ -18,6 +18,7 @@ import com.sri.lanka.traffic.admin.common.dto.menu.TcMenuMngMenuCheckDTO;
 import com.sri.lanka.traffic.admin.common.entity.TcMenuAuth;
 import com.sri.lanka.traffic.admin.common.entity.TcUserMng;
 import com.sri.lanka.traffic.admin.common.enums.code.AthrztSttsCd;
+import com.sri.lanka.traffic.admin.common.enums.code.UserTypeCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuAuthRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcUserMngRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
@@ -40,6 +41,11 @@ public class AuthorityCheckerInterceptor implements HandlerInterceptor {
 		
 		LoginMngrDTO tcUserMngInfo = LoginMngrUtils.getTcUserMngInfo();
 		
+		// 개발자 계정일 경우 통과
+		if (tcUserMngInfo.getUserAuth().equals("developer") || tcUserMngInfo.getUserType().equals(UserTypeCd.SUPER)) {
+			return true;
+		}
+		
 		// 세션 정보를 가져오지 못 했을 때
 		if (CommonUtils.isNull(tcUserMngInfo)) {
 			throw new NoLoginException(ErrorCode.NOT_FOUND_USER_INFO);
@@ -53,11 +59,6 @@ public class AuthorityCheckerInterceptor implements HandlerInterceptor {
 			throw new NoLoginException(ErrorCode.MNGR_STTS_NOT_NORMAL);
 		}
 		
-		// 개발자 계정일 경우 통과
-		if (dbTcUserMng.getUserAuth().equals("developer")) {
-			return true;
-		}
-		
 		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		Authority auth = handlerMethod.getMethodAnnotation(Authority.class);
 		
@@ -68,16 +69,16 @@ public class AuthorityCheckerInterceptor implements HandlerInterceptor {
 			//메뉴 사용여부 조회
 			switch (auth.authType()) {
 			case CREATE:
-				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthId(), "Y", null, null, null);
+				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthgrpId(), "Y", null, null, null);
 				break;
 			case READ:
-				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthId(), null, "Y", null, null);
+				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthgrpId(), null, "Y", null, null);
 				break;
 			case UPDATE:
-				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthId(), null, null, "Y", null);
+				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthgrpId(), null, null, "Y", null);
 				break;
 			case DELETE:
-				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthId(), null, null, null, "Y");
+				tcMenuAuth = new TcMenuAuth(tcUserMngInfo.getAuthgrpId(), null, null, null, "Y");
 				break;
 			case GENERAL:
 				return true;

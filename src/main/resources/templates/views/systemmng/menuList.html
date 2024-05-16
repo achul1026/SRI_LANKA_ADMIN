@@ -7,18 +7,22 @@
 		<div class="screen-division menu-container">
 			<div class="is-box menu-tree-box">
 				<div class="scroll">
-					<div class="division-box" th:each="item:${bffltdAuthGrpList}">
-						<div class="division-title-box">
-							<span class="division-title" th:text="${item.bffltdNm}"></span>
-							<span class="division-title-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+					<th:block th:if="${!#lists.isEmpty(bffltdAuthGrpList)}"> 
+						<div class="division-box" th:each="item:${bffltdAuthGrpList}">
+							<div class="division-title-box">
+								<span class="division-title" th:text="${item.bffltdNm}"></span>
+								<span class="division-title-arrow"><img th:src="@{/images/right_arrow.png}" alt="arrow"></span>
+							</div>
+							<ul class="division-menu">
+								<li th:each="subAuth:${item.subAuthGrpList}">
+									<a href="javascript:void(0)" th:onclick="setAuthGrp([[${item.bffltdNm}]], [[${subAuth}]])" th:text="${subAuth.authgrpNm}">시스템 관리자</a>
+									<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
+								</li>
+							</ul>
 						</div>
-						<ul class="division-menu">
-							<li th:each="subAuth:${item.subAuthGrpList}">
-								<a href="javascript:void(0)" th:onclick="setAuthGrp([[${item.bffltdNm}]], [[${subAuth}]])" th:text="${subAuth.authgrpNm}">시스템 관리자</a>
-								<span class="division-menu-arrow"><img th:src="@{/images/right_arrow_key_color.png}" alt="arrow"></span>
-							</li>
-						</ul>
-					</div>
+					</th:block>
+					<th:block th:if="${#lists.isEmpty(bffltdAuthGrpList)}"> 권한이 없습니다.
+					</th:block>
 				</div>
 			</div>
 			<div class="menu-table-list-box">
@@ -33,15 +37,22 @@
 							</tr>
 						</thead>
 						<tbody id="authGrpTbody">
-							<tr>
-								<td id="bffltdNm" th:text="${bffltdAuthGrpList[0].bffltdNm}"></td>
-								<td id="authgrpNm" th:text="${bffltdAuthGrpList[0].subAuthGrpList[0].authgrpNm}"></td>
-								<td><span th:text="${totalCnt}"></span>명</td>
-								<td>
-									<input type="button" th:onclick="groupUpdateModal();" class="is-key-button" value="그룹 권한 설정"/>
-									<input type="hidden" id="authgrpId" th:value="${bffltdAuthGrpList[0].subAuthGrpList[0].authgrpId}">
-								</td>
-							</tr>
+							<th:block th:if="${!#lists.isEmpty(bffltdAuthGrpList[0].subAuthGrpList)}"> 
+								<tr>
+									<td id="bffltdNm" th:text="${bffltdAuthGrpList[0].bffltdNm}"></td>
+									<td id="authgrpNm" th:text="${bffltdAuthGrpList[0].subAuthGrpList[0].authgrpNm}"></td>
+									<td><span th:text="${totalCnt}"></span>명</td>
+									<td>
+										<input type="button" th:onclick="groupUpdateModal();" class="is-key-button" value="그룹 권한 설정"/>
+										<input type="hidden" id="authgrpId" th:value="${bffltdAuthGrpList[0].subAuthGrpList[0].authgrpId}">
+									</td>
+								</tr>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(bffltdAuthGrpList[0].subAuthGrpList)}">
+								<tr>
+									<td colspan="4">소속된 그룹유형이 없습니다.</td>
+								</tr>
+							</th:block>
 						</tbody>
 					</table>
 				</div>
@@ -49,7 +60,7 @@
 					<form id="searchForm" name="searchForm" onsubmit="asynchronousSearchList('1');">
 						<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
 						<div class="menu-list-search-box">
-							<input type="text" class="input-text" name="searchContent" placeholder="ID 또는 이름을 입력하세요.">
+							<input type="text" class="input-text" name="searchContent" placeholder="ID 또는 이름을 입력하세요." th:value="${searchInfo.searchContent}">
 							<button type="submit" class="is-key-button">검색</button>
 						</div>
 					</form>
@@ -96,11 +107,10 @@
 		const authgrpId = document.getElementById('authgrpId').value;
 		new ModalBuilder().init('그룹 메뉴 권한 설정', '500').ajaxBody("/systemmng/menu/group/update/"+authgrpId).footer(3,'저장',function(button, modal){
 			
-			let authId		= $("#authId").val();
-			let authNm 		= $('#authNm').val();
-			let authDescr 	= $('#authDescr').val();
-			let authgrpId 	= $('#authgrpId').val();
-			
+			let authgrpId		= $("#authgrpId").val();
+// 			let authgrpNm 		= $('#authgrpNm').val();
+// 			let authgrpDescr 	= $('#authgrpDescr').val();
+// 			alert(authgrpId + " : " + authgrpNm + " : " + authgrpDescr);
 			let authSaveDTO = new Object();
 			let tcMenuAuthList = new Array();
 
@@ -113,7 +123,7 @@
 			    let parentmenuauthId = menuElement.data('parentmenuauthid');
 		        
 			    let authParentMenu = {
-			    	authId: authId,
+			    	authgrpId: authgrpId,
 		            menuId: parentMenuId,
 		            menuauthId: parentmenuauthId,
 		            srchYn: parentMenuCheckedVal,
@@ -132,7 +142,7 @@
 		            let subMenuauthId = subMenuElement.data('menuauthid');
 
 		            let authSubMenu = {
-		            	authId: authId,
+		            	authgrpId: authgrpId,
 		                menuId: subMenuId,
 		                menuauthId: subMenuauthId,
 		                srchYn: subMenuElement.find('[name="srchYn"]').is(':checked') ? 'Y' : 'N',
@@ -145,10 +155,9 @@
 		        });
 			});
 
-			authSaveDTO.authId = authId;
-			authSaveDTO.authNm = authNm;
-			authSaveDTO.authDescr = authDescr;
 			authSaveDTO.authgrpId = authgrpId;
+// 			authSaveDTO.authgrpNm = authgrpNm;
+// 			authSaveDTO.authgrpDescr = authgrpDescr;
 			authSaveDTO.tcMenuAuthList = tcMenuAuthList;
 
 			fetch(__contextPath__ + "/systemmng/menu/", {
@@ -163,7 +172,7 @@
 			    if (result.code == '200') {
 			        new ModalBuilder().init().alertBody(result.message).footer(4, '확인', function(button, modal) {
 			            modal.close();
-			            window.location.href = __contextPath__ + "/systemmng/menu";
+// 			            window.location.href = __contextPath__ + "/systemmng/menu";
 			        }).open();
 			    } else {
 			        new ModalBuilder().init().alertBody(result.message).footer(4, '확인', function(button, modal) {
@@ -281,7 +290,6 @@
 						}
 			)
 	}
-	
 	
 	//divisionBox active
 	const divisionBox = document.querySelectorAll('.division-box');

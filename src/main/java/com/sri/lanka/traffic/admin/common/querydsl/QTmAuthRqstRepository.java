@@ -10,7 +10,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserRqstAuthDTO;
 import com.sri.lanka.traffic.admin.common.entity.QTcAuthGrp;
-import com.sri.lanka.traffic.admin.common.entity.QTcAuthMng;
 import com.sri.lanka.traffic.admin.common.entity.QTcCdInfo;
 import com.sri.lanka.traffic.admin.common.entity.QTcUserMng;
 import com.sri.lanka.traffic.admin.common.entity.QTmAuthRqst;
@@ -29,8 +28,6 @@ public class QTmAuthRqstRepository {
 	private QTmAuthRqst tmAuthRqst = QTmAuthRqst.tmAuthRqst;
 	
 	private QTcAuthGrp tcAuthGrp = QTcAuthGrp.tcAuthGrp;
-	
-	private QTcAuthMng tcAuthMng = QTcAuthMng.tcAuthMng;
 	
 	private QTcUserMng tcUserMng = QTcUserMng.tcUserMng;
 
@@ -75,13 +72,12 @@ public class QTmAuthRqstRepository {
 		TcUserRqstAuthDTO result = queryFactory
 				.select(Projections.bean(TcUserRqstAuthDTO.class, tcUserMng.usermngId
 						, tcCdInfo.cdNm.as("bffltdNm"), tcAuthGrp.authgrpNm, tcUserMng.userId, tcUserMng.userNm
-						, tcUserMng.userTel, tcUserMng.userEmail, tmAuthRqst.rqstStts, tmAuthRqst.rqstRsn, tcAuthMng.authId
+						, tcUserMng.userTel, tcUserMng.userEmail, tmAuthRqst.rqstStts, tmAuthRqst.rqstRsn, tcAuthGrp.authgrpId
 						))
 				.from(tmAuthRqst)
 	            .leftJoin(tcUserMng).on(tcUserMng.usermngId.eq(tmAuthRqst.usermngId))
 	            .leftJoin(tcCdInfo).on(tcUserMng.userBffltd.eq(tcCdInfo.cd))
 	            .leftJoin(tcAuthGrp).on(tcAuthGrp.authgrpId.eq(tmAuthRqst.authgrpId))
-	            .leftJoin(tcAuthMng).on(tcAuthMng.authgrpId.eq(tmAuthRqst.authgrpId))
 	            .where(tmAuthRqst.authrqstId.eq(authrqstId))
 				.fetchOne();
 		return result;

@@ -1,33 +1,14 @@
-#calendarContainer {
-	position:relative;
-}
 #fullCalendar {
-	position:absolute;
-	top:0;
-	left:0;
-	width:100%;
-	height:calc(100vh - 150px) !important;
-	opacity:0;
-	transition:opacity 0.6s;
-	pointer-events:none;
+	display:none;
 }
 #calendarList {
-	width:100%;
-	position:absolute;
-	top:0;
-	right:-3000px;
-	opacity:0;
-	transition:opacity 0.6s;
-	pointer-events:none;
+	display:none;
 }
 #fullCalendar.active {
-	opacity:1;
-	pointer-events:unset;
+	display:flex;
 }
 #calendarList.active {
-	right:0;
-	opacity:1;
-	pointer-events:unset;
+	display:block;
 }
 .calendar-total-box {
 	position:relative;

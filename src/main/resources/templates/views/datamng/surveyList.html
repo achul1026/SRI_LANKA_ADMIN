@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+			<form id="searchForm" name="searchForm" th:action="@{/datamng/survey}">
+				<input type="hidden" name="pageNo" value="1">
+				<div class="list-search-wrap">
+					<div class="list-search-box">
+						<select class="select-list-box" name="searchTypeCd">
+							<option value="">조사 유형</option>
+							<option th:each="item:${srvyCdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${searchInfo.searchTypeCd eq item.cd}"></option>
+						</select>
+						<input type="text" class="input-text" name="searchContent" placeholder="조사명을 입력해주세요." th:value="${searchInfo.searchContent}">
+						<div>
+							<label>조사기간</label>
+							<input type="text" class="input-text startPicker" name="startDate" placeholder="날짜를 선택해주세요." th:value="${searchInfo.startDate}">
+							<span>~</span>
+							<input type="text" class="input-text endPicker" name="endDate" placeholder="날짜를 선택해주세요." th:value="${searchInfo.endDate}">
+							<button type="submit" class="is-key-button">검색</button>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div id="listTableContainer">
+				<div class="list-save-box">
+					<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
+					<div>
+						<a href="/datamng/survey/save" class="is-key-button">설문 등록</a>
+					</div>
+				</div>
+				<table id="listTable">
+					<thead>
+		                <tr>
+		                    <th>번호</th>
+		                    <th>조사 유형</th>
+		                    <th>설문명</th>
+		                    <th>조사 기간</th>
+		                    <th>작성자</th>
+		                </tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${totalCnt > 0}">
+			                <tr class="table-link" th:each="item,status : ${surveyList}" th:onclick="|location.href='@{/datamng/survey/{srvyId}(srvyId=${item.srvyId})}'|">
+								<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+			                    <td th:text="${item.srvyTypeNm}"></td> 
+			                    <td th:text="${item.srvyTitle}"></td>
+			                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'YYYY-MM-dd')}"></td>
+			                    <td th:text="${item.registId}"></td>
+			                </tr>
+						</th:block>
+						<th:block th:if="${totalCnt == 0}">
+							<tr>
+								<td colspan="5">검색 결과가 없습니다.</td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
+			<div th:insert="tags/paging/paging :: pagingFragment"></div>
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+</script>

@@ -10,4 +10,6 @@ public interface TcCdInfoRepository extends JpaRepository<TcCdInfo, String>{
 
 	TcCdInfo findByCd(String bffltdCd);
 
+	TcCdInfo findByCdNm(String type);
+
 }

@@ -22,7 +22,7 @@ import com.sri.lanka.traffic.admin.common.enums.code.AthrztSttsCd;
 import com.sri.lanka.traffic.admin.common.enums.code.UserTypeCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuAuthRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcMenuMngRepository;
-import com.sri.lanka.traffic.admin.common.repository.TcAuthMngRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcAuthGrpRepository;
 import com.sri.lanka.traffic.admin.common.repository.TcUserMngRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
 import com.sri.lanka.traffic.admin.common.util.LoginMngrUtils;
@@ -46,7 +46,7 @@ public class MenuInterceptor implements HandlerInterceptor {
 	QTcMenuMngRepository qTcMenuMngRepository;
 	
 	@Autowired
-	TcAuthMngRepository tcAuthMngRepository;
+	TcAuthGrpRepository tcAuthGrpRepository;
 	
 	@Autowired
 	DevMenuMngService menuMngService;
@@ -63,7 +63,6 @@ public class MenuInterceptor implements HandlerInterceptor {
 		
 		LoginMngrDTO loginSessionDTO = LoginMngrUtils.getTcUserMngInfo();
 		TcUserMng tcUserMng = tcUserMngRepository.findOneByUsermngIdAndAthrztStts(loginSessionDTO.getUsermngId(), AthrztSttsCd.APPROVAL);
-//		TcAuthMng tcAuthMng = tcAuthMngRepository.findOneByAuthId(tcUserMng.getAuthId()); useYn 미사용으로 비활성화
 		
 		//세션 정보 못가져올때
 		if(CommonUtils.isNull(tcUserMng)) {
@@ -90,7 +89,7 @@ public class MenuInterceptor implements HandlerInterceptor {
 			List<TcMenuMngDTO> sideMenuList = qTcMenuMngRepository.getMenuList(tcMenuMngDTO);
 			request.setAttribute("sideMenuList", sideMenuList);
 		// 권한이 없거나 미사용인 경우
-		} else if (CommonUtils.isNull(tcUserMng.getAuthId())) {
+		} else if (CommonUtils.isNull(tcUserMng.getAuthgrpId())) {
 			TcMenuMngDTO tcMenuMngDTO = new TcMenuMngDTO();
 			tcMenuMngDTO.setBscmenuYn("Y"); // 기본 메뉴만 조회하도록 설정
 			tcMenuMngDTO.setUseYn("Y"); // 사용 중인 메뉴만 조회하도록 설정
@@ -98,7 +97,7 @@ public class MenuInterceptor implements HandlerInterceptor {
 		    List<TcMenuMngDTO> sideMenuList = qTcMenuMngRepository.getMenuList(tcMenuMngDTO);
 		    request.setAttribute("sideMenuList", sideMenuList);
 		} else {
-			List<TcMenuAuthDTO> sideMenuList = qTcMenuAuthRepository.getSideAuthMenuList(tcUserMng.getAuthId());
+			List<TcMenuAuthDTO> sideMenuList = qTcMenuAuthRepository.getSideAuthMenuList(tcUserMng.getAuthgrpId());
 			request.setAttribute("sideMenuList", sideMenuList);
 		}
 		//메뉴 경로 세팅

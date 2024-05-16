@@ -23,6 +23,7 @@ import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.entity.TlBbsInfo;
 import com.sri.lanka.traffic.admin.common.enums.AuthType;
 import com.sri.lanka.traffic.admin.common.enums.MenuType;
+import com.sri.lanka.traffic.admin.common.enums.code.BbsTypeCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTlBbsInfoRepository;
 import com.sri.lanka.traffic.admin.common.repository.TlBbsInfoRepository;
 import com.sri.lanka.traffic.admin.common.util.LoginMngrUtils;
@@ -56,11 +57,11 @@ public class InvstAlarmMngController {
 	@Authority(authType = AuthType.READ)
 	@GetMapping
 	public String invstAlarmListPage(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+		searchCommonDTO.setSearchType(BbsTypeCd.ALARM.getCode());
 		
-		String type = "alarm";
-		searchCommonDTO.setSearchType("bbsTitle");
-		List<TlBbsInfo> sriAlarmList = qTlBbsInfoRepository.getBbsList(searchCommonDTO, paging, type);
-		long totalCnt = qTlBbsInfoRepository.getTotalCount(searchCommonDTO, type);
+		List<TlBbsInfo> sriAlarmList = qTlBbsInfoRepository.getBbsList(searchCommonDTO, paging);
+		
+		long totalCnt = qTlBbsInfoRepository.getTotalCount(searchCommonDTO);
 		
 		paging.setTotalCount(totalCnt);
 

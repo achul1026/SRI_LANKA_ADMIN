@@ -5,10 +5,9 @@ import lombok.Data;
 @Data
 public class TcAuthGrpMenuDTO {
 	
-	private String authId;
-	private String authDescr;
-    private String authgrpId;
-    private String authgrpNm;
+	private String authgrpId;
+	private String authgrpNm;
+	private String authgrpDescr;
 //    private List<TcMenuAuthDTO> subMenuAuthList;
 	
 }

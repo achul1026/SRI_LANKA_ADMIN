@@ -13,7 +13,6 @@ import lombok.EqualsAndHashCode;
 public class TcUserRqstAuthDTO extends CommonDTO {
 	
 	private String usermngId;
-	private String authId;
 	private String userId;
 	private String userBffltd;
 	private String userEmail;

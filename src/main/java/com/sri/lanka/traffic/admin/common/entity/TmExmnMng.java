@@ -27,6 +27,8 @@ public class TmExmnMng extends CreateEntity{
     private String exmnmngId = CommonUtils.getUuid(); //조사 관리 아이디
 
     private String exmngrpId; //조사 그룹 아이디
+    
+    private String srvyId; //설문 정보 아이디
 
     private String usermngId; //관리자 아이디
 
@@ -48,6 +50,8 @@ public class TmExmnMng extends CreateEntity{
     private String roadCd; //도로 명
 
     private String roadDescr; //경로
+    
+    private BigDecimal laneCnt; //차로 수
 
     private String exmnDiv; //조사 구분
 

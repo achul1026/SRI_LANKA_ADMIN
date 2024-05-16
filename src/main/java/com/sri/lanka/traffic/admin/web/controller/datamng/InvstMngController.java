@@ -3,7 +3,6 @@ package com.sri.lanka.traffic.admin.web.controller.datamng;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,23 +21,22 @@ import com.sri.lanka.traffic.admin.common.dto.common.SearchCommonDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnMngDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnMngSaveDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmExmnMngUpdateDTO;
+import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvyInfoDTO;
 import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectDetailDTO;
-import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectSaveDTO;
-import com.sri.lanka.traffic.admin.common.dto.invst.TmSrvySectUpdateDTO;
 import com.sri.lanka.traffic.admin.common.dto.mngr.TcUserMngDTO;
 import com.sri.lanka.traffic.admin.common.entity.TmExmnDrct;
-import com.sri.lanka.traffic.admin.common.entity.TmExmnMng;
 import com.sri.lanka.traffic.admin.common.enums.AuthType;
+import com.sri.lanka.traffic.admin.common.enums.GroupCode;
 import com.sri.lanka.traffic.admin.common.enums.MenuType;
 import com.sri.lanka.traffic.admin.common.enums.code.AthrztSttsCd;
 import com.sri.lanka.traffic.admin.common.enums.code.ColorTypeCd;
 import com.sri.lanka.traffic.admin.common.enums.code.ExmnTypeCd;
-import com.sri.lanka.traffic.admin.common.enums.code.QstnTypeCd;
-import com.sri.lanka.traffic.admin.common.enums.code.SectTypeCd;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTcUserMngRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmExmnMngRepository;
+import com.sri.lanka.traffic.admin.common.querydsl.QTmSrvyInfoRepository;
 import com.sri.lanka.traffic.admin.common.querydsl.QTmSrvySectRepository;
+import com.sri.lanka.traffic.admin.common.repository.TcCdInfoRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnDrctRepository;
 import com.sri.lanka.traffic.admin.common.repository.TmExmnMngRepository;
 import com.sri.lanka.traffic.admin.common.util.CommonUtils;
@@ -64,12 +62,18 @@ public class InvstMngController {
 
 	@Autowired
 	QTmSrvySectRepository qTmSrvySectRepository;
+	
+	@Autowired
+	QTmSrvyInfoRepository qTmSrvyInfoRepository;
 
 	@Autowired
 	TmExmnMngRepository tmExmnMngRepository;
 	
 	@Autowired
 	TmExmnDrctRepository tmExmnDrctRepository;
+	
+	@Autowired
+	TcCdInfoRepository tcCdInfoRepository;
 
 	@Autowired
 	InvstMngService invstMngService;
@@ -127,10 +131,14 @@ public class InvstMngController {
 	@Authority(authType = AuthType.CREATE)
 	@PostMapping
 	public @ResponseBody CommonResponse<?> invstSave(@RequestBody TmExmnMngSaveDTO tmExmnMngSaveDTO) {
-		invstMngService.saveInvstInfo(tmExmnMngSaveDTO);
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("exmnmngId", tmExmnMngSaveDTO.getTmExmnMng().getExmnmngId());
-		return CommonResponse.successToData(result, "조사 정보가 등록되었습니다.");
+		try {
+			invstMngService.saveInvstInfo(tmExmnMngSaveDTO);
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("exmnmngId", tmExmnMngSaveDTO.getTmExmnMng().getExmnmngId());
+			return CommonResponse.successToData(result, "조사 정보가 등록되었습니다.");
+		} catch (CommonException e) {
+			return CommonResponse.ResponseCodeAndMessage(400, "조사 정보 등록이 실패 했습니다.");
+		}
 	}
 
 	/**
@@ -151,7 +159,7 @@ public class InvstMngController {
 	}
 
 	/**
-	 * @Method Name : invstInvestigator
+	 * @Method Name : modalInvstInvestigator
 	 * @작성일 : 2024. 01. 09.
 	 * @작성자 : NK.KIM
 	 * @Method 설명 : 서비스 관리 조사 관리 조사원 상세
@@ -159,8 +167,8 @@ public class InvstMngController {
 	 * @return
 	 */
 	@Authority(authType = AuthType.READ, menuType = MenuType.DETAIL)
-	@GetMapping("/mngr")
-	public String invstInvestigator(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+	@GetMapping("/modal/mngr")
+	public String modalInvstInvestigator(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
 		searchCommonDTO.setSearchSttsCd(AthrztSttsCd.APPROVAL.getCode());
 		List<TcUserMngDTO> mngrList = qTcUserMngRepository.getTcUserList(searchCommonDTO, paging);
 
@@ -175,20 +183,55 @@ public class InvstMngController {
 
 		return "views/datamng/modal/invstMngrList";
 	}
-
+	
 	/**
-	 * @Method Name : invstInvestigatoList
-	 * @작성일 : 2024. 01. 10.
+	 * @Method Name : modalSurveyForm
+	 * @작성일 : 2024. 01. 09.
 	 * @작성자 : NK.KIM
-	 * @Method 설명 : 서비스 관리 조사 등록 조사 담당자
+	 * @Method 설명 : 모달 설문 양식 조회
 	 * @param model
 	 * @return
 	 */
 	@Authority(authType = AuthType.READ)
-	@GetMapping("/invst/invstmng/investigato")
-	public String invstInvestigatoList(Model model) {
-		return "views/datamng/modal/invstInvestigatoList";
+	@GetMapping("/modal/survey")
+	public String modalSurveyForm(Model model, SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+		
+		String exmnType = ExmnTypeCd.getEnums(searchCommonDTO.getSearchType()).name();
+		String srvyTypeCd = tcCdInfoRepository.findByCdNm(exmnType).getCd();
+		searchCommonDTO.setSearchTypeCd(srvyTypeCd);
+		
+		List<TmSrvyInfoDTO> surveyList = qTmSrvyInfoRepository.getSurveyList(searchCommonDTO, paging);
+
+		long totalCnt = qTmSrvyInfoRepository.getTotalCount(searchCommonDTO);
+
+		paging.setTotalCount(totalCnt);
+		model.addAttribute("surveyList", surveyList);
+		model.addAttribute("totalCnt", totalCnt);
+		model.addAttribute("paging", paging);
+		model.addAttribute("searchInfo", searchCommonDTO);
+		
+		return "views/datamng/modal/invstSruveyList";
 	}
+	
+	@Authority(authType = AuthType.READ)
+	@GetMapping("/modal/survey/asynchronous")
+	public @ResponseBody CommonResponse<?> surveyAsynchronousSetting(SearchCommonDTO searchCommonDTO, PagingUtils paging) {
+		List<TmSrvyInfoDTO> surveyList = qTmSrvyInfoRepository.getSurveyList(searchCommonDTO, paging);
+
+		long totalCnt = qTmSrvyInfoRepository.getTotalCount(searchCommonDTO);
+
+		paging.setTotalCount(totalCnt);
+		
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("surveyList", surveyList);
+		result.put("totalCnt", totalCnt);
+		result.put("paging", paging);
+		result.put("searchInfo", searchCommonDTO);
+		
+		return CommonResponse.successToData(result,"");
+	}
+
 
 	/**
 	 * @Method Name : invstPageSurveyQuestionSave
@@ -205,8 +248,7 @@ public class InvstMngController {
 		TmExmnMngDTO srvyInvstInfo = invstMngService.getInvstInfo(exmnmngId);
 
 		// 조사 타입 enum 호출
-		model.addAttribute("sectTypeCd", SectTypeCd.values());
-		model.addAttribute("qstnTypeCd", QstnTypeCd.values());
+		model.addAttribute("qstnTypeCd", qTcCdInfoRepository.getTcCdInfoListByGrpCd(GroupCode.QSTN_TYPE_CD.getCode()));
 		model.addAttribute("srvyInvstInfo", srvyInvstInfo);
 
 		return "views/datamng/invstSurveySave";
@@ -236,42 +278,6 @@ public class InvstMngController {
 	}
 
 	/**
-	 * @Method Name : invstSurveySaveQuestion
-	 * @작성일 : 2024. 3. 25.
-	 * @작성자 : NK.KIM
-	 * @Method 설명 : 설문 등록
-	 * @param model
-	 * @param tmSrvySectSaveDTO
-	 * @param exmnmngId
-	 * @return
-	 */
-	@Authority(authType = AuthType.CREATE)
-	@PostMapping("/survey/question")
-	public @ResponseBody CommonResponse<?> invstSurveySaveQuestion(Model model,
-			@RequestBody TmSrvySectSaveDTO tmSrvySectSaveDTO) {
-		invstMngService.saveSrvyInvstQstn(tmSrvySectSaveDTO);
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "설문 양식 정보가 등록되었습니다.");
-	}
-
-	/**
-	 * @Method Name : invstSurveyUpdateQuestion
-	 * @작성일 : 2024. 3. 25.
-	 * @작성자 : NK.KIM
-	 * @Method 설명 : 설문 수정
-	 * @param model
-	 * @param tmSrvySectUpdateDTO
-	 * @param exmnmngId
-	 * @return
-	 */
-	@Authority(authType = AuthType.UPDATE)
-	@PutMapping("/survey/question/{exmnmngId}")
-	public @ResponseBody CommonResponse<?> invstSurveyUpdateQuestion(Model model,
-			@RequestBody TmSrvySectUpdateDTO tmSrvySectUpdateDTO, @PathVariable String exmnmngId) {
-		invstMngService.updateSrvyInvstQstn(tmSrvySectUpdateDTO, exmnmngId);
-		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK, "설문 양식 정보가 수정되었습니다.");
-	}
-
-	/**
 	 * @Method Name : invstDetail
 	 * @작성일 : 2024. 3. 18.
 	 * @작성자 : NK.KIM
@@ -282,14 +288,14 @@ public class InvstMngController {
 	@Authority(authType = AuthType.READ, menuType = MenuType.DETAIL)
 	@GetMapping("/{exmnmngId}")
 	public String invstMngDetailPage(Model model, @PathVariable String exmnmngId) {
-		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
-		if (!invstInfo.isPresent()) {
+		TmExmnMngDTO invstInfo = qTmExmnMngRepository.getInvstInfo(exmnmngId);
+		if (CommonUtils.isNull(invstInfo)) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
 		}
 
 		//설문형 조사인 경우에만 설문 정보 호출
-		if("survey".equals(invstInfo.get().getExmnType().getType())){
-			TmSrvySectDetailDTO tmSrvySectDetailDTO = invstMngService.getSrvySectInfo(exmnmngId);
+		if("false".equals(invstInfo.getExmnType().getHasDrct())){
+			TmSrvySectDetailDTO tmSrvySectDetailDTO = invstMngService.getSrvySectInfo(invstInfo.getSrvyId());
 			model.addAttribute("exmnMngSrvyList", tmSrvySectDetailDTO.getTmSrvySectList());
 		} else {
 		//TC조사인경우
@@ -297,7 +303,7 @@ public class InvstMngController {
 			model.addAttribute("tmExmnDrctList", tmExmnDrctList);
 		}
 
-		model.addAttribute("invstInfo", invstInfo.get());
+		model.addAttribute("invstInfo", invstInfo);
 		model.addAttribute("colorTypeCd", ColorTypeCd.values());
 		
 		return "views/datamng/invstDetail";
@@ -311,19 +317,21 @@ public class InvstMngController {
 	 * @param
 	 * @return
 	 */
-	@Authority(authType = AuthType.READ, menuType = MenuType.DETAIL)
+	@Authority(authType = AuthType.READ, menuType = MenuType.UPDATE)
 	@GetMapping("/{exmnmngId}/update")
 	public String invstMngUpdatePage(Model model, @PathVariable String exmnmngId) {
-		Optional<TmExmnMng> invstInfo = tmExmnMngRepository.findById(exmnmngId);
-		if (!invstInfo.isPresent()) {
+		TmExmnMngDTO invstInfo = qTmExmnMngRepository.getInvstInfo(exmnmngId);
+		String invstType = invstInfo.getExmnType().getType();
+		if (CommonUtils.isNull(invstInfo)) {
 			throw new CommonException(ErrorCode.EMPTY_DATA, "Examination is empty");
 		}
-		model.addAttribute("invstInfo", invstInfo.get());
+		model.addAttribute("invstType", invstType);
+		model.addAttribute("invstInfo", invstInfo);
 		model.addAttribute("cmCdList", ExmnTypeCd.values());
 		model.addAttribute("colorTypeCd", ColorTypeCd.values());
 		
 		//TC조사인경우
-		if("traffic".equals(invstInfo.get().getExmnType().getType())){
+		if("traffic".equals(invstType)){
 			List<TmExmnDrct> tmExmnDrctList = tmExmnDrctRepository.findAllByExmnmngIdOrderByDrctSqnoAsc(exmnmngId);
 			model.addAttribute("tmExmnDrctList", tmExmnDrctList);
 		}
@@ -361,4 +369,5 @@ public class InvstMngController {
 		invstMngService.deleteInvstInfo(exmnmngId);
 		return CommonResponse.ResponseCodeAndMessage(HttpStatus.OK,"조사 정보가 삭제 되었습니다.");
 	}
+	
 }

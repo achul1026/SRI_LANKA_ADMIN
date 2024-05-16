@@ -120,13 +120,10 @@
 		                    modal.close();
 	                    }).open();
 	                } else {
-// 	                	var message = data.message;
-// 	                	alert("data" + data);
-// 	                	var msgTrgt = message.split("/")[0];
-// 	                	alert(msgTrgt);
-// 	                	var errorMsg = message.split("/")[1];
-// 	                	alert(errorMsg);
-// 	                	$("#"+msgTrgt+"Trgt").text(errorMsg);
+	                	var message = data.message;
+	                	var msgTrgt = message.split("/")[0];
+	                	var errorMsg = message.split("/")[1];
+	                	$("#"+msgTrgt+"Trgt").text(errorMsg);
 	                }
 	            }
 	        });

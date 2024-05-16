@@ -18,4 +18,8 @@ public interface TmSrvyQstnRepository extends JpaRepository<TmSrvyQstn, String>{
 	  * @return
 	  */
 	List<TmSrvyQstn> findAllBySectIdOrderByQstnSqnoAsc(String sectId);
+
+	List<TmSrvyQstn> findAllBySectId(String sectId);
+
+	void deleteAllByQstnId(String qstnId);
 }
