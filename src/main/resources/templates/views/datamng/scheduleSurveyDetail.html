@@ -1,116 +1,89 @@
-    <div id="scheduleHistoryContainer" class="none">
-    	<div class="is-box">
+    <div id="scheduleHistoryContainer" >
+		<input type="hidden" id="asynchronousPageNo" value="1">
+    	<div>
     		<div class="flex-between">
-	            <h3 class="info-title">조사 현황 및 일정 상세</h3>
-	            <div>
-	            	<input type="button" class="is-key-button" onclick="detailView();" value="상세 보기"/>
-	            </div>
+	            <h3 class="info-title" th:text="#{schedule.scheduleSurveyDetail.title}">조사 현황 및 일정 상세</h3>
+				<a th:if="${not #lists.isEmpty(tlExmnSrvyRsltHistoryDTO.surveyHistoryTableList) and (currentMenuAuthInfo.inputYn eq 'Y')}" th:text="#{common.button.download}" class="is-key-button" th:href="@{/datamng/schedule/survey/{exmnmngId}/download(exmnmngId=${tlExmnSrvyRsltHistoryDTO.exmnmngId})}"></a>
         	</div>
         	<div class="histroy-flex-box">
-	        	<div class="is-box history-chart-box">
-	        		<div class="text-center">
-	        			<span>조사 기간</span>
-	        			<span id="startHistoryDate">2024-05-09</span>
-	        			<span>~</span>
-	        			<span id="endHistoryDate">2024-06-10</span>
-	        		</div>
+	        	<div class="history-cm-box history-chart-box">
 	        		<div class="history-chart">
-		        		<div class="chart-title text-center">노측면접조사</div>
+		        		<div class="chart-title text-center" th:text="${tlExmnSrvyRsltHistoryDTO.exmnNm}">노측면접조사</div>
 			        	<div class="chart" id="historyChart"></div>
 	        		</div>
 	        		<div>
-	        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 목표 개수</span><span id="surveyTotalNumber">150</span></div>
-	        			<div class="survey-history-txt-box"><span class="survey-history-txt">목표 달성 개수</span><span id="surveyTargetNumber">150</span></div>
-	        			<div class="survey-history-txt-box"><span class="survey-history-txt">목표 미달성 개수</span><span id="surveyNonTargetNumber">150</span></div>
+						<div class="survey-history-txt-box">
+							<span class="survey-history-txt" th:text="#{common.table.investPeriod}">조사 기간</span>
+							<div>
+								<span id="startHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnSrvyRsltHistoryDTO.startDt,'yyyy-MM-dd')}"></span>
+			        			<span>~</span>
+			        			<span id="endHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnSrvyRsltHistoryDTO.endDt,'yyyy-MM-dd')}"></span>
+							</div>
+						</div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt" th:text="#{invst.common.invest.target.number}">조사 목표 개수</span><span id="surveyTotalNumber" th:text="${tlExmnSrvyRsltHistoryDTO.invstGoalCnt}"></span></div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt" th:text="#{schedule.scheduleSurveyDetail.goal.achieved}">목표 달성 개수</span><span id="surveyTargetNumber" th:text="${tlExmnSrvyRsltHistoryDTO.invstCompletedCnt}"></span></div>
+	        			<div class="survey-history-txt-box"><span class="survey-history-txt" th:text="#{schedule.scheduleSurveyDetail.goal.notAchieved}">목표 미달성 개수</span><span id="surveyNonTargetNumber" th:text="${tlExmnSrvyRsltHistoryDTO.invstIncompletedCnt}"></span></div>
 	        		</div>
 	        	</div>
-	        	<div class="is-box history-table-box">
+	        	<div class="history-cm-box history-table-box">
+					<div class="list-search-wrap history-date-box" th:if="${tlExmnSrvyRsltHistoryDTO.exmnType.getHasDrct() eq 'true'}">
+						<div class="cm-detail-text-select">
+							<label th:text="#{invst.common.invest.direction}">조사방향</label>
+							<div class="select-div-box">
+								<select class="select-list-box" id="exmndrctId" onchange="asynchronousSearchList();">
+									<th:block th:each="item : ${exmnDrctList}">
+										<option th:selected="${item.exmndrctId eq tlExmnTrfvlRsltHistorySearchDTO.exmndrctId}" th:text="|${item.startlcNm} -> ${item.endlcNm}|" th:value="${item.exmndrctId}" th:data-startlc-nm="${item.startlcNm}" th:data-endlc-nm="${item.endlcNm}"></option>
+									</th:block>
+								</select>
+							</div>
+						</div>
+					</div>	
 					<table id="listTable">
 						<thead>
 			                <tr>
-			                    <th>번호</th>
-			                    <th>조사날짜</th>
-			                    <th>조사 등록 개수</th>
-			                    <th>조사 누적 개수</th>
+			                    <th th:text="#{common.table.number}">번호</th>
+			                    <th th:text="#{schedule.common.invest.date}">조사날짜</th>
+								<th th:text="#{schedule.scheduleDateList.investigator}">조사원 이름</th>
+								<th th:text="#{common.contact}">조사원 연락처</th>
+								<th:block th:if="${tlExmnSrvyRsltHistoryDTO.exmnType.getCode() eq 'ETC003'}">
+									<th th:text="#{schedule.scheduleSurveyDetail.car.type}">자동차 타입</th>
+								</th:block>
+								<th:block th:if="${tlExmnSrvyRsltHistoryDTO.exmnType.getCode() eq 'ETC004'}">
+									<th th:text="#{schedule.scheduleSurveyDetail.respondent}">응답자</th>
+								</th:block>
+								<th th:text="#{common.search.detail.content}">보기</th>
 			                </tr>
 						</thead>
 						<tbody id="invstListTbody">
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
-							<tr>
-								<td>1</td>
-								<td>2024-06-13</td>
-								<td>7개</td>
-								<td>16개</td>
-							</tr>
+							<th:block th:if="${not #lists.isEmpty(tlExmnSrvyRsltHistoryDTO.surveyHistoryTableList)}">
+								<tr th:each="item,status : ${tlExmnSrvyRsltHistoryDTO.surveyHistoryTableList}">
+									<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+									<td th:text="${item.startDt}"></td>
+									<td th:text="${item.pollsterNm}"></td>
+									<td th:text="${item.pollsterTel}"></td>
+									<th:block th:if="${tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC003' or tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC004'}">
+   										<td th:text="${item.ansCnts}"></td>
+									</th:block>
+									<td><input type="button" class="is-key-button" th:onclick="viewSurveyResult([[${item.srvyrsltId}]],this)" th:value="#{common.button.search}"></td>
+								</tr>
+							</th:block>	
+							<th:block th:unless="${not #lists.isEmpty(tlExmnSrvyRsltHistoryDTO.surveyHistoryTableList)}">
+								<th:block th:if="${tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC003' or tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC004'}">
+									<td colspan="6" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+								</th:block>
+								<th:block th:unless="${tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC003' or tlExmnSrvyRsltHistoryDTO.exmnType.getCode() == 'ETC004'}">
+									<td colspan="5" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+								</th:block>
+								<tr>
+								</tr>
+							</th:block>
 						</tbody>
 					</table>
-					<div>
-						<ul id="pagination">
-							<li class="page-item"><a href="javascript:pageMove('1')" class="first"><i id="pageLeftArrow"></i></a></li>
-							<li class="page-item"><a href="javascript:pageMove('1')" class="active page-number">1</a></li>
-							<li class="page-item"><a href="javascript:pageMove('1')" class="last"><i id="pageRightArrow"></i></a></li>
-						</ul>
-					</div>										        		
+					<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>									        		
 	        	</div>
         	</div>
     	</div>
+    	<div id="surveyResult"></div>
     </div>
+    
+   

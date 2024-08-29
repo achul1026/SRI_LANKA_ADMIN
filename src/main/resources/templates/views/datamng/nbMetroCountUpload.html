@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title th:text="#{metrocount.upload.title}">메트로 카운트 파일 업로드</title>
+</head>
+<body>
+<div layout:fragment="content" id="contentContainer" class="is-box">
+    <h1 class="nb-title-small" th:text="#{metrocount.upload.title}">메트로 카운트 파일 업로드</h1>
+    <!-- 파일 업로드 컨테이너 -->
+    <div class="nb-file-upload-container">
+        <div class="nb-upload-row">
+            <!-- 장비 타입 선택 -->
+            <div class="nb-equipment-type-selection">
+                <div class="nb-select-div-box">
+                    <select class="select-list-box" name="equipmentType">
+                        <option value="fixed" th:text="#{metrocount.equipmentType.fixed}">고정형</option>
+                        <option value="mobile" th:text="#{metrocount.equipmentType.mobile}">이동형</option>
+                    </select>
+                </div>
+            </div>
+            <br>
+            <!-- 파일 선택 버튼 -->
+            <div class="nb-file-selection">
+                <button id="chooseFilesBtn" class="is-key-button" th:text="#{metrocount.upload.chooseFiles}"
+                        onclick="document.getElementById('fileInput').click();">파일 선택
+                </button>
+                <span>&nbsp;</span>
+                <span id="noFileChosen" th:text="#{metrocount.upload.noFileChosen}">선택된 파일이 없습니다.</span>
+            </div>
+        </div>
+        <!-- 파일 업로드 버튼 -->
+        <button id="nbUploadBtn" class="is-key-button" th:text="#{metrocount.upload.uploadFiles}" disabled>파일 업로드
+        </button>
+    </div>
+    <!-- 메시지 표시 영역 -->
+    <div id="errorMessage" class="nb-error-message"></div>
+    <div id="successMessage" class="nb-success-message"></div>
+    <div id="partialSuccessMessage" class="nb-partial-success-message"></div>
+    <!-- 로딩 오버레이 -->
+    <div id="nb-loadingOverlay" style="display: none;">
+        <div class="nb-loader"></div>
+    </div>
+    <!-- 숨겨진 파일 입력 필드 -->
+    <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFiles(this.files)">
+    <!-- 선택된 파일 목록 -->
+    <div id="fileList" class="nb-file-list"></div>
+
+    <script th:inline="javascript">
+        /**
+         * 로딩 바를 표시하는 함수
+         */
+        function showLoadingBar() {
+            document.getElementById('nb-loadingOverlay').style.display = 'flex';
+        }
+
+        /**
+         * 로딩 바를 숨기는 함수
+         */
+        function hideLoadingBar() {
+            document.getElementById('nb-loadingOverlay').style.display = 'none';
+        }
+
+        /**
+         * 메시지 객체 - 다국어 지원을 위한 메시지 정의
+         */
+        const messages = {
+            fileExceedsLimit: /*[[#{metrocount.upload.fileExceedsLimit}]]*/ '파일 크기가 제한을 초과합니다. (1 GB)',
+            duplicateFiles: /*[[#{metrocount.upload.duplicateFiles}]]*/ '중복된 파일이 있습니다: ',
+            totalFileSizeExceedsLimit: /*[[#{metrocount.upload.totalFileSizeExceedsLimit}]]*/ '전체 파일 크기가 제한을 초과합니다. (1 GB)',
+            selectAtLeastOneFile: /*[[#{metrocount.upload.selectAtLeastOneFile}]]*/ '적어도 하나의 파일을 선택하세요.',
+            uploadSuccessful: /*[[#{metrocount.upload.uploadSuccessful}]]*/ '파일 업로드 성공',
+            uploadFailed: /*[[#{metrocount.upload.uploadFailed}]]*/ '파일 업로드 실패',
+            uploadError: /*[[#{metrocount.upload.uploadError}]]*/ '파일 업로드 중 오류 발생',
+            successfullyProcessedFiles: /*[[#{metrocount.upload.successfullyProcessedFiles}]]*/ '성공적으로 처리된 파일:',
+            totalInsertedRecords: /*[[#{metrocount.upload.totalInsertedRecords}]]*/ '총 삽입된 레코드 수:',
+            partiallyProcessedFiles: /*[[#{metrocount.upload.partiallyProcessedFiles}]]*/ '',
+            failedFiles: /*[[#{metrocount.upload.failedFiles}]]*/ '처리 실패한 파일:',
+            detailedResults: /*[[#{metrocount.upload.detailedResults}]]*/ '상세 처리 결과',
+            success: /*[[#{metrocount.upload.success}]]*/ '성공',
+            partialSuccess: /*[[#{metrocount.upload.partialSuccess}]]*/ '부분 성공',
+            failure: /*[[#{metrocount.upload.failure}]]*/ '실패'
+        };
+
+        // 선택된 파일들을 저장하는 배열
+        let selectedFiles = [];
+
+        /**
+         * 파일 선택 시 호출되는 함수
+         * @param {FileList} files - 선택된 파일 목록
+         */
+        function handleFiles(files) {
+            const newFiles = Array.from(files);
+            document.getElementById('successMessage').style.display = 'none';
+            newFiles.forEach(file => {
+                // 중복 파일 체크
+                if (!selectedFiles.some(existingFile => existingFile.name === file.name)) {
+                    selectedFiles.push(file);
+                } else {
+                    showError(messages.duplicateFiles + file.name);
+                }
+            });
+            updateFileList();
+            validateFiles();
+        }
+
+        /**
+         * 선택된 파일 목록을 UI에 업데이트하는 함수
+         */
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'nb-file-item';
+                fileItem.innerHTML = `
+                <span class="nb-file-name">${file.name}</span>
+                <button onclick="removeFile(${index})" class="is-danger-button">Remove</button>
+            `;
+                fileList.appendChild(fileItem);
+            });
+            const noFileChosen = document.getElementById('noFileChosen');
+            noFileChosen.style.display = selectedFiles.length > 0 ? 'none' : 'inline';
+            document.getElementById('nbUploadBtn').disabled = selectedFiles.length === 0;
+        }
+
+
+        /**
+         * 선택된 파일을 제거하는 함수
+         * @param {number} index - 제거할 파일의 인덱스
+         */
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+            validateFiles();
+        }
+
+        /**
+         * 선택된 파일들의 유효성을 검사하는 함수
+         */
+        function validateFiles() {
+            const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+
+            if (selectedFiles.some(file => file.size > 1024 * 1024 * 1024)) {
+                showError(messages.fileExceedsLimit);
+            } else if (totalSize > 1024 * 1024 * 1024) {
+                showError(messages.totalFileSizeExceedsLimit);
+            }
+
+            document.getElementById('nbUploadBtn').disabled = errorMessage.style.display !== 'none' || selectedFiles.length === 0;
+        }
+
+
+        /**
+         * 에러 메시지를 표시하는 함수
+         * @param {string} message - 표시할 에러 메시지
+         */
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.style.opacity = 1;
+        }
+
+        /**
+         * 성공 메시지를 표시하는 함수
+         * @param {string} message - 표시할 성공 메시지
+         */
+        function showSuccess(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            successMessage.style.opacity = 1;
+        }
+
+        /**
+         * 부분 성공 메시지를 표시하는 함수
+         * @param {string} message - 표시할 부분 성공 메시지
+         */
+        function showPartialSuccess(message) {
+            const partialSuccessMessage = document.getElementById('partialSuccessMessage');
+            partialSuccessMessage.textContent = message;
+            partialSuccessMessage.style.display = 'block';
+            partialSuccessMessage.style.opacity = 1;
+        }
+
+        /**
+         * 업로드 응답을 처리하는 함수
+         * @param {Object} data - 서버로부터 받은 응답 데이터
+         */
+        function handleUploadResponse(data) {
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const partialSuccessMessage = document.getElementById('partialSuccessMessage');
+
+            // 모든 메시지 초기화
+            [successMessage, errorMessage, partialSuccessMessage].forEach(elem => {
+                elem.style.display = 'none';
+                elem.textContent = '';
+            });
+
+
+            if (data.code === 200) {
+                const successfulFiles = data.data.successfulFiles;
+                const failedFiles = data.data.failedFiles;
+                const fileErrors = data.data.fileErrors;
+                const totalInserted = data.data.totalInserted;
+
+                // 성공적으로 처리된 파일 메시지
+                if (successfulFiles.length > 0) {
+                    showSuccess(`${messages.successfullyProcessedFiles} ${successfulFiles.join(', ')}. ${messages.totalInsertedRecords} ${totalInserted}`);
+                }
+
+                // 부분적으로 처리된 파일 메시지
+                if (Object.keys(fileErrors).length > 0) {
+                    let partialText = `${messages.partiallyProcessedFiles}\n`;
+                    for (const [fileName, errors] of Object.entries(fileErrors)) {
+                        partialText += `${fileName}:\n${errors.join('\n')}\n\n`;
+                    }
+                    showPartialSuccess(partialText);
+                }
+
+                // 실패한 파일 메시지
+                if (failedFiles.length > 0) {
+                    showError(`${messages.failedFiles} ${failedFiles.join(', ')}`);
+                }
+
+                // 상세 결과 표시
+                displayDetailedResults(data.data);
+
+                // 선택된 파일 목록 초기화
+                selectedFiles = [];
+                updateFileList();
+            } else {
+                showError(messages.uploadFailed + ': ' + data.message);
+            }
+
+            // 메시지 표시 애니메이션
+            [successMessage, errorMessage, partialSuccessMessage].forEach(elem => {
+                if (elem.style.display === 'block') {
+                    setTimeout(() => {
+                        elem.style.opacity = '1';
+                    }, 10);
+                }
+            });
+
+            // 디버깅을 위한 로그
+            console.log('Response data:', data);
+            console.log('Success message:', successMessage.textContent);
+            console.log('Error message:', errorMessage.textContent);
+            console.log('Partial success message:', partialSuccessMessage.textContent);
+        }
+
+        /**
+         * 상세 결과를 화면에 표시하는 함수
+         * @param {Object} data - 서버로부터 받은 상세 결과 데이터
+         */
+        function displayDetailedResults(data) {
+            const detailsContainer = document.createElement('div');
+            detailsContainer.className = 'nb-file-details';
+
+            const successfulFiles = data.successfulFiles;
+            const failedFiles = data.failedFiles;
+            const fileErrors = data.fileErrors;
+
+            let detailsHTML = `<ul>`;
+
+            // 성공한 파일 목록
+            successfulFiles.forEach(file => {
+                detailsHTML += `<li>${file}: ${messages.success}</li>`;
+            });
+
+            // 부분적으로 성공한 파일 목록
+            Object.entries(fileErrors).forEach(([file, errors]) => {
+                detailsHTML += `<li>${file}: ${messages.partialSuccess}<ul>`;
+                errors.forEach(error => {
+                    detailsHTML += `<li>${error}</li>`;
+                });
+                detailsHTML += '</ul></li>';
+            });
+
+            // 실패한 파일 목록
+            failedFiles.forEach(file => {
+                detailsHTML += `<li>${file}: ${messages.failure}</li>`;
+            });
+
+            detailsHTML += '</ul>';
+            detailsContainer.innerHTML = detailsHTML;
+
+            document.getElementById('contentContainer').appendChild(detailsContainer);
+        }
+
+        // 파일 업로드 버튼 이벤트 리스너
+        document.getElementById('nbUploadBtn').addEventListener('click', () => {
+            if (selectedFiles.length === 0) {
+                showError(messages.selectAtLeastOneFile);
+                return;
+            }
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+
+            const equipmentType = document.querySelector('select[name="equipmentType"]').value;
+            formData.append('equipmentType', equipmentType);
+
+            showLoadingBar();
+
+
+            // 파일 업로드 요청
+            fetch('/datamng/metroupload/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    hideLoadingBar();
+                    handleUploadResponse(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    hideLoadingBar();
+                    showError(messages.uploadError + ': ' + error.message);
+                });
+        });
+
+        /**
+         * 페이지 로드 시 실행되는 초기화 함수
+         */
+        function initializePage() {
+            // 파일 입력 필드의 변경 이벤트 리스너 추가
+            document.getElementById('fileInput').addEventListener('change', function (event) {
+                handleFiles(event.target.files);
+            });
+
+            // 드래그 앤 드롭 기능 추가
+            const dropZone = document.getElementById('contentContainer');
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('highlight');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('highlight');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+        }
+
+        // 페이지 로드 시 초기화 함수 호출
+        document.addEventListener('DOMContentLoaded', initializePage);
+
+        /**
+         * 전역 에러 핸들러
+         */
+        window.onerror = function (message, source, lineno, colno, error) {
+            console.error('Global error:', message, 'at', source, lineno, colno);
+            showError('예기치 않은 오류가 발생했습니다. 페이지를 새로고침하거나 관리자에게 문의해주세요.');
+            hideLoadingBar();
+            return true;
+        };
+
+        /**
+         * 파일 크기를 읽기 쉬운 형식으로 변환하는 함수
+         * @param {number} bytes - 파일 크기 (바이트)
+         * @returns {string} 변환된 파일 크기
+         */
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        /**
+         * 파일 확장자 검증 함수
+         * @param {string} filename - 파일 이름
+         * @returns {boolean} 유효한 확장자인지 여부
+         */
+        function isValidFileExtension(filename) {
+            const allowedExtensions = ['txt', 'csv', 'xlsx', 'xls'];
+            const extension = filename.split('.').pop().toLowerCase();
+            return allowedExtensions.includes(extension);
+        }
+
+        // 파일 선택 시 추가 검증
+        function handleFiles(files) {
+            const newFiles = Array.from(files);
+            document.getElementById('successMessage').style.display = 'none';
+
+            newFiles.forEach(file => {
+                if (!isValidFileExtension(file.name)) {
+                    showError(`파일 ${file.name}의 확장자가 유효하지 않습니다. 허용된 확장자: txt, csv, xlsx, xls`);
+                    return;
+                }
+                if (!selectedFiles.some(existingFile => existingFile.name === file.name)) {
+                    selectedFiles.push(file);
+                } else {
+                    showError(messages.duplicateFiles + file.name);
+                }
+            });
+            updateFileList();
+            validateFiles();
+        }
+
+        // 파일 목록 업데이트 함수 수정
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'nb-file-item';
+                fileItem.innerHTML = `
+    <span class="nb-file-name">${file.name}</span>
+    <span class="nb-file-size">(${formatFileSize(file.size)})</span>
+    &nbsp;&nbsp; <!-- 여기에 공백 추가 -->
+    <button onclick="removeFile(${index})" class="is-danger-button">Remove</button>
+`;
+                fileList.appendChild(fileItem);
+            });
+            const noFileChosen = document.getElementById('noFileChosen');
+            noFileChosen.style.display = selectedFiles.length > 0 ? 'none' : 'inline';
+            document.getElementById('nbUploadBtn').disabled = selectedFiles.length === 0;
+        }
+
+    </script>
+</div>
+</body>
+</html>

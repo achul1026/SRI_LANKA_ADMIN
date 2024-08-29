@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<h3 class="info-title" th:text="#{region.regionSave.title}">지역 코드 등록</h3>
+		<div class="region-box cm-first-table">
+			<h3 class="cm-code-title mb8" th:text="#{region.regionSave.title}">- DSD 코드</h3>
+			<input type="button" class="is-key-button" id="dsdRegistBtn" th:value="#{region.regionSave.registDsd}" />
+		</div>
+		<div>
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th th:text="#{region.common.dsd}">DSD CODE</th>
+						<th th:text="#{region.common.dsd.name}">DSD NAME</th>
+						<th th:text="#{region.common.province.code}">Province CODE</th>
+						<th th:text="#{region.common.district.code}">District CODE</th>
+						<th th:text="#{invst.common.table.management}">관리</th>
+					</tr>
+				</thead>
+				<tbody id="appendTbody">
+					<tr>
+						<td colspan="6" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="list-table-container is-box mt16">
+		<div class="region-box">
+			<h3 class="cm-code-title" th:text="#{region.common.taz}">- TAZ 코드</h3>
+			<input type="button" class="is-key-button" id="tazRegistBtn" th:value="#{region.regionSave.registTaz}"/>
+		</div>
+		<table class="list-table">
+			<thead>
+				<tr>
+					<th th:text="#{region.common.taz}">TAZ CODE</th>
+					<th th:text="#{region.common.lat}">중앙 위도</th>
+					<th th:text="#{region.common.lon}">중앙 경도</th>
+					<th th:text="#{region.common.ratio}">비율(%)</th>
+					<th th:text="#{invst.common.table.management}">관리</th>
+				</tr>
+			</thead>
+			<tbody id="regionSelectAddBox">
+				<tr class="regionListNotData">
+					<td colspan="5" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="info-button-box">
+			<div class="btn__list">
+				<a href="/systemmng/region" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+			</div>
+			<div class="btn__list">
+				<input type="button" onclick="dsdRegionRegist()" class="is-key-button overLapping"
+					th:value="#{common.button.regist}" autocomplete="off">
+			</div>
+		</div>
+	</div>
+</th:block>
+
+</html>
+
+<script>
+
+	document.getElementById('dsdRegistBtn').addEventListener('click', () => {
+		pageType = "DSD"
+		setTazModal(pageType);
+	});
+
+	document.getElementById('tazRegistBtn').addEventListener('click', () => {
+		pageType = "TAZ";
+		setTazModal(pageType);
+	});
+
+	function deleteDsdInfo() {
+		const appendTbody = document.getElementById('appendTbody');
+		const html = `
+				<tr>
+					<td colspan="6">${message.search.result_not_exist}</td>
+				</tr>
+				`;
+		appendTbody.innerHTML = html;
+	}
+
+	function asynchronousSearchList() {
+		setTazModal(pageType);
+	}
+
+function setTazModal(type){
+	let paramData = $("#searchForm").serialize();
+	const modalContainer = document.querySelector('.modal-container');
+	if(modalContainer) modalContainer.remove();	
+	if(type === 'DSD'){
+		new ModalBuilder().init(message.region.regionSave_regist_dsd).ajaxBody(__contextPath__ + "/systemmng/region/save/dsd",paramData).footer(3,message.common.button_regist,function(button, modal){
+			let dsdInfo = document.querySelector('input[name="dsdInfo"]:checked');
+			let test = dsdInfo.dataset.provinNm;
+			const appendTbody = document.getElementById('appendTbody');
+			const html =`
+							<tr>
+								<td><input type="hidden" id="dsdId" name="dsdId" value="${dsdInfo.value}"/>${dsdInfo.value}</td>
+								<td>${dsdInfo.dataset.prvinNm} > ${dsdInfo.dataset.districtNm} > ${dsdInfo.dataset.dsdNm}</td>
+								<td>${dsdInfo.dataset.provinCd}</td>
+								<td>${dsdInfo.dataset.districtCd}</td>
+								<td><input type="button" class="input-reset pointer" value="${message.common.button_delete}" onclick="deleteDsdInfo();"/></td>
+							</tr>
+						`;
+				appendTbody.innerHTML = html;
+				modal.close();
+			}, message.common.button_cancel, function (button, modal) {
+				modal.close();
+			}).open();
+		} else {
+			new ModalBuilder().init(message.code.code_taz_save, "1200").ajaxBody(__contextPath__ + "/systemmng/region/save/taz", paramData).footer(3, message.common.button_regist, function (button, modal) {
+				if (checkedRegionDisplayCodeArray.length == 0) {
+					new MsgModalBuilder().init().alertBody(message.code.code_taz_update).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+					//alert(message.code.code_taz_update);
+					return
+				}
+				tazModalSave(type);
+				modal.close();
+			}, message.common.button_cancel, function (button, modal) {
+				checkedRegionDisplayCodeArray = regionCodeDefaultArray.map(innerArray => innerArray.slice());
+				modal.close();
+			}).open();
+			regionPagingAdd(type);
+		}
+	}
+	
+	function dsdRegionRegist() {
+		let dsdId = document.getElementById('dsdId');
+		
+		let tazArray = document.querySelectorAll('.region-select-tr');
+		let tazInfoArr = new Array();
+		
+		if (tazArray.length > 0 && !!dsdId) {
+			for (let i = 0; i < tazArray.length; i++) {
+	            let tazTr = tazArray[i];
+	            let tazInfo = new Object();
+
+	            let dstrctCd = tazTr.querySelector('.taz-district-code').value;
+	            let dstrbCnt = tazTr.querySelector('.region-code-percentage');
+	            
+	            if (!dstrbCnt.value) {
+	                alert(message.authRqst.authSetting_emptyValidation);
+	                dstrbCnt.focus();
+	                return;
+	            }
+	            
+	            tazInfo.dstrctCd = dstrctCd;
+	            tazInfo.dstrbCnt = dstrbCnt.value;
+
+	            tazInfoArr.push(tazInfo);
+	        }
+
+			let data = {
+				dsdId: dsdId.value,
+				tazInfoArr: tazInfoArr
+			};
+
+			const loading = new setLoading().start();
+
+			fetch(__contextPath__ + "/systemmng/region/dsd/save", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			}).then(response => response.json())
+				.then(result => {
+					if (result.code == 200) {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+							location.href = "/systemmng/region";
+						}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+				}).catch(error => {
+					return;
+				}).finally(() => {
+					loading.end();
+				});
+		} else {
+			new MsgModalBuilder().init().alertBody(message.openAPI.openApiUpdate_at_least_one_required).footer(4, message.common.button_confirm, function (button, modal) {
+				modal.close();
+			}).open();
+			//alert(message.openAPI.openApiUpdate_at_least_one_required);
+		}
+	}
+</script>

@@ -1,26 +1,34 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-      
-	<th:block layout:fragment="modalContent">
-		<form id="pwUpdateForm">
-			<div>
-				<table class="modal-table">
-					<tr>
-						<th>기존 비밀번호 <span class="required">*</span></th>
-						<td><input type="password" name="userPswd" placeholder="기존 비밀번호를 입력하세요."></td>
-					</tr>
-					<tr>
-						<th>새 비밀번호 <span class="required">*</span></th>
-						<td><input type="password" id="newUserPswd" name="newUserPswd" placeholder="새 비밀번호를 입력하세요."></td>
-					</tr>
-					<tr>
-						<th>새 비밀번호 확인 <span class="required">*</span></th>
-						<td><input type="password" id="newUserPswdChk" placeholder="새 비밀번호를 다시 입력하세요."></td>
-					</tr>
-				</table>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="pwUpdateForm">
+		<div id="modalOneLineWrap">
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{mngr.mngrPwUpdate.current.password}">
+					기존비밀번호
+				</h3>
+				<input type="password" id="userPswd" class="input-text modal-input" name="userPswd"
+							th:placeholder="#{mngr.mngrPwUpdate.placeholder.current.password}">
 			</div>
-		</form>
-	</th:block>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{mngr.mngrPwUpdate.new.password}">
+					새비밀번호
+				</h3>
+				<div class="modal-double-wrap">
+					<input type="password" id="newUserPswd" class="input-text modal-input" name="newUserPswd"
+							th:placeholder="#{mngr.mngrPwUpdate.placeholder.new.password}">
+				</div>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title"
+					th:text="#{mngr.mngrPwUpdate.new.password.check}">인증키 만료일</h3>
+				<input type="password" id="newUserPswdChk" class="input-text modal-input"
+							th:placeholder="#{mngr.mngrPwUpdate.placeholder.new.password.check}">
+			</div>
+		</div>
+	</form>
+</th:block>
+
 </html>

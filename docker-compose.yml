@@ -1,0 +1,13 @@
+services:
+  sriadmin:
+    container_name: sri_admin 
+    build: 
+      context : ../sriwas/
+    volumes:
+      - ../build/admin/:/usr/local/tomcat/webapps/
+      - ../tomcat/was1/conf/:/usr/local/tomcat/conf/
+    expose:
+      - "8009"
+    ports:
+      - "8888:8080"
+  

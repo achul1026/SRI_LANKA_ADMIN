@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="searchForm" name="searchForm" onSubmit="return false;">
+		<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		<input type="hidden" id="pageType" th:value="${pageType}">
+		<div class="modal-filter">
+			<h3 class="modal-filter-title" th:text="#{common.search.detail.content}">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<input type="text" name="searchContent" class="input-text modal-input" th:placeholder="#{region.tazCodeSave.placeholder.taz}" th:value="${searchInfo.searchContent}">
+				<button type="button" class="modal-search" onclick="asynchronousSearchList();">
+					<img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+				</button>
+			</div>
+		</div>
+	</form>
+	<div class="flex gap16">
+		<div class="">
+			<h4 class="modal-filter-title mb8">Taz 리스트</h4>
+			<table class="list-table">
+				<colgroup>
+					<col width="30%"/>
+					<col width="10%"/>
+					<col width="10%"/>
+					<col width="10%"/>
+				</colgroup>
+				<thead>
+					<tr>
+						<th th:text="#{common.table.select}">추가</th>
+						<th th:text="#{region.common.taz}">TAZ CODE</th>
+						<th th:text="#{region.common.lat}">중앙 위도</th>
+						<th th:text="#{region.common.lon}">중앙 경도</th>
+					</tr>
+				</thead>
+				<tbody class="modal-table-pointer">
+					<th:block th:each="item : ${tazList}">
+						<tr onclick="checkedSet(this, 'checkbox', 'use', 'TAZ')">
+							<td><input type="checkbox" class="modal-taz-checkbox" name="checkbox" th:data-region-code="${item.dstrctId}" th:data-lat="${item.cntrLat}" th:data-lon="${item.cntrLon}" value="1"/></td>
+							<td>
+								<input type="hidden" class="region-list-code" th:value="${item.dstrctId}" readonly/>
+								<input type="text" class="region-code" th:value="${item.dstrctCd}" readonly/>
+							</td>
+							<td><input type="text" class="region-list-name" th:value="${item.cntrLat}" readonly/></td>
+							<td><input type="text" class="region-list-name" th:value="${item.cntrLon}" readonly/></td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+		</div>
+		<div class="taz-select-list">
+			<h4 class="modal-filter-title mb8">Select List</h4>
+			<div class="scroll modal-taz-select-table-list">
+				<table class="list-table">
+					<thead>
+						<tr>
+							<th th:text="#{region.common.taz}">TAZ CODE</th>
+							<th th:text="#{region.common.lat}">중앙 위도</th>
+							<th th:text="#{region.common.lon}">중앙 경도</th>
+							<th th:text="#{common.button.delete}">삭제</th>
+						</tr>
+					</thead>
+					<tbody id="modalSelectTbody">
+						<tr class="none regionSelectNotdata">
+							<td colspan="4" th:text="#{region.tazCodeSave.notSelect.taz}">선택된 TAZ가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</th:block>
+</html>

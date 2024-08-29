@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/statisticsLayout}">
+      
+	<th:block layout:fragment="content">
+		<div class="statistics-box" id="statisticsBox">
+			<th:block th:insert="tags/statistics/odStatistics :: odStatisticsFragment"></th:block>
+		</div>
+	</th:block>
+</html>
+<script th:inline="javascript">
+
+	//gnb active
+	const depth = document.querySelectorAll('.statistics-depth');
+	const insertBox = document.getElementById('statisticsBox')
+	const searchNotView = document.querySelector('.statistics-search-view');
+	const searchViewConatiner = document.querySelector('.statistics-list-box');
+	depth.forEach(item => {
+		item.addEventListener('click', (e) => {
+			const searchView = document.querySelector('.statistics-append-box');
+			const allItems = e.target.closest('ul').querySelectorAll('.statistics-depth');
+			const targetInput = e.target.dataset.type;
+			allItems.forEach(all => all.classList.remove('active'));
+			e.target.classList.add('active');
+
+			fetch(__contextPath__+"/statistics/dashboard/"+targetInput)
+			.then((response) => {
+				return response.text();
+			})
+			.then((html) => {
+				insertBox.replaceChildren();
+				insertBox.innerHTML = html;
+
+				switch (targetInput) {
+					case "MCC":
+// 						rdaLocation('surveyLocationSearch','',2);
+						rdaLocation('surveyLocationSearch','gnNm',2,3,'statistic-search-mcc')
+						//dateYearSet(15);
+						break;
+					case "TRAFFIC":
+						rdaLocation('VDSLocationSearch');
+						break;
+					case "AREA":
+						let startYear = document.getElementById("startYear").value;
+						let endYear = document.getElementById("endYear").value;
+
+						if (isNumeric(startYear) && isNumeric(endYear)) {
+						    dateYearSetMinAndMax(Number(startYear), Number(endYear));
+						} else {
+						    dateYearSetMinAndMax();
+						}
+						break;
+					case "TRAFFICPERIOD" :
+						break;
+					default:
+						rdaLocation('origin','gnNm',2,3,'statistic-search-od')
+						rdaLocation('destination','gnNm',2,3,'statistic-search-od');
+						//dateYearSet(15);
+						break;
+				}
+			})
+
+		})
+	})
+	
+</script>

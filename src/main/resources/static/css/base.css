@@ -3,15 +3,15 @@ html {
     scroll-behavior: smooth;
 }
 * {
-	font-family: 'Open Sans', sans-serif;
+	font-family: 'NanumSquare', 'NotoSansSH', sans-serif;
     box-sizing: border-box;
 }
 :before, :after {
     box-sizing: border-box;
 }
 body {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 16px;
+    font-family: 'NanumSquare', 'NotoSansSH', sans-serif;
+    font-size: 14px;
     line-height: 1.6;
     overflow-x: hidden;
 }
@@ -23,8 +23,9 @@ a {
     text-decoration: none;
 }
 input, button, textarea, select {
-    font-size: 16px;
-    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+  font-family: 'NanumSquare', 'NotoSansSH', sans-serif;
+  font-weight: 200;
 }
 /* input[type="radio"], input[type="checkbox"] {display:none;} */
 input:-webkit-autofill,
@@ -46,6 +47,9 @@ button {
     padding:0;
     border: 0;
     background-color: transparent;
+}
+option {
+	font-weight: 200;
 }
 
 /* common class */
@@ -118,9 +122,17 @@ button {
     display:flex;
     flex-direction: column;
 }
+.flex-row {
+    display:flex;
+    flex-direction: row;
+}
 .flex-justify-center {justify-content: center;}
 .flex-baseline {align-items:baseline;}
+.flex-justify-left {justify-content: normal !important;}
+.flex-1 {flex:1;}
 
+.gap6 {gap:0.3rem;}
+.gap7 {gap:0.4rem;}
 .gap8 {gap:0.5rem;}
 .gap16 {gap:1rem;}
 .gap24 {gap:1.5rem;}
@@ -150,6 +162,9 @@ button {
 }
 
 /* width */
+.wd49 {width:49%;}
+.wd50 {width:50% !important;}
+.wd80 {width:80% !important;}
 .wd100 {width:100% !important;}
 .wd800 {width:800px !important;}
 .wd1000 {width:1000px !important;}
@@ -209,10 +224,10 @@ button {
 .pr72 {padding-right:4.5rem;}
 
 /* margin */
-.mj0 {margin:0;}
+.mj0 {margin:0 !important;}
 .mj-auto {margin:0 auto;}
 
-.mt8 {margin-top:0.5rem;}
+.mt8 {margin-top:0.5rem !important;}
 .mt16 {margin-top:1rem;}
 .mt24 {margin-top:1.5rem;}
 .mt32 {margin-top:2rem;}
@@ -222,9 +237,9 @@ button {
 .mt64 {margin-top:4rem;}
 .mt72 {margin-top:4.5rem;}
 
-.mb8 {margin-bottom:0.5rem;}
+.mb8 {margin-bottom:0.5rem !important;}
 .mb10 {margin-bottom: 0.625rem;}
-.mb16 {margin-bottom:1rem;}
+.mb16 {margin-bottom:1rem !important;}
 .mb24 {margin-bottom:1.5rem;}
 .mb32 {margin-bottom:2rem;}
 .mb40 {margin-bottom:2.5rem;}
@@ -263,4 +278,14 @@ h5 {font-size:0.83rem;}
 h6 {font-size:0.67rem;}
 
 /* z-index */
-.index9999 {z-index: 9999;}
+.index9999 {
+	position:relative;
+	z-index: 9999;
+}
+
+.th8-width {
+	min-width: 850px !important;
+}
+.bg-white {
+	background-color: rgb(255 255 255) !important;
+}

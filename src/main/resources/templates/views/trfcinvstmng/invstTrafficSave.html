@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+            <h3 id="infoTitle">조사 등록</h3>
+        </div>
+        <div>
+			<form id="invstSaveForm">	
+				<div id="infoTableWrap">
+					<table id="infoTable">
+						<tr>
+							<th th:text="#{invst.common.invest.type}">조사 종류</th>
+							<td>
+								<select class="select-list-box" name="trfcInvstKndCd">
+									<th:block th:each="item : ${cmCdList}">
+										<option th:value="${item}" th:text="${item.name}"></option>
+									</th:block>
+								</select>
+							</td>
+							<th th:text="#{invst.common.invest.name}">조사명</th>
+							<td>
+		                        <input type="text" name="invstNm" th:placeholder="#{common.search.placeholder.investName}"/>
+							</td>
+						</tr>
+						<tr>
+							<th th:text="#{invst.common.invest.manager}">조사 담당자</th>
+							<td>
+								<span class="info-flex-between">
+									<input type="hidden" class="mngrInfo" id="mngrId" name="mngrId" />
+									<input type="text" class="mngrInfo" id="invstMngr" name="invstMngr" th:placeholder="#{common.search.placeholder.manager}" readonly />
+									<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyOfficer();" th:value="#{common.button.search}"/>
+								</span>
+							</td>
+							<th th:text="#{invst.common.invest.form}">조사 형태</th>
+							<td><input type="text" name="invstType" th:placeholder="#{invst.common.placeholder.form}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{common.table.investPeriod}">조사 기간</th>
+							<td>
+								<input type="text" class="input-text startPicker ml0" id="invstStrDt" th:placeholder="#{common.search.placeholder.date}">
+								~
+								<input type="text" class="input-text endPicker" id="invstEndDt" th:placeholder="#{common.search.placeholder.date}">
+							</td>
+							<th th:text="#{schedule.common.invest.time}">조사 시간</th>
+							<td>						
+								<span class="select-time-box mr8">
+									<select class="select-list-box select-hour startHour"></select>
+									<select class="select-list-box select-minute startMinute"></select>
+								</span>
+								~
+								<span class="select-time-box ml8">
+									<select class="select-list-box select-hour endHour"></select>
+									<select class="select-list-box select-minute endMinute"></select>							
+								</span>
+							</td>		
+						</tr>
+						<tr>	
+							<th th:text="#{invst.common.invest.personel}">조사 인원</th>			
+							<td>
+								<span class="info-flex-between">
+									<input type="text" name="invstPersonCnt" th:placeholder="#{invst.common.placeholder.invest.personel}"/>
+									<span>명</span>
+								</span>
+							</td>
+							<th th:text="#{invst.common.invest.target.number}">조사 목표 개수</th>			
+							<td>
+								<span class="info-flex-between">
+									<input type="text" name="invstPersonCnt" th:placeholder="#{invst.common.placeholder.invest.number}"/>
+									<span>개</span>
+								</span>							
+							</td>							
+						</tr>
+						<tr>
+							<th>조사 위치</th>			
+							<td colspan="3" class="text-right">
+								<span class="info-flex-between">
+									<input type="text" class="locationInfo" id="locationId" placeholder="조사 지점을 검색해주세요." readonly />
+									<input type="button" class="is-key-button" id="searchLocationList" value="검색"/>
+									<input type="hidden" class="locationInfo" id="lat" name="lat" />
+									<input type="hidden" class="locationInfo" id="lon" name="lon" />
+								</span>
+							</td>							
+						</tr>
+						<tr class="mapDetail">
+							<th>도로 번호</th>
+							<td><input type="text" class="locationInfo" id="routeNo" name="routeNo" readonly /></td>
+							<th>경로</th>
+							<td><input type="text" class="locationInfo" id="road" name="road" readonly /></td>
+						</tr>
+						<tr class="mapDetail">
+							<th th:text="#{common.table.coordinate}">좌표</th>
+							<td><input type="text" class="locationInfo" id="coordinate" readonly /></td>
+							<th th:text="#{invst.common.coordinate.radius}">좌표 반경(m)</th>
+							<td>
+								<span class="info-flex-between">
+									<input type="text" id="invstLocationRadius" name="invstLocationRadius" />
+									<input type="button" id="invstLocatRadiusButton" class="is-key-button" th:value="#{common.button.regist}"/>
+								</span>		
+							</td>
+						</tr>
+					</table>
+					<div id="invstMap" class="none">
+						<div id="map"></div>
+					</div>
+				</div>
+			</form>
+			<div class="info-button-box">
+                <a href="javascript:void(0)" id="invstMngTrafficSaveBtn" class="is-key-button">등록</a>
+                <a th:href="@{/trfcinvstmng/invst/list}" class="is-basic-button">취소</a>
+            </div>
+        </div>
+	</th:block>
+</html>
+<script type="text/javascript">
+/* 	$('#investigatoBtn').on('click', function(){
+		$('.mngrInfo').val('');
+		new ModalBuilder().init('조사 담당자 등록').ajaxBody(__contextPath__+"/trfcinvstmng/invst/mngr").footer(1,'등록',function(button, modal){
+			let mngrChecked = $('.mngrCheckBox:checked');
+			let mngrId = mngrChecked.val();
+			let mngrNm = mngrChecked.closest('td').siblings('.mngrNm').text();
+			$("#mngrId").val(mngrId);
+			$("#invstMngr").val(mngrNm);
+			
+			modal.close();
+		}).open();
+	}) */
+	
+	// 교통량 조사 등록
+	$('#invstMngTrafficSaveBtn').on('click',function(){
+		let invstSaveForm = new FormData($("#invstSaveForm")[0]);
+		
+		//시작 기간 / 종료 기간
+		let invstStrDt = $('#invstStrDt').attr('data-start-date');
+		invstSaveForm.append('invstStrDt',invstStrDt);
+		let invstEndDt = $('#invstEndDt').attr('data-end-date');
+		invstSaveForm.append('invstEndDt',invstEndDt);
+		
+		//시작 시간 / 종료 시간		
+		let startHour = $('.startHour').val();
+		let startMinute = $('.startMinute').val();
+		let invstStrTime = startHour+startMinute;
+		invstSaveForm.append('invstStrTime',invstStrTime);
+		let endHour = $('.endHour').val();
+		let endMinute = $('.endMinute').val();
+		let invstEndTime = endHour+endMinute;
+		invstSaveForm.append('invstEndTime',invstEndTime);
+		
+		//조사 반경
+		let invstLocationRadius = Number($('#invstLocationRadius').val());
+		$('#invstLocationRadius').val(invstLocationRadius);
+		
+		fetch(__contextPath__+"/trfcinvstmng/invst/traffic",{
+			method: "POST",
+			body: invstSaveForm
+		})
+		.then(response => response.json())
+		.then(result => {
+				  			if(result.code == '200'){
+								new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
+									modal.close();
+									window.location.href = __contextPath__+"/trfcinvstmng/invst";
+								}).open();
+							}else{
+								new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+							}
+			  			}
+			  )
+			  
+			  
+	})
+	
+	$('#searchLocationList').on('click',function(){
+		new ModalBuilder().init('조사 위치').ajaxBody(__contextPath__+"/trfcinvstmng/invst/location").footer(1,message.common.button_regist,function(button, modal){
+			let locationChecked = $('.locaionCheckBox:checked');
+			let locationId = locationChecked.val();
+			let lat = locationChecked.attr('data-lat');
+			let lon = locationChecked.attr('data-lon');
+			let road = locationChecked.attr('data-roadnm');
+			let routeno = locationChecked.attr('data-routeno');
+			const mapContainer = document.getElementById('invstMap');
+			
+			$("#coordinate").val(lat + "," + lon)
+			
+			$('#locationId').val(locationId);
+			$('#lat').val(lat);
+			$('#lon').val(lon);
+			$('#road').val(road);
+			$('#routeNo').val(routeno);
+			
+			modal.close();
+			
+			//map
+			mapContainer.classList.remove('none');
+			locationLon = lon;
+			locationLat = lat;
+			mapRemove();
+			mapboxGl(locationLon, locationLat);
+		}).open();
+	})
+	
+	//위치반경
+	const locationCircleButton = document.getElementById('invstLocatRadiusButton');
+	locationCircleButton.addEventListener('click', () => {
+		const coordInateValue = document.getElementById('coordinate').value;
+		const locationCircleValue = document.getElementById('invstLocationRadius').value;
+		if(coordInateValue !== ''){		
+			if(locationCircleValue !== '') {
+				mapRemove();
+			 	mapboxGl(locationLon, locationLat, locationCircleValue);
+			} else {
+				new MsgModalBuilder().init().alertBody(message.map.map_js_coordinate_radius).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+			}
+		} else {
+			new MsgModalBuilder().init().alertBody(message.map.map_js_regist_location).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();				
+		}
+	})
+</script>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="statisticsHeaderFragment">
+	<div class="statistics-header">
+		<nav>
+			<ul class="statistics-gnb">
+				<li><input type="button" class="statistics-depth input-reset active" data-type="OD" th:value="#{statistics.statisticsHeader.od}"/></li>
+				<li><input type="button" class="statistics-depth input-reset" data-type="MCC" th:value="#{statistics.statisticsHeader.mcc}"/></li>
+				<li><input type="button" class="statistics-depth input-reset" data-type="AXLELOAD" th:value="#{statistics.statisticsHeader.axleload}"/></li>
+				<li><input type="button" class="statistics-depth input-reset" data-type="TRAFFIC" th:value="#{statistics.statisticsHeader.traffic}"/></li>
+				<li><input type="button" class="statistics-depth input-reset" data-type="AREA" th:value="#{statistics.statisticsHeader.local}"/></li>
+				<li><input type="button" class="statistics-depth input-reset" data-type="TRAFFICPERIOD" th:value="#{statistics.statisticsHeader.daterange}"/></li>
+			</ul>
+		</nav>
+	</div>
+</th:block>
+</html>

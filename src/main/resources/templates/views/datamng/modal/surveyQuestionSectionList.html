@@ -6,14 +6,14 @@
 	<th:block layout:fragment="modalContent">
 		<div class="list-table-container">
 			<div class="list-search-box">
-				<input type="text" class="input-text modal-input-text" placeholder="설문 유형을 검색해주세요.">
-				<input type="button" class="is-key-button" value="검색">
+				<input type="text" class="input-text modal-input-text" th:placeholder="#{survey.surveyQuestionSectionList.placeholder.surveyType}">
+				<input type="button" class="is-key-button" th:value="#{common.button.search}">
 			</div>
 			<table class="list-table mt16">
 				<thead>
 					<tr>
-						<th>선택</th>
-						<th>섹션명</th>
+						<th th:text="#{common.select.select}">선택</th>
+						<th th:text="#{survey.surveyQuestionSectionList.section.name}">섹션명</th>
 					</tr>
 				</thead>
 				<tbody>

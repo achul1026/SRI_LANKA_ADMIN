@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<th:block th:replace="fragments/head :: headFragment"></th:block>
+	<body th:data-prod="${@environment.getProperty('spring.config.activate.on-profile')} eq 'prod'" onload="disableContextAndDrag()">
+		<main id="mainContainer">
+			<th:block th:replace="fragments/sidebar :: sidebarFragment"></th:block>
+			<section id="statisticsContainer">
+				<div id="statisticsWrap">
+					<th:block th:replace="fragments/statisticsHeader :: statisticsHeaderFragment"></th:block>
+					<th:block layout:fragment="content"></th:block>
+				</div>
+			</section>
+		</main>
+	</body>
+</html>

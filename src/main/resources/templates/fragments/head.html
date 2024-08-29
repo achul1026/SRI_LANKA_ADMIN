@@ -2,6 +2,17 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="headFragment">
     <head>
+		<!--싱할라 폰트 로딩 최적화-->
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Thin.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Light.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-ExtraLight.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Regular.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Medium.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Bold.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-ExtraBold.woff}"as="font" type="font/woff" crossorigin />
+		<link rel="preload" th:href="@{/fonts/NotoSansSinhala-Black.woff}"as="font" type="font/woff" crossorigin />
+
+        <link th:href="@{/css/style.css}" rel="stylesheet">
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,29 +20,39 @@
         <meta name="author" content="">
         <link th:href="@{/images/favicon-16x16.png}" rel="icon">
         <link th:href="@{/images/favicon-32x32.png}" rel="icon">
-        <link th:href="@{/css/style.css}" rel="stylesheet">
 		<link rel="stylesheet" th:href="@{https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css}" type="text/css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.5/xlsx.full.min.js"></script>  
+		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
         <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
         <script th:src="@{/js/jquery-ui.js}"></script>
+        <script th:src="@{/js/jquery.ui.monthpicker.js}"></script>
         <script th:src="@{/js/mapbox-gl.js}"></script>
+        <script th:src="@{/js/chart.min.js}"></script>
         <script th:src="@{/js/index.global.min.js}"></script>
         <script th:src="@{/js/rda.common.js}"></script>
         <script th:src="@{/js/rda.sidebar.js}"></script>
         <script th:src="@{/js/rda.datepicker.js}"></script>
         <script th:src="@{/js/rda.survey.js}"></script>
         <script th:src="@{/js/rda.modal.js}"></script>
+        <script th:src="@{/js/rda.gis.js}"></script>
         <script th:src="@{/js/rda.map.js}"></script>
-        <script th:src="@{/js/rda.fullcalender.js}"></script>
+        <script th:src="@{/js/rda.gis.data.js}"></script>
+        <script th:src="@{/js/rda.gis.statistics.data.js}"></script>
         <script th:src="@{/js/turf.min.js}"></script>
+        <script th:src="@{/js/rda.chart.js}"></script>
         <script th:src="@{/js/rda.location.search.js}"></script>
-		<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>        
+        <script th:src="@{/js/rda.validation.js}"></script>
+        <script type="module" th:src="@{/js/rda.excel.js}"></script>
+        <script th:src="@{/js/rda.statistics.js}"></script>
+        <script th:src="@{/js/rda.system.js}"></script>
         <title>SRILANKA</title>
         
         <link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}"/>
 		<script type="text/javascript">
 		    var __contextPath__ = $('#contextPathHolder').attr('data-contextPath');
-		    if(isNull(__contextPath__)) __contextPath__ = '';  
-		</script>
+		    if(isNull(__contextPath__)) __contextPath__ = '';
+        </script>
+        <script th:src="@{'/js/messages/message_' + ${lang ?: 'kor'} + '.js'}"></script>
     </head>
 </th:block>
 

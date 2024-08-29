@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="searchForm" name="searchForm" onSubmit="return false;">
+		<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		<div class="modal-filter">
+			<h3 class="modal-filter-title" th:text="#{common.search.detail.content}">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<input type="text" name="searchContent" class="input-text modal-input" th:placeholder="#{region.dsdCodeSave.placeholder.dsd}"
+					th:value="${searchInfo.searchContent}">
+				<button type="button" class="modal-search" onclick="asynchronousSearchList();">
+					<img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+				</button>
+<!-- 				<button type="button" id="searchBtn" class="modal-search" > -->
+<!-- 					<img src="/images/search.png" class="cm-csimg find-img" alt="검색"> -->
+<!-- 				</button> -->
+			</div>
+		</div>
+	</form>
+	<div >
+		<table class="list-table">
+			<thead>
+				<tr>
+					<th th:text="#{common.table.select}">선택</th>
+					<th th:text="#{region.common.code}">CODE</th>
+					<th th:text="#{region.common.name}">NAME</th>
+				</tr>
+			</thead>
+			<tbody>
+				<th:block th:if="${totalCnt > 0}">
+					<tr class="table-link" onclick="checkedSet(this)" th:each="item : ${dsdList}">
+						<td><input type="radio" name="dsdInfo" th:value="${item.dsdId}" th:data-prvin-nm="${item.provinNm}" th:data-provin-cd="${item.provinCd}" th:data-district-nm="${item.districtNm}"
+								   th:data-district-cd="${item.districtCd}" th:data-dsd-nm="${item.dsdNm}" th:data-dsd-cd="${item.dsdCd}" ></td>
+						<td th:text="${item.dsdId}"></td>
+						<td th:text="|${item.provinNm} > ${item.districtNm} > ${item.dsdNm}|"></td>
+					</tr>
+				</th:block>
+				<th:block th:if="${totalCnt == 0}">
+					<tr>
+						<td colspan="3" th:text="#{common.search.result.notExist}"></td>
+					</tr>
+				</th:block>
+			</tbody>
+		</table>
+	</div>
+	<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+</th:block>
+
+</html>

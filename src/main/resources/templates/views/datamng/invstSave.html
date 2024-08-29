@@ -2,250 +2,326 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
-      
-	<th:block layout:fragment="content">
-        <div>
-			<form id="invstSaveForm">	
-				<div class="is-box">
-					<div>
-        				<h3 id="infoTitle">조사 업무 등록</h3>
-        			</div>
-        			<div class="infoTableWrap">
-						<table id="mapLocationSave" class="infoTable survey-save-table">
-							<tr>
-								<th>조사 종류</th>
-								<td class="type-box">
-									<select class="select-list-box" id="exmnType" name="exmnType" onchange="typeOption();">
-										<th:block th:each="item : ${cmCdList}">
-											<option th:value="${item}" th:data-invst-type="${item.type}" th:data-has-drct="${item.hasDrct}" th:data-invst-typecd="${item.code}" th:text="${item.name}"></option>
-										</th:block>
-									</select>
-								</td>
-								<th>조사명</th>
-								<td>
-			                        <input type="text" name="exmnNm" class="input-table-text surveyValue" placeholder="조사명을 입력해주세요." />
-								</td>
-							</tr>
-							<tr>
-								<th>조사 담당자</th>
-								<td>
-									<span class="table-flex">
-										<input type="hidden" class="mngrInfo" id="usermngId" name="usermngId" />
-										<input type="text" class="mngrInfo input-table-text surveyValue" id="exmnpicId" name="exmnpicId" placeholder="조사 담당자를 검색해주세요." readonly />
-										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyOfficer();" value="검색"/>
-									</span>
-								</td>
-								<th>조사 형태</th>
-								<td><input type="text" name="exmnDiv" class="input-table-text surveyValue" placeholder="조사 형태를 입력해주세요."></td>
-							</tr>
-							<tr class="survey-objectives none">
-								<th>설문 양식</th>
-								<td>
-									<span class="table-flex">
-										<input type="hidden" class="srvyInfo" id="srvyId" name="srvyId" />
-										<input type="text" class="srvyInfo input-table-text" id="srvyTitle" name="srvyTitle" placeholder="조사 설문지를 검색해주세요." readonly />
-										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyForm();" value="검색"/>
-									</span>
-								</td>
-								<th>조사 목표 개수</th>			
-								<td>
-									<span class="table-flex">
-										<input type="text" name="goalCnt" class="input-table-text surveyValue" value="0" oninput="inputOnlyNumber(this)" placeholder="조사 목표 개수를 입력해주세요." />
-										<span>개</span>
-									</span>							
-								</td>
-							</tr>
-							<tr>
-								<th>조사 기간</th>
-								<td>
-									<input type="text" class="input-table-text startPicker ml0 surveyValue" id="invstStrDt" placeholder="기간을 설정해주세요.">
-									~
-									<input type="text" class="input-table-text endPicker surveyValue" id="invstEndDt" placeholder="기간을 설정해주세요.">
-								</td>
-								<th>조사 시간</th>
-								<td>						
-									<span class="select-time-box mr8">
-										<select class="select-list-box select-hour startHour"></select>
-										<select class="select-list-box select-minute startMinute"></select>
-									</span>
-									~
-									<span class="select-time-box ml8">
-										<select class="select-list-box select-hour endHour"></select>
-										<select class="select-list-box select-minute endMinute"></select>							
-									</span>
-								</td>		
-							</tr>
-							<tr>	
-								<th>조사 인원</th>			
-								<td>
-									<span class="table-flex">
-										<input type="text" name="exmnNop" class="input-table-text surveyValue" oninput="inputOnlyNumber(this)" placeholder="조사 인원을 입력해주세요." />
-										<span>명</span>
-									</span>
-								</td>
-								<th>캘린더 색상</th>			
-								<td id="radioColorSet">
-					            	<span class="radio-color-box">
-										<th:block th:each="item,status : ${colorTypeCd}">
-											<label th:class="${item.getCode()}" th:classappend="${status.index} == 0 ? 'active'"><input type="radio" th:value="${item}" name="colorType" th:checked="${status.index} == 0 ? 'checked'"/></label>
-										</th:block>
-					            	</span>							
-								</td>							
-							</tr>
-							<tr>
-								<th>조사 지역</th>			
-								<td id="tableLocationColSpan">
-									<span class="survey-objectives">
-										<input type="hidden" class="table-input-reset surveyLocationValue" id="surveyMapLocation" name="exmnLc" readonly/>
-									</span>
-									<span class="survey-loaction-box none">
-										<span class="survey-location-list"></span>
-<!-- 										<input type="hidden" name="exmnLc" class="surveyLocationValue"/> -->
-									</span>
-								</td>
-								<th class="surveyDirectionBox">도로 차선 수</th>			
-								<td class="surveyDirectionBox">
-									<input type="text" class="input-table-text surveyValue" name="laneCnt"/>
-								</td>
-							</tr>
-							<tr class="surveyDirectionBox">
-								<th>좌표</th>
-								<td>
-									<input type="text" class="locationInfo table-input-reset surveyValue" id="coordinate" readonly/>
-									<input type="hidden" class="locationInfo" id="lat" name="lat"/>
-									<input type="hidden" class="locationInfo" id="lon" name="lon"/>
-								</td>
-								<th>좌표 반경(m)</th>
-								<td>
-									<span class="table-flex">
-										<input type="text" id="exmnRange" class="input-table-text surveyValue" oninput="inputOnlyNumber(this)" name="exmnRange" />
-										<input type="button" id="invstLocatRadiusButton" class="is-key-button" onclick="layerCircle();" value="추가"/>
-									</span>		
-								</td>
-							</tr>
-							<tr id="tableMap" class="surveyDirectionBox">
-								<th>ස්ථානය</th>
-								<td colspan="3" id="mapSearch">
-									<span id="detailMap">
-										<span id="map"></span>
-								    	<span id="zoomBox">
-			    							<span id="zoomIn"><img th:src="@{/images/zoom_in.png}" alt="확대"/></span>
-			    							<span id="zoomOut"><img th:src="@{/images/zoom_out.png}" alt="축소"/></span>
-		    							</span>
-									</span>
-								</td>
-							</tr>
-						</table>
-        			</div>
-				</div>
-			</form>
-			<!-- 조사방향 -->
-			<div id="surveyDirectionBox" class="is-box mt24 surveyDirectionBox">
-				<div class="flex-between">
-					<h3 class="info-title">조사 방향</h3>
-					<input type="button" class="is-key-button" onclick="directionAdd();" value="추가하기"/>	
-				</div>
-				<div class="infoTableWrap">
-					<table class="infoTable">
-						<thead>
-							<tr>
-								<th>번호</th>
-								<th>From</th>
-								<th>To</th>
-								<th>삭제</th>
-							</tr>
-						</thead>
-						<tbody id="surveyDirectionAppendBox">
-							<tr class="drct-wrap" data-drct-sqno="1">
-								<td class="text-center directionNumber">1</td>
-								<td><input type="text" class="input-table-text startlcNm" name="startlcNm" placeholder="from"/></td>
-								<td><input type="text"  class="input-table-text endlcNm" name="endlcNm" placeholder="to"/></td>
-								<td class="text-center">
-									<input type="button" onclick="directionRemove(this);" class="is-key-button direction-remove-button" value="삭제하기"/>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-	        </div>				
-			<div class="info-button-box">
-                <input type="button" onclick="saveInvstMngSurvey()" class="is-key-button overLapping" value="확인"/>
-                <a th:href="@{/datamng/invst}" class="is-basic-button">취소</a>
+
+<th:block layout:fragment="content">
+   <div>
+      <form id="invstSaveForm">
+         <div class="is-box">
+            <div>
+               <h3 class="info-title" th:text="#{invst.invstSave.title}">조사 업무 등록</h3>
             </div>
-        </div>
-	</th:block>
+            <div class="infoTableWrap">
+               <table id="mapLocationSave" class="infoTable survey-save-table">
+                  <tr>
+                     <th th:text="#{invst.common.invest.type}">조사 종류</th>
+                     <td class="type-box">
+                        <select class="select-list-box validation-tag table-select" id="exmnType" name="exmnType" onchange="typeOption();">
+                           <th:block th:each="item : ${cmCdList}">
+                              <option th:value="${item}" th:data-invst-type="${item.type}" th:data-has-drct="${item.hasDrct}" th:data-invst-typecd="${item.code}" th:text="${item.name}"></option>
+                           </th:block>
+                        </select>
+                     </td>
+                     <th th:text="#{invst.common.invest.name}">조사명</th>
+                     <td>
+                        <input type="text" id="exmnNm" name="exmnNm" class="input-table-text validation-tag" th:placeholder="#{common.search.placeholder.investName}" onchange="valid(this);" maxlength="50"/>
+                     </td>
+                  </tr>
+                  <tr>
+                     <th th:text="#{invst.common.invest.manager}">조사 담당자</th>
+                     <td>
+                           <span class="table-flex">
+                              <input type="hidden" class="mngrInfo" id="usermngId" name="usermngId" />
+                              <input type="hidden" class="mngrInfo" id="exmnpicId" name="exmnpicId" />
+                              <input type="text" class="mngrInfo input-table-text validation-tag" id="userNm" th:placeholder="#{common.search.placeholder.manager}" readonly/>
+                              <button type="button" id="investigatoBtn" class="modal-find-img" onclick="surveyOfficer();">
+								  <img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+							  </button>
+                           </span>
+                     </td>
+                     <th th:text="#{invst.common.invest.form}">조사 형태</th>
+                     <td><input type="text" id="exmnDiv" name="exmnDiv" class="input-table-text validation-tag" th:placeholder="#{invst.common.placeholder.form}" onkeyup="valid(this);" maxlength="20"/></td>
+                  </tr>
+                  <tr class="survey-OD none">
+                     <th th:text="#{invst.common.survey.form}">설문 양식</th>
+                     <td>
+                           <span class="table-flex">
+                              <input type="hidden" class="srvyInfo" id="srvyId" name="srvyId" />
+                              <input type="hidden" class="srvyInfo" id="cstmYn" name="cstmYn" value="N"/>
+                              <input type="text" class="srvyInfo input-table-text" id="srvyTitle" name="srvyTitle" th:placeholder="#{invst.common.placeholder.survey}" readonly/>
+                              <input type="button" class="is-key-button" onclick="surveyForm();" th:value="#{common.button.search}"/>
+                           </span>
+                     </td>
+                     <th th:text="#{invst.common.invest.target.number}">조사 목표 개수</th>
+                     <td>
+                           <span class="table-flex">
+                              <input type="text" id="goalCnt" name="goalCnt" class="input-table-text" onkeyup="valid(this);" oninput="inputOnlyNumber(this)" th:placeholder="#{invst.common.placeholder.invest.number}"/>
+                              <span th:text="#{common.unit.item}">개</span>
+                           </span>
+                     </td>
+                  </tr>
+                  <tr>
+                     <th th:text="#{invst.common.invest.personel}">조사 인원</th>
+                     <td>
+	                     <span class="table-flex">
+	                        <input type="text" id="exmnNop" name="exmnNop" class="input-table-text validation-tag" oninput="inputOnlyNumber(this)" onkeyup="valid(this);" th:placeholder="#{invst.common.placeholder.invest.personel}"/>
+	                        <span th:text="#{common.unit.person}">명</span>
+	                     </span>
+                     </td>
+                     <th th:text="#{invst.common.calendar.color}">캘린더 색상</th>
+                     <td id="radioColorSet">
+	                        <span class="radio-color-box">
+		                         <th:block th:each="item,status : ${colorTypeCd}">
+		                            <label th:class="${item.getCode()}" th:classappend="${status.index} == 0 ? 'active'"><input type="radio" th:value="${item}" name="colorType" th:checked="${status.index} == 0 ? 'checked'"/></label>
+		                         </th:block>
+	                        </span>
+                     </td>
+                  </tr>
+                  <tr>
+                     <th th:text="#{common.table.investPeriod}">조사 기간</th>
+                     <td colspan="3">
+                        <div class="flex-center gap8">
+                           <div>
+                              <input type="text" class="input-table-text surveyStartPicker ml0 validation-tag" id="invstStrDt" th:placeholder="#{common.search.placeholder.date}" onchange="valid(this)" readonly/>
+                              ~
+                              <input type="text" class="input-table-text endPicker validation-tag" id="invstEndDt" th:placeholder="#{common.search.placeholder.date}" onchange="valid(this)" readonly/>
+                           </div>
+                           <div class="select-date-box survey-TM">
+                              <select id="startHour" class="select-list-box select-hour startHour table-select validation-tag" data-validation="surveyTime"></select>
+                              <select class="select-list-box select-minute startMinute table-select"></select>
+                              ~
+                              <select id="endHour" class="select-list-box select-hour endHour table-select " data-validation="surveyTime"></select>
+                              <select class="select-list-box select-minute endMinute table-select"></select>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+                  <tr class="survey-TM">
+                     <th th:text="#{invst.common.invest.roadName}">도로명</th>
+                     <td>
+                        <div class="flex-center gap8 roadname-update">
+                           <input type="hidden" id="locationPointType">
+                           <input id="surveyPointNameDefault" type="hidden">
+                           <input id="surveyPointNameInput" type="hidden">
+                           <select class="select-list-box table-select survey-roadname validation-tag" id="roadNmType" onchange="roadNameSelect(this);" data-validation="select">
+                              <option value="" th:text="#{common.select.select}">선택</option>
+                              <option th:each="item:${roadNmTypeCd}" th:data-column="${item.column}" th:value="${item.code}" th:text="${item.name}">Cordon Line</option>
+                              <!-- 	                     		<option value="codon">Codon Line</option> -->
+                              <!-- 	                     		<option value="screen">Screen Line</option> -->
+                           </select>
+                           <select class="select-list-box table-select survey-pointname validation-tag" id="surveyPointName" data-validation="select" onchange="inputLocationPoint(this)">
+                              <option value="" th:text="#{common.select.select}">선택</option>
+                           </select>
+                           <input type="text" id="roadDescr" name="roadDescr" class="input-table-text validation-tag" th:placeholder="#{invst.common.placeholder.location.setting}" readonly/>
+                        </div>
+                     </td>
+                     <th th:text="#{invst.common.invest.roadcode}">도로 코드</th>
+                     <td><input type="text" id="roadCd" name="roadCd" class="input-table-text validation-tag" th:placeholder="#{invst.common.placeholder.location.codename}" readonly/></td>
+                  </tr>
+                  <tr id="roadSidePoint" class="none roadside">
+                  	<th th:text="#{invst.common.invest.roadName}">조사 지점</th>
+                  	<td colspan="3">
+                  		<select class="select-list-box table-select" id="regionType" data-validation="select" onchange="roadSideSelect(this)">
+                  			<option value="" th:text="#{common.select.select}">선택</option>
+							<option th:each="item:${locationPointTypeCd}" th:data-column="${item.column}" th:value="${item.code}" th:text="${item.name}">Cordon Line</option>
+<!-- 							<option value="CordonLine">Cordon Line</option> -->
+<!-- 							<option value="TollGate">TollGate</option> -->
+                  		</select>
+                  		<select class="select-list-box table-select" data-validation="select" id="surveyRegion" onchange="inputLocationPoint(this)">
+                  			<option value="" th:text="#{common.select.select}">선택</option>
+                  		</select>
+                  	</td>
+                  </tr>
+                  <tr class="survey-TM">
+                  	 <th th:text="#{invst.common.invest.distance}">조사 위치(km)</th>
+                     <td><input type="text" id="exmnDistance" name="exmnDistance" class="input-table-text validation-tag" th:placeholder="#{invst.common.placeholder.location.point}" readonly/></td>
+                     <th th:text="#{invst.common.road.lane.number}">도로 차선 수</th>
+                     <td><input type="text" id="laneCnt" class="input-table-text validation-tag" oninput="inputOnlyNumber(this)" name="laneCnt" th:placeholder="#{invst.common.placeholder.road.lane.number}" onkeyup="valid(this);"/></td>
+                  </tr>
+				  <tr>
+                     <th th:text="#{invst.common.invest.region}">조사 지역</th>
+                     <td colspan="3"><div id="surveyLocationSearch" class="location-event"></div></td>
+                  </tr>                  
+                  <tr class="survey-TM">
+                     <th th:text="#{common.table.coordinate}">좌표(TAZ CODE)</th>
+                     <td>
+                        <input type="text" class="locationInfo input-table-text validation-tag" id="coordinate" th:placeholder="#{invst.common.placeholder.coordinate}" readonly/>
+                        <input type="hidden" class="locationInfo" id="lat" name="lat"/>
+                        <input type="hidden" class="locationInfo" id="lon" name="lon"/>
+                        <input type="hidden" class="locationInfo" id="tazCode" name="tazCd"/>
+                     </td>
+                     <th th:text="#{invst.common.coordinate.radius}">좌표 반경(m)</th>
+                     <td>
+                           <span class="table-flex">
+                              <input type="text" id="exmnRange" class="input-table-text validation-tag flex-1" oninput="inputOnlyNumber(this)" name="exmnRange" th:placeholder="#{invst.common.placeholder.coordinate.radius}"/>
+                              <input type="button" id="invstLocatRadiusButton" class="is-key-button" onclick="setTrafficCircleMeters();" th:value="#{common.button.regist}"/>
+                           </span>
+                     </td>
+                  </tr>
+                  <tr id="tableMap" class="survey-TM">
+                     <th th:text="#{common.table.map}">맵</th>
+                     <td colspan="3" id="mapSearch">
+                           <span id="mapContainer" class="detailMap">
+                              <span id="map"></span>
+                               <span id="zoomBox">
+                                  <span id="zoomIn"><img th:src="@{/images/zoom_in.png}" th:alt="#{common.imgAlt.expansion}"/></span>
+                                  <span id="zoomOut"><img th:src="@{/images/zoom_out.png}" th:alt="#{common.imgAlt.reduce}"/></span>
+                               </span>
+                           </span>
+                     </td>
+                  </tr>
+               </table>
+            </div>
+         </div>
+         <!-- 조사방향 -->
+         <div id="surveyTM" class="is-box mt24 survey-TM">
+            <div class="flex-between">
+               <h3 class="info-title" th:text="#{invst.common.invest.direction}">조사 방향</h3>
+               <input type="button" class="is-key-button" onclick="directionAdd();" th:value="#{invst.common.button.add}"/>
+            </div>
+            <div class="infoTableWrap">
+               <table class="infoTable">
+                  <thead>
+                  <tr>
+                     <th th:text="#{common.table.number}">번호</th>
+                     <th th:text="#{invst.common.table.from}">From</th>
+                     <th th:text="#{invst.common.table.to}">To</th>
+                     <th th:text="#{invst.common.table.management}">관리</th>
+                  </tr>
+                  </thead>
+                  <tbody id="surveyDirectionAppendBox">
+                  <tr class="drct-wrap" data-drct-sqno="1">
+                     <td class="text-center directionNumber">1</td>
+                     <td><input type="text" class="input-table-text startlcNm validation-tag" id="startlcNm" name="startlcNm" th:placeholder="#{invst.common.placeholder.starting.point}" onkeyup="valid(this);"/></td>
+                     <td><input type="text" class="input-table-text endlcNm validation-tag" id="endlcNm" name="endlcNm" th:placeholder="#{invst.common.placeholder.end.point}" onkeyup="valid(this);"/></td>
+                     <td class="text-center">
+                        <button type="button" onclick="directionRemove(this);">
+                           <img src="/images/delete_img.png" class="cm-csimg" th:alt="#{common.imgAlt.delete}">
+                        </button>
+                        <!--                              <input type="button" onclick="directionRemove(this);" class="is-key-button direction-remove-button" value="삭제하기"/>-->
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+         <div class="info-button-box">
+            <a th:href="@{/datamng/invst}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
+            <input type="button" onclick="saveInvstMngSurvey()" class="is-key-button overLapping" th:value="#{common.button.confirm}"/>
+         </div>
+      </form>
+   </div>
+</th:block>
 </html>
 
 <script>
-	/* const surveyType = document.getElementById('exmnType'); */
-	mapboxGl();
-	
-	//캘린더 색상
-	const colorSetContainer = document.getElementById('radioColorSet');
-	colorSetContainer.querySelectorAll('input').forEach(input => {
-		input.addEventListener('change', function(event){
-			const _this = event.target;
-			const radioChecked = _this.checked;
-			if(radioChecked == true){
-				const colorBox = _this.closest('.radio-color-box');
-				const checkedColor = _this.closest('label');
-				colorBox.querySelectorAll('label').forEach(label => label.classList.remove('active'));
-				checkedColor.classList.add('active');
-			}
-		})
-	})
-	
-	//방향추가
-	function directionAdd(){
-		const noAddItem = document.querySelector('.no-additional');
-		if(noAddItem) noAddItem.remove();
-		
-		const tBody = document.getElementById('surveyDirectionAppendBox');
-		const tBodyTr = tBody.querySelectorAll('tr');
-		const tr = document.createElement('tr');
-		tr.setAttribute('data-drct-sqno', tBodyTr.length+1);
-		tr.className = 'drct-wrap';
-		let html = `
-			<td class="text-center directionNumber">${tBodyTr.length+1}</td>
-			<td><input type="text" class="input-table-text startlcNm" name="startlcNm" placeholder="from"/></td>
-			<td><input type="text"  class="input-table-text endlcNm" name="endlcNm" placeholder="to"/></td>
-			<td class="text-center">
-				<input type="button" onclick="directionRemove(this);" class="is-key-button direction-remove-button" value="삭제하기"/>
-			</td>`
-		
-		//~방향제한이 있다면
-		/* if(tBodyTr.length+1 <= 7) {
-			tBody.append(tr);
-			tr.innerHTML = html;
-		} else {
-			new ModalBuilder().init().alertBody('방향은 최대7개까지 추가가 가능합니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-		} */
-		
-		//03.26 윤지님이 일단 방향 제한 없이 해달라고 요청 하였음
-		tBody.append(tr);
-		tr.innerHTML = html;
-	}
-	
-	//방향제거
-	function directionRemove(_this){
-		const tBody = document.getElementById('surveyDirectionAppendBox');
-		const tBodyTr = _this.closest('tr');
-		
-		tBodyTr.remove();
-		const tBodyTrAll = tBody.querySelectorAll('tr');
-		tBodyTrAll.forEach((item, index) => {
-			item.dataset.drctSqno = index+1;
-			item.querySelectorAll('.directionNumber').forEach(textNumber => textNumber.textContent = `${index+1}`);
-		});
-		
-		const tr = document.createElement('tr');
-		tr.classList.add('no-additional')
-		let html = `<td colspan="4" class="text-center">추가된 조사 방향이 없습니다.</td>;`
-		if(tBodyTrAll.length == 0){
-			tBody.append(tr);
-			tr.innerHTML = html;
-		}
-	}
-	
-	locationSearch('survey-location-list');
+    /* const surveyType = document.getElementById('exmnType'); */
+	rdaLocation('surveyLocationSearch');
+	(async () => {
+		let mapgl = await mapboxGl();
+		setTazCodeLayer(mapgl);
+		setMapZoomControl(mapgl);
+		setMapSearch(mapgl);
+		setRoadLayer(mapgl);
+		setTrafficClickMaker(mapgl, mapToLocation);
+	})();   
+
+   //캘린더 색상
+   const colorSetContainer = document.getElementById('radioColorSet');
+   colorSetContainer.querySelectorAll('input').forEach(input => {
+      input.addEventListener('change', function(event){
+         const _this = event.target;
+         const radioChecked = _this.checked;
+         if(radioChecked == true){
+            const colorBox = _this.closest('.radio-color-box');
+            const checkedColor = _this.closest('label');
+            colorBox.querySelectorAll('label').forEach(label => label.classList.remove('active'));
+            checkedColor.classList.add('active');
+         }
+      })
+   })
+
+   //방향추가
+   function directionAdd(){
+      const noAddItem = document.querySelector('.no-additional');
+      if(noAddItem) noAddItem.remove();
+
+      const tBody = document.getElementById('surveyDirectionAppendBox');
+      const tBodyTr = tBody.querySelectorAll('tr');
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-drct-sqno', tBodyTr.length+1);
+      tr.className = 'drct-wrap';
+      let html = `
+         <td class="text-center directionNumber">${tBodyTr.length+1}</td>
+         <td><input type="text" class="input-table-text startlcNm validation-tag" id="startlcNm${tBodyTr.length+1}" name="startlcNm" placeholder="${message.invest.invstSave_placeholder_starting_point}" onkeyup="valid(this);"/></td>
+         <td><input type="text" class="input-table-text endlcNm validation-tag" id="endlcNm${tBodyTr.length+1}" name="endlcNm" placeholder="${message.invest.invstSave_placeholder_end_point}" onkeyup="valid(this);"/></td>
+         <td class="text-center">
+			  <button type="button" onclick="directionRemove(this);">
+				   <img src="/images/delete_img.png" class="cm-csimg" alt="${message.invest.invstSave_alt_delete}">
+			   </button>
+         </td>`
+
+      //~방향제한이 있다면
+      /* if(tBodyTr.length+1 <= 7) {
+         tBody.append(tr);
+         tr.innerHTML = html;
+      } else {
+         new ModalBuilder().init().alertBody('방향은 최대7개까지 추가가 가능합니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
+      } */
+
+      //03.26 윤지님이 일단 방향 제한 없이 해달라고 요청 하였음
+      tBody.append(tr);
+      tr.innerHTML = html;
+   }
+
+   //방향제거
+   function directionRemove(_this){
+      const tBody = document.getElementById('surveyDirectionAppendBox');
+      const tBodyTr = _this.closest('tr');
+
+      tBodyTr.remove();
+      const tBodyTrAll = tBody.querySelectorAll('tr');
+      tBodyTrAll.forEach((item, index) => {
+         item.dataset.drctSqno = index+1;
+         item.querySelectorAll('.directionNumber').forEach(textNumber => textNumber.textContent = `${index+1}`);
+      });
+
+      const tr = document.createElement('tr');
+      tr.classList.add('no-additional')
+      let html = `<td colspan="4" class="text-center">${message.invest.invstSave_notExist_directions}</td>`
+      if(tBodyTrAll.length == 0){
+         tBody.append(tr);
+         tr.innerHTML = html;
+      }
+   }
+   window.inputManual = false;
+   async function inputLocationPoint(selectElement){
+      window.inputManual = false;
+      var selectedValue = selectElement.value;
+      document.getElementById("surveyPointNameInput").value = selectedValue;
+
+      let exmnType = document.getElementById("exmnType").value;
+      if(isNull(exmnType) || (exmnType !== 'MCC' && exmnType !== 'TM') ){
+         return;
+      }
+      let valueArr = selectedValue.split(",");
+         let info = await findTrafficVolumeLineCoordinates(valueArr[0]);
+         let coordinates = new mapboxgl.LngLat(info[0], info[1]);
+         window.map.flyTo({
+            center : coordinates,
+            duration : 200
+         });
+         if(valueArr[0] === "13") {
+            // 도로 gis 정보가 없어 하드코딩 - 도로명 Pannala - Kuliyapitiya, code B0356
+            const roadCd = document.getElementById('roadCd');
+            const roadDescr = document.getElementById('roadDescr');
+            const exmnDistance = document.getElementById('exmnDistance');
+            roadCd.value = "B0356";
+            roadDescr.value = "Pannala - Kuliyapitiya";
+            exmnDistance.value = "0";
+            window.inputManual = true;
+         }
+         window.map.fire('click', {
+            lngLat: coordinates
+         });
+	} 
 </script>

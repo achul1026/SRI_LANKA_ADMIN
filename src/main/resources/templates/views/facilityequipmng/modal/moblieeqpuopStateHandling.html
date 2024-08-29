@@ -36,45 +36,63 @@
 					<td>들어갈내용</td>
 					<th>장애유형</th>
 					<td>
-						<select class="select-list-box">
-							<option>들어갈내용</option>
-						</select>
+						<div class="select-div-box">
+							<select class="select-list-box">
+								<option>들어갈내용</option>
+							</select>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<th>발생일자</th>
 					<td>
-						<input type="text" class="modal-input-text startPicker ml0" placeholder="기간을 설정해주세요.">
+						<input type="text" class="modal-input-text startPicker ml0" th:placeholder="#{common.search.placeholder.date}">
 					</td>
 					<th>발생시간</th>
 					<td>
-						<select class="select-list-box select-hour mr8"></select>
-						<select class="select-list-box select-minute-unit"></select>
+						<div class="select-date-box">
+							<div class="select-div-box">
+								<select class="select-list-box select-hour"></select>
+							</div>
+							<div class="select-div-box">
+								<select class="select-list-box select-minute-unit"></select>
+							</div>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<th>처리일자</th>
 					<td>
-						<input type="text" class="modal-input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+						<input type="text" class="modal-input-text endPicker ml0" th:placeholder="#{common.search.placeholder.date}">
 					</td>
 					<th>처리시간</th>
 					<td>
-						<select class="select-list-box select-hour mr8"></select>
-						<select class="select-list-box select-minute-unit"></select>
+						<div class="select-date-box">
+							<div class="select-div-box">
+								<select class="select-list-box select-hour"></select>
+							</div>
+							<div class="select-div-box">
+								<select class="select-list-box select-minute-unit"></select>
+							</div>
+						</div>
 					</td>
 				</tr>
 				<tr>
 					<th>처리여부</th>
 					<td>
-						<select class="select-list-box">
-							<option>들어갈내용</option>
-						</select>
+						<div class="select-div-box">
+							<select class="select-list-box">
+								<option>들어갈내용</option>
+							</select>
+						</div>
 					</td>
 					<th>장애분류</th>
 					<td>
-						<select class="select-list-box">
-							<option>들어갈내용</option>
-						</select>					
+						<div class="select-div-box">
+							<select class="select-list-box">
+								<option>들어갈내용</option>
+							</select>
+						</div>
 					</td>
 				</tr>
 				<tr>

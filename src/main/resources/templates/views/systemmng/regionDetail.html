@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+	<th:block layout:fragment="content">
+		<h3 th:text="#{region.regionDetail.title}">DSD 코드 상세</h3>
+		<div>
+			<div class="is-box">
+				<div>
+					<h3 class="info-title" th:text="#{region.common.dsd}">DSD 코드</h3>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable table-all-center">
+						<tr>
+							<th th:text="#{region.common.dsd}">DSD CODE</th>
+							<th th:text="#{region.common.dsd.name}">DSD NAME</th>
+							<th th:text="#{region.common.province.code}">Province CODE</th>
+							<th th:text="#{region.common.district.code}">District CODE</th>
+						</tr>
+						<tr>
+							<td th:text="${dsdInfo.dsdId}">TEST</td>
+							<td th:text="|${dsdInfo.provinNm} > ${dsdInfo.districtNm} > ${dsdInfo.dsdNm}|">TEST</td>
+							<td th:text="${dsdInfo.provinCd}">TEST</td>
+							<td th:text="${dsdInfo.districtCd}">TEST</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="is-box">
+				<div>
+					<h3 class="info-title" th:text="#{region.common.taz}">TAZ 코드</h3>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable table-all-center">
+						<tr>
+							<th th:text="#{region.common.taz}">TAZ CODE</th>
+							<th th:text="#{region.common.lat}">중앙 위도</th>
+							<th th:text="#{region.common.lon}">중앙 경도</th>
+							<th th:text="#{region.common.ratio}">비율(%)</th>
+						</tr>
+						<tr th:each="item:${dsdInfo.tazCodeInfoList}">
+							<td th:text="${item.dstrctCd}">TEST</td>
+							<td th:text="${item.cntrLat}">TEST</td>
+							<td th:text="${item.cntrLon}">TEST</td>
+							<td th:text="${item.distrbCnt}">TEST</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="info-button-box">
+				<a th:href="@{/systemmng/region}" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+				<a th:onclick="deleteDsd([[${dsdInfo.dsdId}]])" class="is-danger-button" th:text="#{common.button.delete}">삭제</a>
+				<a th:href="@{/systemmng/region/{dsdId}/update(dsdId=${dsdInfo.dsdId})}" class="is-key-button overLapping" th:text="#{common.button.update}">수정</a>
+			</div>
+		</div>
+	</th:block>
+</html>
+
+<script>
+	// 사무국 구역관계 관리 삭제
+	function deleteDsd(dsdId){
+		fetch(__contextPath__ ="/systemmng/region/"+dsdId,{
+			method: "DELETE"
+		})
+		.then(response => response.json())
+		.then(result => {
+			if (result.code == 200) {
+				alert(result.message);
+				window.location.href="/systemmng/region";
+			} else {
+				throw new Error(result.message);
+			}
+		})
+		.catch(error => {
+			alert(error.message);
+		})
+	}
+</script>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<form id="apiSaveForm" name="apiSaveForm">
+		<div class="is-box">
+			<h3 class="info-title" th:text="#{api.openApiDetail.title}">OpenAPI 데이터 수정</h3>
+			<div class="infoTableWrap">
+				<table class="infoTable survey-save-table">
+					<tr>
+						<th th:text="#{api.common.table.serviceName}">서비스명</th>
+						<td th:text="${openApiDetail.tmApiSrvc.srvcNm}"></td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td th:text="${openApiDetail.tmApiSrvc.srvcClsf}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{api.common.table.apiMngAgency}">제공기관</th>
+						<td th:text="${openApiDetail.tmApiSrvc.pvsnInst}"></td>
+						<th th:text="#{common.table.manager}">관리자</th>
+						<td th:text="${openApiDetail.tmApiSrvc.mngrNm}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{api.common.table.serviceContent}">서비스 내용</th>
+						<td colspan="3" th:text="${openApiDetail.tmApiSrvc.srvcDescr}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{api.common.table.serviceUrl}">요청URL</th>
+						<td colspan="3" th:text="${openApiDetail.tmApiSrvc.srvcUrl}"></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="is-box mt24">
+			<h3 class="info-title" th:text="#{api.openApiSave.secTitle}">요청정보</h3>
+			<div class="infoTableWrap open-api-detail-table">
+				<table class="infoTable">
+					<thead>
+						<tr>
+							<th th:text="#{api.common.table.column}">컬럼명</th>
+							<th th:text="#{api.common.table.type}">타입</th>
+							<th th:text="#{api.common.table.length}">길이</th>
+							<th th:text="#{api.common.table.descript}">설명</th>
+							<th th:text="#{api.common.table.sampledata}">샘플데이터</th>
+							<th th:text="#{api.common.table.required}">필수여부</th>
+						</tr>
+					</thead>
+					<tbody id="requestAppendBox">
+						<th:block th:if="${not #lists.isEmpty(openApiDetail?.tmApiRqstitemList)}">
+							<tr class="req" th:each="item ,status : ${openApiDetail?.tmApiRqstitemList}">
+								<td th:text="${item.itemNm}"></td>
+								<td th:text="${item.itemType}"></td>
+								<td th:text="${item.itemLen}"></td>
+								<td th:text="${item.itemDescr}"></td>
+								<td th:text="${item.smplData}"></td>
+								<td th:switch="${item.esntlYn}">
+									<span th:case="Y" th:text="#{api.common.select.required.y}"></span>
+									<span th:case="N" th:text="#{api.common.select.required.n}"></span>
+								</td>
+							</tr>
+						</th:block>
+						<!-- 							<th:block th:unless="${not #lists.isEmpty(openApiDetail?.tmApiRqstitemList)}"> -->
+						<!-- 								<tr> -->
+						<!-- 									<td colspan="6" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td> -->
+						<!-- 								</tr> -->
+						<!-- 							</th:block> -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="is-box mt24">
+			<h3 class="info-title" th:text="#{api.openApiSave.thrTitle}">응답정보</h3>
+			<div class="infoTableWrap open-api-detail-table">
+				<table class="infoTable">
+					<thead>
+						<tr>
+							<th th:text="#{api.common.table.column}">컬럼명</th>
+							<th th:text="#{api.common.table.type}">타입</th>
+							<th th:text="#{api.common.table.length}">길이</th>
+							<th th:text="#{api.common.table.descript}">설명</th>
+							<th th:text="#{api.common.table.sampledata}">샘플데이터</th>
+							<th th:text="#{api.common.table.required}">필수여부</th>
+						</tr>
+					</thead>
+					<tbody id="responseAppendBox">
+						<th:block th:if="${not #lists.isEmpty(openApiDetail?.tmApiPvsnitemList)}">
+							<tr class="req" th:each="item ,status : ${openApiDetail?.tmApiPvsnitemList}">
+								<td th:text="${item.itemNm}"></td>
+								<td th:text="${item.itemType}"></td>
+								<td th:text="${item.itemLen}"></td>
+								<td th:text="${item.itemDescr}"></td>
+								<td th:text="${item.smplData}"></td>
+								<td th:switch="${item.esntlYn}">
+									<span th:case="Y" th:text="#{api.common.select.required.y}"></span>
+									<span th:case="N" th:text="#{api.common.select.required.n}"></span>
+								</td>
+							</tr>
+						</th:block>
+						<!-- 							<th:block th:unless="${not #lists.isEmpty(openApiDetail?.tmApiPvsnitemList)}"> -->
+						<!-- 								<tr> -->
+						<!-- 									<td colspan="6" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td> -->
+						<!-- 								</tr> -->
+						<!-- 							</th:block> -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="info-button-box">
+			<a th:href="@{/datalink/openapi}" th:text="#{common.button.prePage}"
+				class="is-basic-button cm-leftFix-btn">이전 페이지</a>
+			<a th:onclick="deleteOpenAPI([[${openApiDetail.tmApiSrvc.srvcId}]])" class="is-danger-button"
+				th:text="#{common.button.delete}">삭제</a>
+			<a th:href="@{/datalink/openapi/update(srvcId=${openApiDetail.tmApiSrvc.srvcId})}"
+				th:text="#{common.button.update}" class="is-key-button">수정하기</a>
+		</div>
+	</form>
+</th:block>
+
+</html>
+
+<script>
+	function deleteOpenAPI(srvcId) {
+		new MsgModalBuilder().init().alertBody(message.openAPI.openApiList_apiDelete_message).footer(3, message.common.button_confirm, function (button, modal) {
+			modal.close();
+			fetch(`${__contextPath__}/datalink/openapi/${srvcId}/delete`, {
+				method: "DELETE"
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == "200") {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							location.href = "/datalink/openapi";
+							modal.close();
+						}).open();
+					} else {
+						//throw new Error(result.message);
+					}
+				}).catch(error => {
+					new MsgModalBuilder().init().alertBody(error.message).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+				})
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+</script>

@@ -1,0 +1,467 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<th:block th:fragment="RegionPopulationStats">
+	<div class="statistics-append-box">
+		<div class="flex-end is-box mb16">
+			<input type="button" id="excelDownLoadBtn" class="is-key-button" th:value="#{common.button.download}" />
+		</div>
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.transport.mean}">
+					통행 수단
+				</h4>
+				<!-- chart  -->
+				<div class="content-chart">
+					<div id="travelModeTransportationChart" class="pie-chart"></div>
+					<div id="travelModeTransportationChartTooltip" class="chartTooltip">
+						<p>
+							<span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span
+								class="tooltipValue">0</span>
+						</p>
+					</div>
+					<div class="chart-legend" id="travelModeTransportationChartLegend"></div>
+				</div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.starting.point.type}">
+					출발지 유형
+				</h4>
+				<!-- chart  -->
+				<div class="content-chart">
+					<div id="travelPurposeChart" class="pie-chart"></div>
+					<div id="travelPurposeChartTooltip" class="chartTooltip">
+						<p>
+							<span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span
+								class="tooltipValue">0</span>
+						</p>
+					</div>
+					<div class="chart-legend" id="travelPurposeChartLegend"></div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.destination.type}">
+					도착지
+					유형
+				</h4>
+				<!-- chart  -->
+				<div class="content-chart">
+					<div id="travelDepartureChart" class="pie-chart"></div>
+					<div id="travelDepartureChartTooltip" class="chartTooltip">
+						<p>
+							<span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span
+								class="tooltipValue">0</span>
+						</p>
+					</div>
+					<div class="chart-legend" id="travelDepartureChartLegend"></div>
+				</div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.passage.purpose}">
+					통행
+					목적
+				</h4>
+				<!-- chart  -->
+				<div class="content-chart">
+					<div id="travelDestinationChart" class="pie-chart"></div>
+					<div id="travelDestinationChartTooltip" class="chartTooltip">
+						<p>
+							<span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span
+								class="tooltipValue">0</span>
+						</p>
+					</div>
+					<div class="chart-legend" id="travelDestinationChartLegend"></div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.start.time}">
+						출발 시간
+					</h4>
+					<select class="scroll select-list-box" id="TRAVEL_DEPARTURE_TIME"
+						data-chart-div="travelDepartureTimeChart"
+						onchange="searchChartData(this,'TRAVEL_DEPARTURE_TIME','od')">
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="travelDepartureTimeChart">
+				</div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.arrival.time}">
+						도착
+						시간
+					</h4>
+					<select class="scroll select-list-box" id="TRAVEL_DESTINATION_TIME"
+						data-chart-div="travelDestinationTimeChart"
+						onchange="searchChartData(this,'TRAVEL_DESTINATION_TIME','od')">
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="travelDestinationTimeChart">
+					chart
+				</div>
+			</div>
+		</div>
+
+
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title"
+						th:text="#{statistics.odStatisticsDashboard.average.time.mode}">
+						통행 수단별 평균 이동 시간
+					</h4>
+					<select class="scroll select-list-box" id="AVG_TRAVEL_PURPOSE_TIME"
+						data-chart-div="avgTravelPurposeTimeChart"
+						onchange="searchChartData(this,'AVG_TRAVEL_PURPOSE_TIME','od')">
+					</select>
+				</div>
+				<div class="statistice-text">
+					<span class="statistics-text-chart" id="avgTravelPurposeTimeChart">52</span>min
+				</div>
+			</div>
+			<!--			<div class="od-statistics-content-item">-->
+			<!--				<div class="statistics-title-flex">-->
+			<!--					<h4 th:text="#{statistics.odStatisticsDashboard.average.time.purpose}">통행 목적별 평균 이동 시간</h4>-->
+			<!--					<select class="scroll select-list-box" id="AVG_TRAVEL_TRANSFORT_TIME" data-chart-div="avgTravelTransfortTimeChart" onchange="searchChartData(this,'AVG_TRAVEL_TRANSFORT_TIME','od')">-->
+			<!--						<option>TEST</option>-->
+			<!--					</select>-->
+			<!--				</div>-->
+			<!--				<div class="statistice-text"><span class="statistics-text-chart">50</span>min</div>-->
+			<!--				<div class="content-chart" id="avgTravelTransfortTimeChart">-->
+			<!--				chart-->
+			<!--				</div>-->
+			<!--			</div>-->
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.transfers.number}">
+					환승
+					횟수
+				</h4>
+				<!-- chart  -->
+				<div class="content-chart" id="travelTransfortCntChart"></div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title"
+					th:text="#{statistics.odStatisticsDashboard.average.transfer.time}">
+					평균 환승 소요 시간
+				</h4>
+				<div class="statistice-text">
+					<span class="statistics-text-chart" id="avgTravelTransfortHourChart">13.3</span>min
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.highway}">고속도로 이용</h4>
+				<!-- chart  -->
+				<div class="content-chart">
+					<div id="travelUseHighwayChart" class="pie-chart"></div>
+					<div id="travelUseHighwayChartTooltip" class="chartTooltip">
+						<p>
+							<span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span
+								class="tooltipValue">0</span>
+						</p>
+					</div>
+					<div class="chart-legend" id="travelUseHighwayChartLegend"></div>
+				</div>
+			</div>
+			<!--			<div class="od-statistics-content-item">-->
+			<!--				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.rate.type}">요금 유형</h4>-->
+			<!--				 chart  -->
+			<!--				<div class="content-chart">-->
+			<!--					<div id="travelFeeTypeChart" class="pie-chart"></div>-->
+			<!--					<div id="travelFeeTypeChartTooltip" class="chartTooltip">-->
+			<!--						<p><span class="tooltipColor"></span></span><span class="tooltipName">N/A</span>:<span class="tooltipValue">0</span></p>-->
+			<!--					</div>-->
+			<!--					<div class="chart-legend" id="travelFeeTypeChartLegend"></div>-->
+			<!--				</div>-->
+			<!--			</div>						-->
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.average.number.passengers}">평균 승차 인원</h4>
+					<label for="AVG_TRAVEL_MODE_TRANSPORTATION"></label><select class="scroll select-list-box"
+						id="AVG_TRAVEL_MODE_TRANSPORTATION" data-chart-div="avgTravelModeTransportationChart"
+						onchange="searchChartData(this,'AVG_TRAVEL_MODE_TRANSPORTATION','od')">
+					</select>
+				</div>
+				<div class="statistice-text">
+					<span class="statistics-text-chart" id="avgTravelModeTransportationChart">4</span>people
+				</div>
+			</div>
+			<!--			<div class="od-statistics-content-item">-->
+			<!--				<div class="statistics-title-flex">-->
+			<!--					<h4 th:text="#{statistics.odStatisticsDashboard.average.fare}">평균 요금</h4>-->
+			<!--					<select class="scroll select-list-box" id="AVG_TRAVEL_FEE" data-chart-div="avgTravelFeeChart" onchange="searchChartData(this,'AVG_TRAVEL_FEE','od')">-->
+			<!--						<option>TEST</option>-->
+			<!--					</select>-->
+			<!--				</div>-->
+			<!--				<div class="statistice-text"><span class="statistics-text-chart">75</span>rupee</div>-->
+			<!--				<div class="chart-legend" id="avgTravelFeeChart"></div>-->
+			<!--			</div>-->
+		</div>
+		<!--		<div class="od-statistics-content-box">-->
+		<!--			<div class="od-statistics-content-item">-->
+		<!--				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.furniture.status}">가구 실태</h4>-->
+		<!--				<div class="od-statistics-chart-table">-->
+		<!--					 chart  -->
+		<!--					<div class="content-chart" style="background-color:red">-->
+		<!--					chart-->
+		<!--					</div>-->
+		<!--					<div>-->
+		<!--						<ul>-->
+		<!--							<li class="od-statistics-chart-table-list"><span><span>평균 가구원 수</span><span class="statistics-span">(1가구당)</span></span><span class="statistics-total">4.7</span></li>-->
+		<!--							<li class="od-statistics-chart-table-list"><span><span>평균 미취학 아동 수</span><span class="statistics-span">(1가구당)</span></span><span class="statistics-total">0.6</span></li>-->
+		<!--							<li class="od-statistics-chart-table-list"><span><span>평균 방개수</span><span class="statistics-span">(1가구당)</span></span><span class="statistics-total">2.7</span></li>-->
+		<!--						</ul>-->
+		<!--						<div class="od-statistics-flex-box">-->
+		<!--							<div class="od-statistics-two-table scroll">-->
+		<!--								<h4>평균 차량보유대수</h4>-->
+		<!--								<table class="list-table mt8">-->
+		<!--									<thead>-->
+		<!--										<tr>-->
+		<!--											<th>순위</th>-->
+		<!--											<th>차량유형</th>-->
+		<!--											<th>값</th>-->
+		<!--										</tr>-->
+		<!--									</thead>-->
+		<!--									<tbody>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>Van</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>Van</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>Van</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>Van</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>Van</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--									</tbody>-->
+		<!--								</table>-->
+		<!--							</div>-->
+		<!--							<div class="od-statistics-two-table scroll">-->
+		<!--								<h4 class="statistics-cm-chart-title">평균 소득</h4>-->
+		<!--								<table class="list-table mt8">-->
+		<!--									<thead>-->
+		<!--										<tr>-->
+		<!--											<th>순위</th>-->
+		<!--											<th>소득</th>-->
+		<!--											<th>값</th>-->
+		<!--										</tr>-->
+		<!--									</thead>-->
+		<!--									<tbody>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>TEST</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>TEST</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>TEST</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>TEST</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--										<tr>-->
+		<!--											<td>1</td>-->
+		<!--											<td>TEST</td>-->
+		<!--											<td>0.5</td>-->
+		<!--										</tr>-->
+		<!--									</tbody>-->
+		<!--								</table>-->
+		<!--							</div>											-->
+		<!--						</div>-->
+		<!--					</div>-->
+		<!--				</div>-->
+		<!--			</div>-->
+		<!--		</div>-->
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.personal.situation}">
+					개인 실태
+				</h4>
+				<div class="od-statistics-chart-table">
+					<div class="content-chart" id="personalStatusByAge"></div>
+				</div>
+			</div>
+	
+			<div class="od-statistics-content-item is-box is-box">
+				<h4 class="statistics-cm-chart-title">성별</h4>
+				<ul id="personalStatusByGender">
+					<!--							<li class="od-statistics-chart-table-list"><span>남성</span><span class="statistics-total">58%</span></li>-->
+					<!--							<li class="od-statistics-chart-table-list"><span>여성</span><span class="statistics-total">42%</span></li>-->
+				</ul>
+			</div>
+		</div>
+		
+		<div class="od-statistics-content-box od-only-one">
+
+			<div class="od-statistics-content-item is-box is-box">
+				<div class="statistics-table-view" data-value="education">
+					<div class="flex-between">
+						<h4 class="statistics-cm-chart-title">학력</h4>
+						<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기"
+							data-value="education" />
+					</div>
+					<table class="list-table mt8">
+						<thead>
+							<tr>
+								<th>순위</th>
+								<th>학력</th>
+								<th>비율</th>
+							</tr>
+						</thead>
+						<tbody id="personalStatusByEducation">
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div class="od-statistics-content-item is-box is-box">
+				<div class="statistics-table-view" data-value="occupation">
+					<div class="flex-between">
+						<h4 class="statistics-cm-chart-title">직업</h4>
+						<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기"
+							data-value="occupation" />
+					</div>
+					<table class="list-table mt8">
+						<thead>
+							<tr>
+								<th>순위</th>
+								<th>직업</th>
+								<th>비율</th>
+							</tr>
+						</thead>
+						<tbody id="personalStatusByOccupation">
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+
+			<div class="od-statistics-content-item is-box is-box">
+				<div class="statistics-table-view" data-value="workingday">
+					<div class="flex-between">
+						<h4 class="statistics-cm-chart-title">주 평균 근무일 수</h4>
+						<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기"
+							data-value="workingday" />
+					</div>
+					<table class="list-table mt8">
+						<thead>
+							<tr>
+								<th>순위</th>
+								<th>평균 근무 일수</th>
+								<th>비율</th>
+							</tr>
+						</thead>
+						<tbody id="personalStatusByWorkingday"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+
+
+
+		<!--		<div class="od-statistics-content-box">-->
+		<!--			<div class="od-statistics-content-item">-->
+		<!--				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.personal.situation}">개인 실태</h4>-->
+		<!--				<div class="od-statistics-chart-table">-->
+		<!--					<div class="content-chart" id="personalStatusByAge"></div>-->
+		<!--					<div>-->
+		<!--						<h4 class="statistics-cm-chart-title">성별</h4>-->
+		<!--						<ul id="personalStatusByGender">-->
+		<!--							<li class="od-statistics-chart-table-list"><span>남성</span><span class="statistics-total">58%</span></li>-->
+		<!--							<li class="od-statistics-chart-table-list"><span>여성</span><span class="statistics-total">42%</span></li>-->
+		<!--						</ul>-->
+		<!--						<div class="statistics-table-view mt16" data-value="education">-->
+		<!--							<div class="flex-between">-->
+		<!--								<h4 class="statistics-cm-chart-title">학력</h4>-->
+		<!--								<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기" data-value="education"/>-->
+		<!--							</div>-->
+		<!--							<table class="list-table mt8">-->
+		<!--								<thead>-->
+		<!--									<tr>-->
+		<!--										<th>순위</th>-->
+		<!--										<th>학력</th>-->
+		<!--										<th>비율</th>-->
+		<!--									</tr>-->
+		<!--								</thead>-->
+		<!--								<tbody id="personalStatusByEducation">-->
+		<!--								</tbody>-->
+		<!--							</table>-->
+		<!--						</div>										-->
+		<!--						<div class="statistics-table-view mt16" data-value="occupation">-->
+		<!--							<div class="flex-between">-->
+		<!--								<h4 class="statistics-cm-chart-title">직업</h4>-->
+		<!--								<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기" data-value="occupation"/>-->
+		<!--							</div>-->
+		<!--							<table class="list-table mt8">-->
+		<!--								<thead>-->
+		<!--									<tr>-->
+		<!--										<th>순위</th>-->
+		<!--										<th>직업</th>-->
+		<!--										<th>비율</th>-->
+		<!--									</tr>-->
+		<!--								</thead>-->
+		<!--								<tbody id="personalStatusByOccupation">-->
+		<!--								</tbody>-->
+		<!--							</table>-->
+		<!--						</div>-->
+		<!--						<div class="statistics-table-view mt16" data-value="workingday">-->
+		<!--							<div class="flex-between">-->
+		<!--								<h4 class="statistics-cm-chart-title">주 평균 근무일 수</h4>-->
+		<!--								<input type="button" class="is-key-button" onclick="moreTableData(this)" value="더 보기" data-value="workingday"/>-->
+		<!--							</div>-->
+		<!--							<table class="list-table mt8">-->
+		<!--								<thead>-->
+		<!--									<tr>-->
+		<!--										<th>순위</th>-->
+		<!--										<th>평균 근무 일수</th>-->
+		<!--										<th>비율</th>-->
+		<!--									</tr>-->
+		<!--								</thead>-->
+		<!--								<tbody id="personalStatusByWorkingday">-->
+		<!--								</tbody>-->
+		<!--							</table>-->
+		<!--						</div>-->
+		<!--					</div>-->
+		<!--				</div>-->
+		<!--			</div>-->
+	</div>
+</th:block>

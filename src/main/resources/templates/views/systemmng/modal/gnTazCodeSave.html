@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="searchForm" name="searchForm" onsubmit="return false;">
+		<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		<div class="modal-filter">
+			<h3 class="modal-filter-title" th:text="#{common.search.detail.content}">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<input type="text" name="searchContent" class="input-text modal-input" th:placeholder="#{region.tazCodeSave.placeholder.taz}"
+					th:value="${searchInfo.searchContent}">
+				<button type="button" class="modal-search" onclick="asynchronousSearchList();">
+					<img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+				</button>
+			</div>
+		</div>
+	</form>
+	<div>
+		<table class="list-table">
+			<thead>
+				<tr>
+					<th th:text="#{common.table.select}">선택</th>
+					<th th:text="#{region.common.code}">CODE</th>
+					<th th:text="#{common.table.coordinate.xy}">좌표</th>
+				</tr>
+			</thead>
+			<tbody>
+				<th:block th:if="${totalCnt > 0}">
+					<tr class="table-link" onclick="checkedSet(this)" th:each="item : ${tazList}">
+						<td><input type="radio" name="tazInfo" th:value="${item.dstrctId}" th:data-dstrct-cd="${item.dstrctCd}" th:data-cntr-lon="${item.cntrLon}" th:data-cntr-lat="${item.cntrLat}"></td>
+						<td th:text="${item.dstrctCd}"></td>
+						<td th:text="|${item.cntrLat}, ${item.cntrLon}|"></td>
+					</tr>
+				</th:block>
+				<th:block th:if="${totalCnt == 0}">
+					<tr>
+						<td colspan="3" th:text="#{common.search.result.notExist}"></td>
+					</tr>
+				</th:block>
+			</tbody>
+		</table>
+	</div>
+	<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+</th:block>
+
+</html>

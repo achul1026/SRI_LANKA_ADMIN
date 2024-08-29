@@ -2,13 +2,22 @@
 
 #header {
 	position:relative;
-	width:calc(100vw - 340px);
-	margin-top:30px;
 	padding:14px 30px;
 	color:var(--white);
-	background-color:#353535;
-	box-shadow: 1px 4px 14px 0px rgba(163, 163, 163, 0.25);
+	background-color:var(--white);
+	box-shadow: 1px 1px 8px 0px rgba(163, 163, 163, 0.11);
+	width: 100%;
 }
-.header-link a {
-	color:var(--white);
+.header-link {
+	display: flex;
+	gap:10px;
+	align-items: center;
+}
+.bread-text {
+	
+}
+.bread-text.on {
+	color: var(--key-color);
+    font-weight: 400;
+    border-bottom: 1px solid var(--key-color);
 }

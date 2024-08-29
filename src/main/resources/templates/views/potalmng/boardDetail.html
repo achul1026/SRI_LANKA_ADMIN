@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<form id="boardUpdate" name="boardUpdate">
+		<div class="is-box">
+			<div class="flex-between">
+				<h3 class="info-title" th:text="#{board.boardDetail.title}">게시글 상세</h3>
+			</div>
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{common.table.subject}">제목</th>
+						<td>
+							<div th:text="${tlBbsInfo.bbsTitle}"></div>
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<div th:text="${tlBbsInfo.bbsTypeNm}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.registDate}">작성일</th>
+						<td>
+							<div th:text="${@commonUtils.formatLocalDateTime(tlBbsInfo.registDt, 'yyyy-MM-dd')}"></div>
+						</td>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td>
+							<div th:text="${tlBbsInfo.registId}"></div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{board.file}">첨부파일</th>
+						<td>
+							<div id="detailFileWrap">
+								<div class="detail-file-list" th:each="item, status : ${tlBbsFile}">
+									<span th:text="${item.orgFilenm}"></span>
+									<!-- 						<button type="button" -->
+									<!-- 							th:onclick="deleteFileData([[${item.fileId}]], [[${tlBbsInfo.bbsId}]])">X</button> -->
+									<!-- 									<button type="button" th:onclick="download([[${item.fileId}]])">다운로드(테스트)</button> -->
+								</div>
+							</div>
+						</td>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td>
+							<div class="select-div-box">
+								<div th:text="${tlBbsInfo.dspyYn}"></div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.content}">내용</th>
+						<td colspan="3">
+							<textarea class="modal-textarea validation-tag" name="bbsCnts" th:text="${tlBbsInfo.bbsCnts}"
+					th:placeholder="#{common.search.placeholder.content}" readonly></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</form>
+	<div class="info-button-box">
+		<a th:href="@{/potalmng/board}" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+		<a th:href="@{/potalmng/board/{bbsId}/update(bbsId=${tlBbsInfo.bbsId})}"  class="is-key-button" th:text="#{common.button.update}">수정</a>
+    </div>
+</th:block>
+</html>
+<script>
+</script>

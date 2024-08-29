@@ -1,81 +1,77 @@
-<div id="scheduleHistoryContainer" class="none">
-	<div class="is-box">
+<div id="scheduleHistoryContainer">
+	<input type="hidden" id="asynchronousPageNo" value="1">
+	<div>
 		<div class="flex-between">
-            <h3 class="info-title">조사 현황 및 일정 상세</h3>
-            <div>
-            	<input type="button" class="is-key-button" onclick="detailView();" value="상세 보기"/>
-            </div>
+            <h3 class="info-title" th:text="#{schedule.scheduleTrafficDetail.title}">조사 현황 및 일정 상세</h3>
     	</div>
     	<div class="histroy-flex-box">
-        	<div class="is-box history-tc-box">
-        		<div class="text-center">
-        			<span>조사 기간</span>
-        			<span id="startHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.startDt,'YYYY-MM-dd')}">2024-05-09</span>
-        			<span>~</span>
-        			<span id="endHistoryDate" th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.endDt,'YYYY-MM-dd')}">2024-06-10</span>
-        		</div>
-        		<div class="history-chart">
-            		<div class="tcTiemWrap">
-            			<div class="tcTimeInner scroll">
-            				<div id="tcDate" class="chart-title mb16 text-center" th:text="${tlExmnRsltHistorySearchDTO.searchDate}"></div>
-            				<div class="tc-time-box" th:each="item : ${tlExmnRsltHistoryDTO.hourList}">
-								<div class="tc-time" th:text="${item.hour}"></div>
-								<div class="tc-check">
-									<img th:if="${!item.isExists}" th:src="@{/images/un_check.png}" alt="check">
-									<img th:if="${item.isExists}" th:src="@{/images/check.png}" alt="check">
-								</div>
-							</div>
-            			</div>
-        			</div>
-        		</div>
-        		<div>
-        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 근무 시간</span><span th:text="${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(tlExmnRsltHistoryDTO.endDt,'HH:mm')}"></span></div>
-        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 근무 형태</span><span th:text="${tlExmnRsltHistoryDTO.exmnDiv}"></span></div>
-        			<div class="survey-history-txt-box"><span class="survey-history-txt">총 조사 횟수</span><span th:text="|${tlExmnRsltHistoryDTO.invstTotalCnt}번|"></span></div>
-        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 완료</span><span th:text="|${tlExmnRsltHistoryDTO.invstCompletedCnt}번|">150</span></div>
-        			<div class="survey-history-txt-box"><span class="survey-history-txt">조사 미완료</span><span th:text="|${tlExmnRsltHistoryDTO.invstNotCompletedCnt}번|">150</span></div>
-        		</div>
-        	</div>
-        	<div class="is-box history-table-box">
-				<div class="list-search-wrap history-date-box">
-					<div class="list-search-box gap16">
-						<div>
-							<label>조사방향</label>
-							<select class="select-list-box" id="exmndrctId" onchange="invstHistorySearchList();">
-								<th:block th:each="item : ${exmnDrctList}">
-									<option th:selected="${item.exmndrctId eq tlExmnRsltHistorySearchDTO.exmndrctId}" th:text="|${item.startlcNm} -> ${item.endlcNm}|" th:value="${item.exmndrctId}" th:data-startlc-nm="${item.startlcNm}" th:data-endlc-nm="${item.endlcNm}"></option>
-								</th:block>
-							</select>
-						</div>
+        	<div class="history-table-box">
+				<div class="history-date-box history-table-info">
+					<div>
+						<label th:text="#{invst.common.invest.direction}"></label> :
+						<select class="select-list-box table-select" id="exmndrctId" onchange="asynchronousSearchList();">
+							<th:block th:each="item : ${exmnDrctList}">
+								<option th:selected="${item.exmndrctId eq tlExmnTrfvlRsltHistorySearchDTO.exmndrctId}" th:text="|${item.startlcNm} -> ${item.endlcNm}|" th:value="${item.exmndrctId}" th:data-startlc-nm="${item.startlcNm}" th:data-endlc-nm="${item.endlcNm}"></option>
+							</th:block>
+						</select>
+						<label th:text="#{schedule.common.invest.date}">조사 날짜</label> :
+						<select class="select-list-box table-select" id="searchDate" onchange="asynchronousSearchList();">
+							<th:block th:each="item : ${surveyDtList}">
+								<option th:selected="${item eq tlExmnTrfvlRsltHistorySearchDTO.searchDate}" th:text="${item}" th:value="${item}"></option>
+							</th:block>
+						</select>
 					</div>
-				</div>						
-				<table id="listTable">
-					<thead>
-		                <tr>
-		                    <th>번호</th>
-		                    <th>조사날짜</th>
-		                    <th>총 조사 횟수</th>
-		                    <th>조사완료</th>
-		                    <th>조사 미완료</th>
-		                    <th>위치 변경 사유</th>
-		                </tr>
-					</thead>
-					<tbody id="invstListTbody">
-						<th:block th:each="item,status : ${tlExmnRsltHistoryDTO.trafficHistoryTableList}">
-							<tr class="table-link" onclick="tableTcDate(this);">
-								<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
-								<td th:text="${item.invstDt}">
-									<input type="hidden" class="table-tc-date" th:value="${item.invstDt}"/>
-								</td>
-								<td th:text="|${item.totalCnt}번|"></td>
-								<td th:text="|${item.completeCnt}번|"></td>
-								<td th:text="|${item.incompleteCnt}번|"></td>
-								<td th:text="${item.lcchgRsn}"></td>
+					<div th:if="${!#lists.isEmpty(tlExmnTrfvlRsltHistoryDTO.lcchgRsnList)}" th:each="item : ${tlExmnTrfvlRsltHistoryDTO.lcchgRsnList}">
+						<span th:text="#{schedule.scheduleTrafficDetail.disabled.reason}">조사 불가 사유(날짜)</span> :
+						<span th:text="|${item.lcchgRsn}(${item.lcchgRsnDt})|"></span>
+					</div>
+				</div>
+				<div class="history-data-table-box scroll">
+					<table id="listTable">
+						<thead>
+							<tr>
+								<th th:text="#{invst.invstDetail.time}">시간</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.MCL}">오토바이</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.TWL}">툭툭</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.CAR}">승용차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.VAN}">승합차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.MBU}">소형버스</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.LBU}">버스</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.LGV}">대형 화물차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.MG1}">소형 화물차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.MG2}">중형 화물차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.HG3}">3축 화물차</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.AG3}">3축 트레일러</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.AG4}">4축 트레일러</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.AG5}">5축 트레일러</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.AG6}">6축 트레일러</th>
+								<th th:text="#{enums.MvmnmeanTypeCd.FVH}">농업용 트랙터</th>
 							</tr>
-						</th:block>	
-					</tbody>
-				</table>
-				<div th:insert="tags/paging/paging :: pagingFragment"></div>									        		
+						</thead>
+						<tbody id="invstListTbody">
+							<th:block th:each="item,status : ${tlExmnTrfvlRsltHistoryDTO.trafficHistoryTableList}">
+								<tr>
+									<td th:text="${item.surveyDateTime}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.mclcnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.twlcnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.carcnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.vancnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.mbucnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.lbucnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.lgvcnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.mg1cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.mg2cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.hg3cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.ag3cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.ag4cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.ag5cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.ag6cnt : '-'}"></td>
+									<td th:text="${item.dataYn eq 'Y' ? item.fvhcnt : '-'}"></td>
+								</tr>
+							</th:block>
+						</tbody>
+					</table>
+				</div>
         	</div>
     	</div>
 	</div>

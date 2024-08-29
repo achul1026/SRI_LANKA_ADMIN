@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html th:lang="${lang}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> -->
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>joinComplete</title>    
+</head>
+<body>
+    <div style="">
+        <h1 style="display:flex; align-items:center; justify-content:center; gap:8px; margin:40px 0;">
+            <a th:href="${url}"><img src="logo.png"  alt="logo" style="width:43px; height:43px;"></a>
+            <span style="color:#ff8636;">RDA</span>
+        </h1>
+        <div style="border-top:1px solid #ff8636; border-bottom:1px solid #ff8636; border-left:1px solid #ededed; border-right:1px solid #ededed;">
+            <div style="margin-top:64px; padding:0 32px;">
+                <h2 style="margin:64px 0; text-align:center;" th:text="${joinTitle}">회원가입 완료</h2>
+                <div th:text="${joinContentprefix}">도로교통 DB 운영관리 WEB 회원가입이</div>
+                <div style="margin-bottom:0;"><span style="color:#ff8636;" th:text="${joinContent}">정상적으로 완료</span><span th:text="${joinContentsubfix}">되었습니다.</span></div>
+                <table style="width:100%; margin-top:24px; border-collapse:collapse; border-spacing:0;">
+                    <thead>
+                        <tr>
+                            <th style="padding:16px; color:#fff; font-weight:400; background-color:#ff8636;" th:text="${joinName}">이름</th>
+                            <th style="padding:16px; color:#fff; font-weight:400; background-color:#ff8636;" th:text="${joinId}">아이디</th>
+                            <th style="padding:16px; color:#fff; font-weight:400; background-color:#ff8636;" th:text="${joinDate}">가입 승인일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td th:text="${name}" style="padding:16px; border-bottom:1px solid #bebebe; text-align:center;"></td>
+                            <td th:text="${id}" style="padding:16px; border-bottom:1px solid #bebebe; text-align:center;"></td>
+                            <td th:text="${aprvDT}" style="padding:16px; border-bottom:1px solid #bebebe; text-align:center;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin:120px 0; text-align:center;"><a href="javascript:void(0)" style="display:inline-block; padding:8px 16px; color:#fff; border-radius:6px; background-color:#ff8636; text-decoration:none;" th:text="${joinLogin}">로그인 하기</a></div>
+        </div>
+        <div style="margin-top:16px; font-size:14px; color:#999;">
+            <div th:text="${joinSecurity}">*회원가입을 요청한 사람이 본인이 아닌 경우, 보안을 위해 RDA(+94 11 2 046200)로 연락 주시기 바랍니다.</div>
+            <div th:text="${joinNoreply}">본 메일은 고객님의 수신동의와 관계없이 발송되는 메일로 회신하신 경우 답변이 되지 않습니다.</div>
+        </div>
+    </div>
+</body>
+</html>

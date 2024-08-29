@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="TabBtnWrap">
+			<button class="cm-tab-btn on" onclick="asynchronousSearchList(this)" data-type="dsd">DSD / TAZ</button>
+			<button class="cm-tab-btn" onclick="asynchronousSearchList(this)" data-type="gn">GN / TAZ</button>
+		</div>
+		<form id="searchForm" name="searchForm">
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2 th:text="#{region.regionList.title}">지역 관리</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<tr>
+						<th th:text="#{region.regionList.code}">코드</th>
+						<td>
+							<input type="text" name="searchTypeCd" class="input-text search-input" th:placeholder="#{region.regionList.placeholder.code}">
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{region.regionList.name}">코드 이름</th>
+						<td>
+							<input type="text" name="searchContent" class="input-text search-input" th:placeholder="#{region.regionList.placeholder.name}">
+<!-- 							<input list="regionName" th:placeholder="#{region.regionList.placeholder.name}"> -->
+<!-- 							<datalist id="regionName" maxlength="1"> -->
+<!-- 								<option th:each="item:${dataList}" th:value="${item}"></option> -->
+<!-- 							</datalist> -->
+						</td>
+					</tr>
+				</table>
+				<div id="filterBtnWrap">
+					<button type="button" class="is-key-button"
+						th:text="#{common.button.search}" onclick="asynchronousSearchList()">검색</button>
+				</div>
+			</div>
+		</form>
+		<div id="appendDiv">
+		</div>
+	</div>
+</th:block>
+</html>
+<script th:inline="javascript">
+	document.addEventListener("DOMContentLoaded",function(){
+		asynchronousSearchList(null);
+	});
+	function asynchronousSearchList(_this){
+		const form = document.getElementById('searchForm');
+		
+		let type = 'dsd';
+		
+		if(_this != null &&_this.getAttribute('data-type') != null){
+			type = _this.getAttribute('data-type');
+			form.reset();
+		} else if(document.getElementById('type')){
+			type = document.getElementById('type').value;
+		}
+	   
+		const formData = new FormData(form);
+		let pageNo = document.getElementById('asynchronousPageNo') != null ? document.getElementById('asynchronousPageNo').value : 1;
+		
+		const params = new URLSearchParams(formData);
+		params.append('pageNo', pageNo);
+		 
+		fetch(`${__contextPath__}/systemmng/region/${type}/list?${params.toString()}`)
+		.then((response) => {
+			return response.text();
+		})
+		.then((html) => {
+			let btnList = document.querySelectorAll('.cm-tab-btn');
+	       
+			for(let i = 0; i < btnList.length;i++){
+				btnList[i].classList.remove('on');
+				if(type == btnList[i].getAttribute('data-type')){
+					btnList[i].classList.add('on');			   
+				}
+			}
+	       
+			const appendDiv = document.getElementById('appendDiv');
+			appendDiv.innerHTML = html;
+			
+// 			setDataList();
+		});
+	}
+	
+    function viewDetailPage(type,regionId) {
+		if(type == 'dsd'){
+			window.location.href = `${__contextPath__}/systemmng/region/${regionId}`
+		} else {
+			window.location.href = `${__contextPath__}/systemmng/region/gn/${regionId}`
+		}
+    }
+    
+//     function setDataList(){
+//     	const dataList = JSON.parse(document.getElementById('regionNameList').dataset.dataList);
+//     	const regionName = document.getElementById('regionName');
+//     	regionName.empty();
+//     	let options = '';
+//     	for(let i = 0; i < dataList.length; i++){
+//     		options = `<option value="${dataList[i]}"></option>`;
+//     		regionName.insertAdjacentHTML('beforeend', options);
+//     	}
+//     }
+    
+</script>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="searchForm" name="searchForm" onsubmit="return false;">
+		<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		<div class="modal-filter">
+			<h3 class="modal-filter-title" th:text="#{common.search.detail.content}">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<input type="text" name="searchContent" class="input-text modal-input" th:placeholder="#{region.gnCodeSave.placeholder.gn}"
+					th:value="${searchInfo.searchContent}">
+				<button type="button" class="modal-search" onclick="asynchronousSearchList();">
+					<img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+				</button>
+			</div>
+		</div>
+	</form>
+	<div class="flex gap16">
+		<div class="taz-select-list">
+			<h4 class="modal-filter-title mb8">GN List</h4>
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.select}">추가</th>
+						<th th:text="#{region.common.gn}">GN CODE</th>
+						<th th:text="#{region.common.name}">NAME</th>
+					</tr>
+				</thead>
+				<tbody class="modal-table-pointer">
+					<tr onclick="checkedSet(this, 'checkbox', 'use')" th:each="item:${gnList}">
+						<td><input type="checkbox" class="modal-taz-checkbox" name="checkbox" value="1" th:data-region-code="${item.gnId}"/></td>
+						<td>
+<!-- 							<input type="hidden" class="region-list-code" th:value="${item.gnId}" readonly/> -->
+							<input type="text" class="region-code region-list-code" th:value="${item.gnId}" readonly/>
+						</td>
+						<td>
+							<input type="text" class="region-list-name" th:value="|${item.provinNm} > ${item.districtNm} > ${item.dsdNm}|" readonly/>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+		</div>
+		<div class="taz-select-list">
+			<h4 class="modal-filter-title mb8">Select List</h4>
+			<div class="scroll modal-taz-select-table-list">
+				<table class="list-table">
+					<thead>
+						<tr>
+							<th th:text="#{region.common.gn}">GN CODE</th>
+							<th th:text="#{region.common.name}">NAME</th>
+							<th th:text="#{common.button.delete}">삭제</th>
+						</tr>
+					</thead>
+					<tbody id="modalSelectTbody">
+						<tr class="none regionSelectNotdata">
+							<td colspan="3" th:text="#{region.gnCodeSave.notSelect.gn}">선택된 GN가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</th:block>
+</html>
+<script type="text/javascript">
+</script>

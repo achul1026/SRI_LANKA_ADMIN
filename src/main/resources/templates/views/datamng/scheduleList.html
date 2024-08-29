@@ -5,85 +5,121 @@
       
 	<th:block layout:fragment="content">
 		<div id="calendarContainer">
-			<div id="fullCalendar" class="is-box active"></div>
-			<div id="calendarList" class="is-box">
-				<div class="list-search-wrap flex-between">
-					<div class="list-search-box">
-						<input type="hidden" id="asynchronousPageNo" value="1">
-						<select class="select-list-box" id="searchSttsCd" onchange="asynchronousSearchList('1')">
-							<option value="all">진행상태</option>
-							<th:block th:each="item:${exmnScheduleSttsCd}">
-								<option th:if="${item.isHtmlShow}" th:value="${item.getCode()}" th:text="${item.getName()}"></option>
-							</th:block>
-						</select>
-						<select class="select-list-box ml8" id="searchTypeCd" onchange="asynchronousSearchList('1')" >
-							<option value="all">조사유형</option>
-							<th:block th:each="item:${exmnTypeCd}">
-								<option th:value="${item.getCode()}" th:text="${item.getName()}"></option>
-							</th:block>
-						</select>
-					</div>
-					<div>
-						<input type="button" id="scheduleScreenButton" class="is-key-button" value="달력보기"/>
-					</div>		
-				</div>
+			<div id="fullCalendar" class="is-box"></div>
+			<div id="calendarList" class="is-box active">
 				<div class="calendar-total-box">
-					<dl class="calendar-survey">
-						<dt>MONTH</dt>
-						<dd>진행예정<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notYetProgressCnt}"></strong>건</span></dd>
-						<dd>진행중<span><strong class="survey-total"  th:text="${scheduleStatistics.statisticsMonthInfo.progressingCnt}"></strong>건</span></dd>
-						<dd>진행완료<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.progressCompleteCnt}"></strong>건</span></dd>
-						<dd>미진행<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notProgressCnt}"></strong>건</span></dd>
-						<dd>조사원 미등록<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notYetInvestigatorCnt}"></strong>건</span></dd>
+					<div id="filterTitle">
+						<h2 id="calendarDataTitle" th:text="#{schedule.scheduleList.title}">조사 현황 및 이력</h2>
+					</div>
+					<div id="calendarBtnWrap">
+						<div>
+							<input type="radio" id="calandarMonth" class="calandar-input" name="caladarDate" th:checked="${searchInfo.searchType eq 'month' or searchInfo.searchType eq ''}">
+							<label for="calandarMonth" class="calandar-btn" onclick="dateTabBtn('month')" th:text="#{schedule.scheduleList.month}">한달</label>
+						</div>
+						<div>
+							<input type="radio" id="calandarToday" class="calandar-input" name="caladarDate" th:checked="${searchInfo.searchType eq 'today'}">
+							<label for="calandarToday" class="calandar-btn" onclick="dateTabBtn('today')" th:text="#{schedule.scheduleList.today}">오늘</label>
+						</div>
+						<div>
+							<input type="button" id="scheduleScreenButton" class="calandar-btn" th:value="#{schedule.scheduleList.button.calandar}"/>
+						</div>
+					</div>
+					<dl id="monthData" class="calendar-survey" th:classappend="${searchInfo.searchType eq 'today' ? 'none' : ''}">
+						<dd>
+							<span th:text="#{schedule.scheduleList.notYetProgress}">test진행예정</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notYetProgressCnt}"></strong><span th:text="#{common.unit.case}">건</span></span>
+						</dd>
+						<dd><span th:text="#{schedule.scheduleList.progressing}">진행중</span><span><strong class="survey-total"  th:text="${scheduleStatistics.statisticsMonthInfo.progressingCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.progressComplete}">진행완료</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.progressCompleteCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.notProgress}">미진행</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notProgressCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.notYetInvestigator}">조사원 미등록</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.notYetInvestigatorCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
 					</dl>
-					<dl class="calendar-survey">
-						<dt>TODAY</dt>
-						<dd>진행예정<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notYetProgressCnt}"></strong>건</span></dd>
-						<dd>진행중<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsMonthInfo.progressingCnt}"></strong>건</span></dd>
-						<dd>진행완료<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.progressCompleteCnt}"></strong>건</span></dd>
-						<dd>미진행<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notProgressCnt}"></strong>건</span></dd>
-						<dd>조사원 미등록<span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notYetInvestigatorCnt}"></strong>건</span></dd>
+					<dl id="todayData" class="calendar-survey" th:classappend="${searchInfo.searchType eq 'month' or searchInfo.searchType eq '' ? 'none' : ''}">
+						<dd><span th:text="#{schedule.scheduleList.notYetProgress}">asdas진행예정</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notYetProgressCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.progressing}">진행중</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.progressingCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.progressComplete}">진행완료</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.progressCompleteCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.notProgress}">미진행</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notProgressCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
+						<dd><span th:text="#{schedule.scheduleList.notYetInvestigator}">조사원 미등록</span><span><strong class="survey-total" th:text="${scheduleStatistics.statisticsTodayInfo.notYetInvestigatorCnt}"></strong><span th:text="#{common.unit.case}">건</span></span></dd>
 					</dl>
 				</div>
-				<div class="mt16">
-					<table id="listTable">
+				<div>
+					<form id="searchForm" name="searchForm" th:action="@{/datamng/schedule}">
+						<div class="list-search-box">
+							<div id="searchResult">
+								 <span id="totalCount" th:text="${totalCnt}">"10"</span><span th:text="#{common.search.result}">개 리스트가 검색되었습니다.</span>
+							</div>
+							<div id="searchInputWrap">
+								<input type="hidden" id="pageNo" name="pageNo" value="1">
+								<input type="hidden" id="searchType" name="searchType" th:value="${searchInfo.searchType}">
+								<div class="search-flex-box">
+									<select class="select-list-box" id="searchSttsCd" name="searchSttsCd">
+										<option value="all" th:text="#{common.select.status}">상태 선택</option>
+										<th:block th:each="item:${exmnScheduleSttsCd}">
+											<option th:if="${item.isHtmlShow}" th:value="${item.getCode()}" th:text="${item.getName()}" th:selected="${searchInfo.searchSttsCd eq item.getCode()}"></option>
+										</th:block>
+									</select>
+								</div>
+								<div class="search-flex-box">
+									<select class="select-list-box" id="searchTypeCd" name="searchTypeCd">
+										<option value="all" th:text="#{common.search.selectType}">유형 선택</option>
+										<th:block th:each="item:${exmnTypeCd}">
+											<option th:value="${item.getCode()}" th:text="${item.getName()}" th:selected="${searchInfo.searchTypeCd eq item.getCode()}"></option>
+										</th:block>
+									</select>
+								</div>
+								<input type="text" class="input-text" id="searchContent" name="searchContent" th:value="${searchInfo.searchContent}" th:placeholder="#{common.search.placeholder.investName}"/>
+								<input type="submit" class="is-key-button" th:value="#{common.button.search}">
+							</div>
+						</div>
+					</form>
+					<table id="listTable" class="cm-list-table">
 						<thead>
 			                <tr>
-			                    <th>번호</th>
-			                    <th>조사명</th>
-			                    <th>조사유형</th>
-			                    <th>조사지역</th>
-			                    <th>조사기간</th>
-			                    <th>진행상태</th>
+			                    <th th:text="#{common.table.number}">번호</th>
+			                    <th th:text="#{invst.common.invest.name}">조사명</th>
+			                    <th th:text="#{common.table.investType}">조사유형</th>
+			                    <th th:text="#{invst.common.invest.region}">조사 지역</th>
+			                    <th th:text="#{common.table.investPeriod}">조사 기간</th>
+			                    <th th:text="#{schedule.scheduleList.status}">진행 상태</th>
+								<th th:text="#{schedule.scheduleList.impossible.reason}">불가사유 유무</th>
 			                </tr>
 						</thead>
 						<tbody id="invstListTbody">
-							<th:block th:if="${totalCnt > 0}">
+							<th:block th:if="${not #lists.isEmpty(invstList)}">
+							<!-- 뒤로기가 시 페이징 유지 -->
 				                <tr class="table-link" th:each="item,status : ${invstList}" th:onclick="|location.href='@{/datamng/schedule/{exmnmngId}(exmnmngId=${item.exmnmngId})}'|">
+<!-- 				                scheduleDetail([[${item.exmnmngId}]]) -->
 				                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
 				                    <td th:text="${item.exmnNm}"></td> 
-				                    <td th:text="${item.exmnType.getName()}"></td> 
+				                    <td th:text="${item.exmnType.getName()}"></td>
 				                    <td th:text="${item.exmnLc}"></td> 
-				                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'YYYY-MM-dd')}"></td>
-				                    <td th:text="${item.exmnScheduleSttsNm}"></td> 
-				                </tr>
+				                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'yyyy-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'yyyy-MM-dd')}"></td>
+				                    <td th:text="${item.exmnScheduleSttsNm}"></td>
+									<td th:text="${item.lcchgRsnChkVal}"></td>
+<!-- 				                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td> -->
+<!-- 				                    <td th:text="${item.exmnNm}"></td>  -->
+<!-- 				                    <td th:text="${item.exmnType.getName()}"></td> -->
+<!-- 				                    <td th:text="${item.exmnLc}"></td>  -->
+<!-- 				                    <td th:text="${@commonUtils.formatLocalDateTime(item.startDt,'yyyy-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(item.endDt,'yyyy-MM-dd')}"></td> -->
+<!-- 				                    <td th:text="${item.exmnScheduleSttsNm}"></td> -->
+<!-- 									<td th:text="${item.lcchgRsnChkVal}"></td> -->
+								</tr>
 							</th:block>
-							<th:block th:if="${totalCnt == 0}">
+							<th:block th:unless="${not #lists.isEmpty(invstList)}">
 								<tr>
-									<td colspan="6">검색 결과가 없습니다.</td>
+									<td colspan="7" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
 								</tr>
 							</th:block>
 						</tbody>
 					</table>								
 				</div>
-				<div id="paingDiv" th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+				<div id="paingDiv" th:insert="tags/paging/paging :: pagingFragment"></div>
 			</div>		
 		</div>
 	</th:block>
 </html>
 <script th:inline="javascript">
-$(function() {
-	
+
+	function calendar() {
 	  const calendarEl = document.getElementById('fullCalendar');
 	  
 	  const calendarData = /*[[${calendarData}]]*/
@@ -103,7 +139,7 @@ $(function() {
 	    dayMaxEvents: 5,
 	    customButtons: {
 			scheduleListButton : {
-				text: '조사 목록 보기',
+				text: message.schedule.scheduleList_invest_list,
 				click: function(){
 					document.getElementById('fullCalendar').classList.remove('active');
 					document.getElementById('calendarList').classList.add('active');
@@ -116,7 +152,13 @@ $(function() {
 	    	const date = new Date(dateStr);
 	    	const day = date.getDate();
 	    	const dayWeek = date.getDay();
-	    	const daysWeek = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+	    	const daysWeek = [message.schedule.sunday
+				    		 , message.schedule.monday
+				    		 , message.schedule.tuesday
+				    		 , message.schedule.wednesday
+				    		 , message.schedule.thursday
+				    		 , message.schedule.friday
+				    		 , message.schedule.saturday];
 	    	const dayName = daysWeek[dayWeek];
 	    	
 	    	const events = calendar.getEvents();
@@ -137,7 +179,7 @@ $(function() {
 		let year = today.getFullYear();
 		let month = today.getMonth() +1;
 		let monthSet = month < 10 ? '0' + month : month;
-		let calendarToday = monthSet+'월 '+year+'년';
+		let calendarToday = year + "-" + monthSet;
 		const centerTitle = document.querySelector('.fc-toolbar-title');
 		if(centerTitle) centerTitle.textContent = calendarToday;
 		
@@ -147,11 +189,11 @@ $(function() {
 		        let year = info.view.currentStart.getFullYear();
 		        let month = info.view.currentStart.getMonth() +1;
 		        let monthSet = month < 10 ? '0' + month : month;
-		        centerTitle.textContent = monthSet+'월 '+year+'년';
+		        centerTitle.textContent = year + "-" + monthSet;
 		    }
 		});
-	});
-	
+		
+	}
 	
 	function endDate(dateStr) {
 	  var date = new Date(dateStr);
@@ -163,10 +205,30 @@ $(function() {
 	document.getElementById('scheduleScreenButton').addEventListener('click', () => {
 		document.getElementById('calendarList').classList.remove('active');		
 		document.getElementById('fullCalendar').classList.add('active');
+		calendar();
 	})
 	
+	//날짜별 데이터 보기 한달,오늘
+	function dateTabBtn(date){
+		const monthData = document.getElementById("monthData");
+		const todayData = document.getElementById("todayData");
+		const searchType = document.getElementById("searchType");
 		
+		if(date === 'today'){
+		   searchType.value = "today";
+		   monthData.classList.add("none");
+		   todayData.classList.remove("none");
+		} else {
+		   searchType.value = "month";
+		   monthData.classList.remove("none");
+		   todayData.classList.add("none");
+		}
+	}
+	
+	
+	//비동기 목록 조회	
 	function asynchronousSearchList(pageNo = '0'){
+		
 		if(pageNo === '0'){
 			pageNo = document.getElementById('asynchronousPageNo').value;
 		}
@@ -177,11 +239,17 @@ $(function() {
 		const searchTypeCd = document.getElementById('searchTypeCd');
 		const searchTypeCdValue = searchTypeCd.options[searchTypeCd.selectedIndex].value;
 
+		const searchContent = document.getElementById('searchContent');
+		
 		const params = new URLSearchParams();
 		params.append('pageNo', pageNo);
 		params.append('searchSttsCd', searchSttsCdValue);
 		params.append('searchTypeCd', searchTypeCdValue);
-
+		if (!!searchContent.value) {
+			params.append('searchContent', searchContent.value);
+		}
+		
+		
 		fetch(__contextPath__+"/datamng/schedule/asynchronous?"+params.toString(),{
 			method: "GET"
 		})
@@ -198,8 +266,8 @@ $(function() {
 								const paingDiv = document.getElementById('paingDiv');
 								paingDiv.innerHTML="";
 								let trHtml = "";
+								const totalCnt = result.data.totalCnt;
 								if(invstList.length > 0){
-									const totalCnt = result.data.totalCnt;
 									const paging = result.data.paging;
 									//data 세팅
 									for(let [idx,item] of invstList.entries()){
@@ -212,23 +280,24 @@ $(function() {
 									                    +'<td>'+item.exmnTypeNm+'</td>' 
 									                    +'<td th:text="${item.exmnLc}">'+item.exmnLc+'</td>'
 									                    +'<td>' +formatDate(item.startDt)+' ~ '+formatDate(item.endDt)+'</td>'
-									                    +'<td>'+item.exmnScheduleSttsNm+'</td>' 
-									               +'</tr>';
+									                    +'<td>'+item.exmnScheduleSttsNm+'</td>'
+														+'<td>'+item.lcchgRsnChkVal+'</td>'
+												+'</tr>';
 									}
 									
 									if(!isNull(paging)){
 										const pagingHtml = writePaging(paging);
 										//paingDiv append
 										$("#paingDiv").append(pagingHtml);
-										
 									}
 								}else{
 									//data is empty
 									trHtml += '<tr class="table-link">'
-								                    +'<td colspan="6">검색 결과가 없습니다.</td>'
+								                    +'<td colspan="7">'+message.search.result_not_exist+'</td>'
 								               +'</tr>';
 								}
-								$('#invstListTbody').append(trHtml); 
+								$('#invstListTbody').append(trHtml);
+								$('#totalCount').text(totalCnt); 
 							}
 						}
 			)

@@ -4,36 +4,45 @@
       layout:decorate="~{layout/modalLayout}">
       
 	<th:block layout:fragment="modalContent">
-		<div class="list-table-container" style="min-width:1000px;">
-			<div class="list-search-box text-left mb8">
-				<form id="searchForm" onSubmit="return false;">
+		<div class="list-table-container th8-width">
+				<form id="searchForm" class="modal-form" onSubmit="return false;">
 					<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
-					<div class="list-search-box">
-						<select name="searchType" class="select-list-box">
-							<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
-							<option value="mngrId" th:selected="${searchInfo.searchType} == 'mngrId'">ID</option>
-							<option value="mngrNm" th:selected="${searchInfo.searchType} == 'mngrNm'">이름</option>
-							<option value="mngrTel" th:selected="${searchInfo.searchType} == 'mngrTel'">연락처</option>
-							<option value="mngrEmail" th:selected="${searchInfo.searchType} == 'mngrEmail'">이메일</option>
-						</select>
-						<input type="text" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
-						<button type="button" class="is-key-button" onclick="asynchronousSearchList();">검색</button>
+					<div id="modalSearchWrap">
+						<div class="modal-filter">
+							<h3 class="modal-filter-title" th:text="#{invst.invstMngrList.type.setting}">타입 설정</h3>
+							<select name="searchType" class="select-list-box modal-select">
+								<option value="all" th:selected="${searchInfo.searchType} == 'all'" th:text="#{common.select.all}">전체</option>
+								<option value="mngrId" th:selected="${searchInfo.searchType} == 'mngrId'" th:text="#{common.id}">ID</option>
+								<option value="mngrNm" th:selected="${searchInfo.searchType} == 'mngrNm'" th:text="#{common.name}">이름</option>
+								<option value="mngrTel" th:selected="${searchInfo.searchType} == 'mngrTel'" th:text="#{common.contact}">연락처</option>
+								<option value="mngrEmail" th:selected="${searchInfo.searchType} == 'mngrEmail'" th:text="#{common.email}">이메일</option>
+							</select>
+						</div>
+						<div class="modal-filter">
+							<h3 class="modal-filter-title" th:text="#{common.search.detail.content}">상세 내용</h3>
+							<div class="modal-search-wrap">
+								<input type="text" name="searchContent" class="input-text modal-input" th:placeholder="#{common.search.placeholder.searchContext}" th:value="${searchInfo.searchContent}">
+								<button type="button" class="modal-search" onclick="asynchronousSearchList();">
+									<img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+								</button>
+							</div>
+						</div>
 					</div>		
 				</form>
-			</div>					
+					
 			<div class="table-wrap">
 				<div class="table-box">
 					<table class="list-table">
 						<thead>
 							<tr>
-								<th>선택</th>
-								<th>번호</th>
-								<th>ID</th>
-								<th>이름</th>
-								<th>연락처</th>
-								<th>이메일</th>
-								<th>소속</th>
-								<th>권한</th>
+								<th th:text="#{common.table.select}">선택</th>
+								<th th:text="#{common.table.number}">번호</th>
+								<th th:text="#{common.id}">ID</th>
+								<th th:text="#{common.name}">이름</th>
+								<th th:text="#{common.contact}">연락처</th>
+								<th th:text="#{common.email}">이메일</th>
+								<th th:text="#{common.institution}">소속</th>
+								<th th:text="#{common.authority}">권한</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -42,7 +51,7 @@
 									<td><input type="radio" class="mngrCheckBox" name="mngrList" th:value="${item.usermngId}"></td>
 				                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
 				                    <td class="userId" th:text="${item.userId}"></td>
-				                    <td th:text="${item.userNm}"></td>
+				                    <td class="userNm" th:text="${item.userNm}"></td>
 				                    <td th:text="${item.userTel}"></td>
 				                    <td th:text="${item.userEmail}"></td>
 				                    <td th:text="${item.bffltdNm}"></td>
@@ -51,7 +60,7 @@
 			                </th:block>
 			                <th:block th:if="${totalCnt == 0}">
 			                	<tr>
-			                		<td colspan="8">검색된 결과가 없습니다.</td>
+			                		<td colspan="8" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
 			                	</tr>
 			                </th:block>
 						</tbody>
@@ -66,17 +75,20 @@
 	function asynchronousSearchList(){
 		let paramData = $("#searchForm").serialize();
 		$(".modal-container").remove();
-		new ModalBuilder().init('조사 담당자 등록').ajaxBody("/datamng/invst/modal/mngr",paramData).footer(1,'등록',function(button, modal){
+		new ModalBuilder().init(message.invest.invstMngrList_regist_manager).ajaxBody("/datamng/invst/modal/mngr",paramData).footer(1, message.common.button_regist,function(button, modal){
 			let mngrId, mngrNmValue;
 			const mngrChecked 		= document.querySelector('.mngrCheckBox:checked');
 			const modalUsermngId 	= mngrChecked.value;
 			const modalUserId 		= mngrChecked.closest('tr').querySelector('.userId').textContent;
-	
+			const modalUserNm 		= mngrChecked.closest('tr').querySelector('.userNm').textContent;
+
 			const exmnpicIdElement  = document.getElementById('exmnpicId');
 			exmnpicIdElement.value  = modalUserId;
 			const usermngIdElement  = document.getElementById('usermngId');
 			usermngIdElement.value  = modalUsermngId;
-			
+			const userNmElement  = document.getElementById('userNm');
+			userNmElement.value  = modalUserNm;
+
 			modal.close();
 		}).open();
 	}

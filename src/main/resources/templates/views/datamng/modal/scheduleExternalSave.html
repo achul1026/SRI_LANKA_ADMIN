@@ -9,42 +9,42 @@
 				<table class="modal-table">
 					<tbody>
 						<tr>
-							<th>이름</th>
+							<th th:text="#{common.name}">이름</th>
 							<td class="text-left">
-								<input type="text" id="invstId" class="modal-input-text" placeholder="이름을 입력해주세요.">
+								<input type="text" id="invstId" class="modal-input-text" th:placeholder="#{login.common.placeholder.name}">
 							</td>
-							<th>생년월일</th>
+							<th th:text="#{schedule.scheduleExternalSave.birth}">생년월일</th>
 							<td class="text-left">
-								<input type="text" id="invstDate" class="modal-input-text" placeholder="생년월일을 입력해주세요.">
+								<input type="text" id="invstDate" class="modal-input-text" th:placeholder="#{schedule.scheduleExternalSave.placeholder.birth}">
 							</td>
 						</tr>
 						<tr>
-							<th>핸드폰 번호</th>
+							<th th:text="#{common.contact}">핸드폰 번호</th>
 							<td class="text-left">
-								<input type="text" id="invstPhone" class="modal-input-text" placeholder="핸드폰번호를 입력해주세요.">
+								<input type="text" id="invstPhone" class="modal-input-text" th:placeholder="#{login.join.placeholder.contact}">
 							</td>
-							<th>이메일</th>
+							<th th:text="#{common.email}">이메일</th>
 							<td class="text-left">
-								<input type="text" id="invstEmail" class="modal-input-text" placeholder="이메일을 입력해주세요.">
+								<input type="text" id="invstEmail" class="modal-input-text" th:placeholder="#{login.common.placeholder.email}">
 							</td>
 						</tr>						
 					</tbody>
 				</table>
-				<div class="mt8"><button type="button" id="test" class="is-key-button">추가하기</button></div>								
+				<div class="mt8"><button type="button" id="test" class="is-key-button" th:text="#{invst.common.button.add}">추가하기</button></div>								
 			</form>
 		</div>
 		<div id="selectInvstContainer">
-			<div>조사원 수 : ( <span id="totalSelectInvstNumber" class="required">0</span> / <span id="totalInvstNumber">2</span> )</div>
+			<div><span th:text="#{schedule.scheduleExternalSave.number.investigators}">조사원 수</span> : ( <span id="totalSelectInvstNumber" class="required">0</span> / <span id="totalInvstNumber">2</span> )</div>
 			<div class="table-wrap mt16">
 				<div class="table-box">
 					<table class="list-table">
 						<thead>
 							<tr>
-								<th>이름</th>
-								<th>생년월일</th>
-								<th>연락처</th>
-								<th>이메일</th>
-								<th>삭제</th>
+								<th th:text="#{common.name}">이름</th>
+								<th th:text="#{schedule.scheduleExternalSave.birth}">생년월일</th>
+								<th th:text="#{common.contact}">연락처</th>
+								<th th:text="#{common.email}">이메일</th>
+								<th th:text="#{schedule.scheduleExternalSave.delete}">삭제</th>
 							</tr>
 						</thead>
 						<tbody id="invstAddList">

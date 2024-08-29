@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<form id="searchForm">
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2 th:text="#{common.search.title}">검색 설정</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<tr>
+						<th th:text="#{common.search.selectType}">카테고리 선택</th>
+						<td>
+							<select name="searchType" class="select-list-box">
+								<option value="" th:text="#{common.select.all}">전체</option>
+								<option th:each="item:${faqCdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${searchInfo.searchType eq item.cd}">
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.search.detail.content}">상세 내용</th>
+						<td>
+							<input type="text" id="searchContent" class="input-text search-input" name="searchContent"
+								th:placeholder="#{common.search.placeholder.searchContext}" th:value="${searchInfo.searchContent}"/>
+						</td>
+					</tr>
+				</table>
+				<div id="filterBtnWrap">
+					<button type="submit" id="searchBtn" class="is-key-button"
+						th:text="#{common.button.search}">검색</button>
+				</div>
+			</div>
+			<input type="hidden" name="pageNo" value="1"/>
+		</form>
+		<div id="listTableContainer">
+			<div class="list-save-box">
+				<div class="flex-center gap8">
+					<input type="button" th:value="#{common.button.selectAll}" class="is-sub-button" th:onclick="selectAll()" />
+					<input type="button" th:value="#{common.button.selectDelete}" onclick="deleteFaq()" class="is-danger-button" />
+				</div>
+				<div>
+					<a href="/potalmng/faq/save" th:text="#{common.button.regist}" class="is-key-button"></a>
+				</div>
+			</div>
+			<table id="listTable" class="cm-list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.select}">선택</th>
+						<th th:text="#{common.table.number}">번호</th>
+						<th th:text="#{common.table.class}">분류</th>
+						<th th:text="#{faq.common.question}">질문</th>
+						<th th:text="#{common.table.registDate}">작성일</th>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${totalCnt > 0}">
+						<tr th:each="item, status : ${faqList}" th:onclick="location.href='/potalmng/faq/'+[[${item.faqId}]]">
+							<td onclick="event.stopPropagation();"><input type="checkbox" name="checkbox" th:value="${item.faqId}" /></td>
+							<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+							<td th:text="${item.faqType}">분류</td>
+							<td th:text="${item.faqQstn}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(item.registDt, 'yyyy-MM-dd')}"></td>
+							<td th:text="${item.registId}"></td>
+							<td th:text="${item.dspyYn} == 'Y' ? #{common.option.dspyYn.y} : #{common.option.dspyYn.n}">
+							</td>
+						</tr>
+					</th:block>
+					<th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="9" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</th:block>
+
+</html>
+<script type="text/javascript">
+	// 전체선택
+	function selectAll() {
+		if ($('input:checkbox').is(':checked') == true) {
+			$('input:checkbox').prop('checked', false);
+		} else {
+			$('input:checkbox').prop('checked', true);
+		}
+	}
+	
+	// 게시글 삭제
+	function deleteFaq() {
+		new MsgModalBuilder().init().alertBody(message.faq.faqList_faq_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+				modal.close();
+				const selectedElements = document.querySelectorAll('input[name="checkbox"]:checked');
+				const faqIds = Array.from(selectedElements).map(el => el.value);
+
+				fetch(__contextPath__ + "/potalmng/faq", {
+					method: "DELETE",
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({faqIds: faqIds})
+				})
+					.then(response => response.json())
+					.then(result => {
+						if (result.code == '200') {
+							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+								window.location.href = __contextPath__ + "/potalmng/faq";
+								modal.close();
+							}).open();
+						} else {
+							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+								modal.close();
+							}).open();
+						}
+					})
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+</script>

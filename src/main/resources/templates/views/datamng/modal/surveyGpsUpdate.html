@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div id="gpsMapContainer" style="position:relative; width:100%; height:400px;">
+			<div id="gpsMap"></div>
+		</div>
+		<input type="text" id="modalGpsLocation" class="input-text wd100 mt8" readonly/>
+	</th:block>
+</html>
+<script>
+	const loading = new setLoading().start();
+	(async () => {
+		let mapgl = await mapboxGl('79.92619137078884', '6.8996839117806275', '10', 'gpsMap');
+		setMapSearch(mapgl);
+		setSurveyGps(mapgl);
+		
+	})();
+	loading.end();
+</script>

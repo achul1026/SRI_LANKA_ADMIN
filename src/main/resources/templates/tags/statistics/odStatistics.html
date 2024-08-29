@@ -1,0 +1,81 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	
+<th:block th:fragment="odStatisticsFragment">
+	<div class="statisticsInsertBox">
+		<div class="statistics-search-box is-box">
+			<form id="searchSurveyForm" data-type="od">
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.type}">Survey Type</h4>
+					<div class="select-div-box">
+						<select class="select-list-box table-select-97 statistic-search validation-tag" id="exmnTypeCd" name="exmnTypeCd" data-validation="select" onchange="statisticsType()">
+							<option value="" th:text="#{common.select.select}">선택</option>
+							<option value="OD" th:text="#{statistics.roadSideChartStats.household}">HouseHold Survey</option>
+							<option value="ROADSIDE" th:text="#{statistics.roadSideChartStats.roadSide}">roadSide Survey</option>
+						</select>
+					</div>
+				</div>
+<!--				<div class="statistics-search-item">-->
+<!--					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.sheet}">Survey Sheet</h4>-->
+<!--					<div class="select-div-box wd100">-->
+<!--						<select class="select-list-box ellipsis table-select-97" id="searchSrvyId" name="searchSrvyId">-->
+<!--							<option value="" th:text="#{common.select.select}">선택</option>-->
+<!--						</select>-->
+<!--					</div>-->
+<!--				</div>-->
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.origin}">Origin</h4>
+					<div id="origin" class="location-event"></div>
+					<div id="surveyLocationSearch" class="none"></div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.destination}">Destination</h4>
+					<div id="destination" class="location-event"></div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.year}">Survey Year</h4>
+					<div class="select-div-box">
+						<select class="dateYear scroll select-list-box table-select-97 validation-tag" id="searchDate" name="searchDate" data-validation="oneDateSelect">
+							<option value="" th:text="#{common.select.select}"></option>
+							<th:block th:each="item : ${years}">
+								<option th:value="${item}" th:text="${item}"></option>
+							</th:block>
+						</select>
+					</div>
+				</div>
+			</form>
+			<div class="statistics-search-button">
+				<input type="button" id="statisitcsSearchChange" class="is-key-button wd100" th:value="#{statistics.button.apply}" onclick="ODStatisticsInit();"/>
+			</div>
+		</div>
+	</div>
+	<div class="statistics-search-view">
+		<div class="statistics-search-img">
+			<img th:src="@{/images/dash_search.png}" alt="serach"/>
+			<div th:text="#{statistics.mccStatisticsDashboard.search}">검색조건을 입력 후 검색해주세요.</div>
+		</div>
+	</div>
+	<div class="statistics-list-box none">
+		<div class="statistics-sub-header">
+			<div id="downloadTitle"></div>
+			<input type="button" class="is-key-button" th:value="#{common.button.download}"/>
+		</div>
+		<div class="statistics-content"></div>
+	</div>
+	<script>
+		try {
+			const loading = new setLoading().start();
+
+			Promise.all([
+				rdaLocation('origin', 'gnNm', 2, 3, 'statistic-search-od'),
+				rdaLocation('destination', 'gnNm', 2, 3, 'statistic-search-od')
+			]).then(() => {
+				loading.end();
+			}).catch(error => {
+				loading.end();
+			});
+		} catch(error) {
+			consloe.log("에러 발생")
+		}
+	</script>
+</th:block>

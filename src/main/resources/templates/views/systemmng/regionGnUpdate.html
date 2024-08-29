@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+	<th:block layout:fragment="content">
+		<h3 th:text="#{region.regionGnUpdate.title}">GN 코드 수정</h3>
+		<div>
+			<div class="is-box">
+				<div>
+					<h3 class="info-title" th:text="#{region.common.taz}">TAZ 코드</h3>
+				</div>
+				<div class="infoTableWrap">
+					<input type="hidden" id="dstrctCd" th:value="${gnInfo.dstrctCd}">
+					<table class="infoTable">
+						<tr>
+							<th th:text="#{region.common.taz}">TAZ CODE</th>
+							<th th:text="#{region.common.lat}">중앙 위도</th>
+							<th th:text="#{region.common.lon}">중앙 경도</th>
+						</tr>
+						<tr>
+							<td th:text="${gnInfo.dstrctCd}">TEST</td>
+							<td th:text="${gnInfo.cntrLat}">TEST</td>
+							<td th:text="${gnInfo.cntrLon}">TEST</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="is-box">
+				<div>
+					<h3 class="info-title" th:text="#{region.common.gn}">GN 코드</h3>
+					<input type="button" id="tazRegistBtn" class="is-key-button" th:value="#{region.regionGnSave.registGn}">
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable">
+						<thead>
+							<tr>
+								<th th:text="#{region.common.gn}">GN CODE</th>
+								<th th:text="#{region.common.name}">NAME</th>
+								<th th:text="#{region.common.ratio}">비율(%)</th>
+								<th th:text="#{invst.common.table.management}">관리</th>
+							</tr>
+						</thead>
+						<tbody id="regionSelectAddBox">
+							<tr class="region-select-tr" th:each="item:${gnInfo.gnCodeInfoList}" th:data-rc="${item.gnId}" th:data-dc="${item.gnId}">
+								<td th:text="${item.gnId}">TEST</td>
+								<td class="taz-list-name" th:text="|${item.provinNm} > ${item.districtNm} > ${item.dsdNm}|">TEST</td>
+								<td><input type="text" class="input-table-text region-code-percentage" th:value="${item.distrbCnt}"/></td>
+								<td><input type="button" class="taz-button-reset" th:value="#{common.button.delete}" onclick="tazListRemove(this)"></td>
+							</tr>
+							<tr class="regionListNotData none">
+								<td colspan="4" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="info-button-box">
+				<a th:href="@{/systemmng/region/gn/{dstrctCd}(dstrctCd=${gnInfo.dstrctCd})}" class="is-basic-button"
+					th:text="#{common.button.prePage}">이전 페이지</a> <input type="button"
+					class="is-key-button overLapping" th:value="#{common.button.update}" onclick="gnRegionUpdate()"/>
+			</div>
+		</div>
+	</th:block>
+</html>
+
+<script>
+
+//GN 코드 목록 저장
+document.addEventListener("DOMContentLoaded", function () {
+	let gnCodes = document.querySelectorAll('.region-select-tr');
+	let tazNames = document.querySelectorAll('.taz-list-name');
+// 	let tazDistrictCodes = document.querySelectorAll('.taz-code');
+	let tazPercentages = document.querySelectorAll('.region-code-percentage');
+	for (let i = 0; i < gnCodes.length; i++) {
+	    let gnCode = gnCodes[i].dataset.rc;
+	    let tazName = tazNames[i].innerText;
+// 	    let tazDistrictCode = gnCodes[i].value;
+	    let tazPercentage = tazPercentages[i].value;
+	    checkedRegionContentArray.push([gnCode, tazName, tazPercentage]);
+	    checkedRegionDisplayCodeArray.push(gnCode);
+	}
+});
+function asynchronousSearchList(){
+	setTazModal("GN");
+}
+
+document.getElementById('tazRegistBtn').addEventListener('click', () => {
+	setTazModal("GN");
+// 	new ModalBuilder().init("GN 등록").ajaxBody(__contextPath__ + "/systemmng/region/gn/save/gn").footer(3,message.common.button_regist,function(button, modal){
+// 	}, message.common.button_cancel, function(button, modal){
+// 	}).open();
+});
+
+
+function setTazModal(type){
+	let paramData = $("#searchForm").serialize();
+	const modalContainer = document.querySelector('.modal-container');
+	if(modalContainer) modalContainer.remove();	
+// 	if(type === 'TAZ'){
+// 		new ModalBuilder().init("TAZ 등록").ajaxBody(__contextPath__ + "/systemmng/region/gn/save/taz",paramData).footer(3,message.common.button_regist,function(button, modal){
+// 			let tazInfo = document.querySelector('input[name="tazInfo"]:checked');
+// 			const appendTbody = document.getElementById('appendTbody');
+// 			const html =`
+// 							<tr>
+// 								<td><input type="hidden" id="dstrctCd" name="dstrctCd" value="${tazInfo.dataset.dstrctCd}"/>${tazInfo.dataset.dstrctCd}</td>
+// 								<td>추가예정</td>
+// 								<td>${tazInfo.dataset.cntrLat}</td>
+// 								<td>${tazInfo.dataset.cntrLon}</td>
+// 								<td><input type="button" class="input-reset pointer" value="삭제" onclick="deleteTazInfo();"/></td>
+// 							</tr>
+// 						`;
+// 			appendTbody.innerHTML = html;
+// 			modal.close();
+// 		}, message.common.button_cancel, function(button, modal){
+// 			modal.close();
+// 		}).open();
+// 	}else{
+		new ModalBuilder().init(message.code.code_gn_save, "1200").ajaxBody(__contextPath__ + "/systemmng/region/gn/save/gn",paramData).footer(3,message.common.button_regist,function(button, modal){
+			if(checkedRegionDisplayCodeArray.length == 0) {
+				alert(message.code.code_gn_update);
+				return
+			}
+			tazModalSave();
+			modal.close();
+		}, message.common.button_cancel, function(button, modal){
+			checkedRegionDisplayCodeArray = regionCodeDefaultArray.map(innerArray => innerArray.slice());
+			modal.close();
+		}).open();
+		regionPagingAdd();
+// 	}
+}
+
+//전체선택
+function selectAll() {
+	if ($('input:checkbox').is(':checked') == true) {
+		$('input:checkbox').prop('checked', false);
+	} else {
+		$('input:checkbox').prop('checked', true);
+	}
+}
+
+//GN 코드 수정
+function gnRegionUpdate(){
+	let dstrctCd = document.getElementById('dstrctCd').value;
+	
+	let gnArray = document.querySelectorAll('.region-select-tr');
+	let gnInfoArr = new Array();
+	
+	if(gnArray.length > 0){
+		for (let i = 0; i < gnArray.length; i++) {
+            let gnTr = gnArray[i];
+			let gnInfo = new Object();
+
+			let gnId = gnTr.getAttribute("data-rc");
+			let dstrbCnt = gnTr.querySelector('.region-code-percentage');
+			
+			if (!dstrbCnt.value) {
+                alert(message.authRqst.authSetting_emptyValidation);
+                dstrbCnt.focus();
+                return;
+            }
+			
+			gnInfo.gnId = gnId;
+			gnInfo.dstrbCnt = dstrbCnt.value;
+
+			gnInfoArr.push(gnInfo);		
+		}
+	
+		let data = {
+			dstrctCd: dstrctCd,
+		    gnInfoArr: gnInfoArr
+		};
+		
+		const loading = new setLoading().start();
+	
+		fetch(__contextPath__ +"/systemmng/region/gn/"+dstrctCd+"/update", {
+			method: "PUT",
+		    headers: {
+		        'Content-Type': 'application/json'
+		    },
+		    body: JSON.stringify(data)
+		}).then(response => response.json())
+		.then(result => {
+			if(result.code == 200){
+				location.href="/systemmng/region/gn/"+dstrctCd;
+			} else {
+				alert(result.message);
+			}
+		}).catch(error => {
+			return;
+		}).finally(() => {
+			loading.end();
+		});
+	} else {
+		alert(message.openAPI.openApiUpdate_at_least_one_required);
+	}
+}
+</script>

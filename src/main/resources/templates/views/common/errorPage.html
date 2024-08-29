@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 	<meta charset="UTF-8">
 	<link th:href="@{/css/style.css}" rel="stylesheet">
-	<title>SB Admin</title>
+	<link th:href="@{/images/favicon-16x16.png}" rel="icon">
+	<link th:href="@{/images/favicon-32x32.png}" rel="icon">
+	<title>RDA</title>
 </head>
+
 <body>
 	<script>
-		const backBtn = function(){
+		const backBtn = function () {
 			history.back();
 		}
 	</script>
 	<div id="errorContainer">
 		<div id="errorWrap">
 			<div id="errorImg">
-				<img src="/images/error_img.png" alt="에러이미지">
+				<img src="/images/error_img.png" th:alt="#{common.imgAlt.error}">
 			</div>
 			<div id="errorTitle">
-				<h2>요청하신 페이지를 찾을수 없습니다.</h2>
+				<h2 th:text="#{error.title}">요청하신 페이지를 찾을수 없습니다.</h2>
 			</div>
-			<div id="errorSubTitle">
+			<div id="errorSubTitle" th:utext="#{error.content}" style="white-space: pre-wrap">
 				존재하지 않거나 만료된 페이지입니다.<br>
-	            페이지 확인 후 다시 시도해 주세요.
+				페이지 확인 후 다시 시도해 주세요.
 			</div>
 			<div id="errorBtn">
-				<button onclick="backBtn()">뒤로가기</button>
+				<button onclick="backBtn()" th:text="#{common.button.back}">뒤로가기</button>
 			</div>
 		</div>
 	</div>
 </body>
+
 </html>

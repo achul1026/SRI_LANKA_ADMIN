@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{faq.faqDetail.title}">FAQ 상세</h3>
+		</div>
+		<form id="faqSave" name="faqSave">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{faq.common.question}">질문</th>
+						<td th:text="${faqInfo.faqQstn}"></td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td th:text="${faqInfo.faqType}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td th:text="${faqInfo.registId}"></td>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td th:text="${faqInfo.dspyYn}"></td>
+					</tr>
+					<tr>
+					</tr>
+					<tr>
+						<th th:text="#{faq.common.answer}">답변</th>
+						<td colspan="3" th:text="${faqInfo.faqAns}"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+	            <a href="/potalmng/faq" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+	            <a th:href="@{/potalmng/faq/{faqId}/update(faqId=${faqInfo.faqId})}" class="is-key-button overLapping" th:text="#{common.button.update}">수정</a>
+    	    </div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	function saveFaq() {
+		if (validation('#faqSave')) {
+			//			if (!inputChecked) {
+			fetch(__contextPath__ + "/potalmng/faq/save", {
+				method: "POST",
+				body: new FormData($("#faqSave")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							location.href="/potalmng/faq";
+						}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+						//throw Error(result.message);
+					}
+				})
+				.catch(error => alert(error.message));
+		}
+	}
+</script>

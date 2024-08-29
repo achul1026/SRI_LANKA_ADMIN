@@ -6,67 +6,66 @@
 	<th:block layout:fragment="content">
 		<div class="is-box">
 	        <div>
-	            <h3 id="infoTitle">사용자 상세 정보</h3>
+	            <h3 class="info-title" th:text="#{mngr.mngrDetail.title}">사용자 상세 정보</h3>
 	        </div>
 	        <div>
 				<div class="infoTableWrap">
 					<table class="infoTable table-width">
 						<tr>
-							<th>ID</th>
+							<th th:text="#{common.id}">ID</th>
 							<td th:text="${userInfo.userId}"></td>
-							<th>이름</th>
+							<th th:text="#{common.name}">이름</th>
 							<td th:text="${userInfo.userNm}"></td>
 						</tr>
 						<tr>
-							<th>연락처</th>
+							<th th:text="#{common.contact}">연락처</th>
 							<td th:text="${userInfo.userTel}"></td>
-							<th>이메일</th>
+							<th th:text="#{common.email}">이메일</th>
 							<td th:text="${userInfo.userEmail}"></td>
 						</tr>
 						<tr>
-							<th>소속</th>
+							<th th:text="#{common.institution}">소속</th>
 							<td th:text="${userInfo.bffltdNm}"></td>
-							<th>상태</th>
-							<td th:text="${userInfo.athrztStts.name}"></td>
+							<th th:text="#{common.department}">부서</th>
+							<td th:text="${userInfo.deptNm}"></td>
 						</tr>
 						<tr>
-							<!-- 
-							04.03 기획서 반영 수정
-							<th>권한</th>
-							<td th:text="${userInfo.authgrpNm}"></td> -->
+							<th th:text="#{mngr.common.athrztStts}">승인 상태</th>
+							<td th:text="${userInfo.athrztStts.name}"></td>
+							<th></th>
 						</tr>
 					</table>
 				</div>
-				<div class="info-button-box">
-	                <a th:href="@{/systemmng/mngr}" class="is-basic-button">이전 페이지</a>
-	                <th:block th:if="${userInfo.athrztStts.code == 'ASC002'}">
-	                	<a class="is-key-button" th:onclick="accountApproval([[${userInfo.userId}]])">승인</a>
-	                </th:block>
-					<a th:href="@{/systemmng/mngr/{usermngId}/update(usermngId=${userInfo.usermngId})}" class="is-key-button">수정</a>
-	            </div>
 	        </div>
 		</div>
+		<div class="info-button-box">
+	        <a th:href="@{/systemmng/mngr}" class="is-basic-button cm-leftFix-btn" th:text="#{common.button.prePage}">이전 페이지</a>
+			<a th:href="@{/systemmng/mngr/{usermngId}/update(usermngId=${userInfo.usermngId})}" class="is-key-button" th:text="#{common.button.update}">수정</a>
+            <th:block th:if="${userInfo.athrztStts.code == 'ASC002'}">
+            	<a class="is-key-button" th:onclick="accountApproval([[${userInfo.userId}]])" th:text="#{common.button.approval}">승인</a>
+            </th:block>
+        </div>
 	</th:block>
 </html>
 <script>
 	function accountApproval(userId){
 		
-		const formData = new FormData();
+		var formData = new FormData();
 		formData.append("userId", userId);
-		formData.append("athrztSttsCd", 'ASC001');
+// 		formData.append("athrztSttsCd", 'ASC001');
 		
-		fetch(__contextPath__+"/systemmng/mngr",{
+		fetch(__contextPath__+"/systemmng/mngr/approval",{
     		method: "PUT",
     		body: formData
     	})
     	.then(response => response.json())
     	.then(result => {
-    		if(result.code == '200'){
-				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+    		if (result.code == '200') {
+				new MsgModalBuilder().init().alertBody(result.data.message).footer(4, message.common.button_confirm,function(button, modal){
 		            location.href= __contextPath__+"/systemmng/mngr";
 				}).open();
-			}else{
-				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+			} else {
+				new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm,function(button, modal){
 					modal.close();
 				}).open();
 			}

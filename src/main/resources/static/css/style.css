@@ -4,8 +4,6 @@
 
 @import url(jquery-ui.css);
 
-@import url(fonts.css);
-
 @import url(variable.css);
 
 @import url(base.css);
@@ -33,3 +31,11 @@
 @import url(calendar.css);
 
 @import url(mapbox-gl.css);
+
+@import url(statistics.css);
+
+@import url(main.css);
+
+@import url(fonts.css);
+
+@import url(nb_metro.css);

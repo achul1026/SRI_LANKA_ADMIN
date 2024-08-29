@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{dataRegist.dataRegistSave.title}">데이터 등록</h3>
+		</div>
+		<form id="dataRegistSave" name="tsPopMng">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{dataRegist.data.name}">데이터명</th>
+						<td>
+							<input type="text" class="input-table-text validation-tag" name="popmngTitle"
+								th:placeholder="#{dataRegist.placeholder.data.name}" />
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<div class="select-div-box">
+								<select id="popStatTypeCd" name="popmngType"
+									class="select-list-box table-select validation-tag" data-validation="select">
+									<option value="" th:text="#{common.select.class}">분류</option>
+									<th:block th:each="item : ${popStatTypeCd}">
+										<option th:value="${item}" th:data-value="${item.code}" th:text="${item.name}">
+											통계 유형</option>
+									</th:block>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.agency}">관리 기관</th>
+						<td>
+							<div th:text="${loginUser.bffltdNm}"></div>
+							<input type="hidden" class="input-text validation-tag" name="userBffltd"
+								th:placeholder="#{dataRegist.dataRegistSave.placeholder.agency}"
+								th:value="${loginUser.userBffltd}" readonly />
+						</td>
+						<th th:text="#{common.table.manager}">관리자</th>
+						<td>
+							<div th:text="${loginUser.userNm}"></div>
+							<input type="hidden" class="validation-tag" name="registId"
+								th:placeholder="#{dataRegist.dataRegistSave.placeholder.manager}"
+								th:value="${loginUser.userId}" readonly />
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{dataRegist.select.date}">날짜 선택</th>
+						<td>
+							<div class="modal-double-wrap">
+								<select id="startDt" name="startYear"
+									class="dateYear scroll table-select select-list-box validation-tag"
+									data-validation="selectDate"></select>
+								~
+								<select id="endDt" name="endYear"
+									class="dateYear scroll table-select select-list-box validation-tag"
+									data-validation="selectDate"></select>
+							</div>
+						</td>
+						<th th:text="#{dataRegist.dataRegistSave.form.title}">양식</th>
+						<td>
+							<span class="modal-filter-title-sub"
+								th:text="#{dataRegist.dataRegistSave.form.title.sub}">(데이터 포맷
+								양식이 다를 경우 데이터 등록이 되지 않을 수 있습니다.)</span>
+							<input type="button" id="downloadFormBtn" class="is-key-button"
+								th:value="#{dataRegist.dataRegistSave.button.form}" />
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.file}">첨부파일</th>
+						<td>
+							<span class="modal-filter-title-sub"
+								th:text="#{dataRegist.dataRegistSave.form.title.sub}">(데이터 포맷
+								양식이 다를 경우 데이터 등록이 되지 않을 수 있습니다.)</span>
+							<div>
+								<span id="fileName"></span>
+								<span>
+									<input type="button" id="fileUpload" class="is-key-button"
+										th:value="#{common.button.file}" />
+									<input type="file" id="inputFile" class="none" />
+								</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{dataRegist.descript}">설명</th>
+						<td colspan="3">
+							<textarea class="cm-textarea" name="popmngCnts"
+								th:placeholder="#{dataRegist.placeholder.descript}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+				<a href="/datamng/dataregist" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+				<input type="button" onclick="dataRegist()" class="is-key-button overLapping"
+					th:value="#{common.button.regist}" autocomplete="off">
+			</div>
+			<div id="modalRegistWrap">
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.data.name}">데이터명</h3>-->
+				<!--					<input type="text" class="input-text modal-input validation-tag" name="popmngTitle"-->
+				<!--						th:placeholder="#{dataRegist.placeholder.data.name}"/>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.class}">분류</h3>-->
+				<!--					<div class="select-div-box">-->
+				<!--						<select id="popStatTypeCd" name="popmngType" class="select-list-box modal-select validation-tag"-->
+				<!--							data-validation="select">-->
+				<!--							<option value="" th:text="#{common.select.class}">분류</option>-->
+				<!--							<th:block th:each="item : ${popStatTypeCd}">-->
+				<!--								<option th:value="${item}" th:data-value="${item.code}" th:text="${item.name}">통계 유형</option>-->
+				<!--							</th:block>-->
+				<!--						</select>-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.agency}">관리 기관</h3>-->
+				<!--					<div class="modal-date-show" th:text="${loginUser.bffltdNm}"></div>-->
+				<!--					<input type="hidden" class="validation-tag" name="userBffltd" th:placeholder="#{dataRegist.dataRegistSave.placeholder.agency}"-->
+				<!--						th:value="${loginUser.userBffltd}" readonly />-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.manager}">관리자</h3>-->
+				<!--					<div class="modal-date-show" th:text="${loginUser.userNm}"></div>-->
+				<!--					<input type="hidden" class="validation-tag" name="registId" th:placeholder="#{dataRegist.dataRegistSave.placeholder.manager}"-->
+				<!--						th:value="${loginUser.userId}" readonly />-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.select.date}">날짜 선택</h3>-->
+				<!--					<div class="modal-double-wrap">-->
+				<!--						<div class="modal-double-list">-->
+				<!--														<span th:text="#{dataRegist.start}">시작</span>-->
+				<!--							<select id="startDt" name="startYear"-->
+				<!--								class="dateYear scroll modal-select select-list-box validation-tag"-->
+				<!--								data-validation="selectDate"></select>-->
+				<!--						</div>-->
+				<!--						<div class="modal-double-list">-->
+				<!--														<span th:text="#{dataRegist.end}">종료</span>-->
+				<!--							<select id="endDt" name="endYear"-->
+				<!--								class="dateYear scroll modal-select select-list-box validation-tag"-->
+				<!--								data-validation="selectDate"></select>-->
+				<!--						</div>-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.descript}">설명</h3>-->
+				<!--					<input type="text" class="input-text modal-input" name="popmngCnts"-->
+				<!--						th:placeholder="#{dataRegist.dataRegistSave.placeholder.descript}" />-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<div class="flex-center gap6">-->
+				<!--						<h3 class="modal-filter-title" th:text="#{dataRegist.dataRegistSave.form.title}">양식</h3><span-->
+				<!--							class="modal-filter-title-sub" th:text="#{dataRegist.dataRegistSave.form.title.sub}">(데이터 포맷-->
+				<!--							양식이 다를 경우 데이터 등록이 되지 않을 수 있습니다.)</span>-->
+				<!--					</div>-->
+				<!--					<div class="modal-double-wrap">-->
+
+				<!--						<input type="button" id="downloadFormBtn" class="is-key-button"-->
+				<!--							th:value="#{dataRegist.dataRegistSave.button.form}" />-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.file}">첨부파일</h3>-->
+				<!--					<div>-->
+				<!--						<span id="fileName"></span>-->
+				<!--						<span>-->
+				<!--							<input type="button" id="fileUpload" class="is-key-button"-->
+				<!--								th:value="#{common.button.file}" />-->
+				<!--							<input type="file" id="inputFile" class="none" />-->
+				<!--						</span>-->
+				<!--					</div>-->
+				<!--				</div>-->
+			</div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	//데이터 등록
+	function dataRegist() {
+		//new ModalBuilder().init(message.dataRegist.regist_data).ajaxBody(__contextPath__ + "/datamng/dataregist/save").footer(3, message.common.button_regist, function (button, modal) {
+		let inputFile = document.getElementById('inputFile').files[0];
+		let popStatTypeCd = document.getElementById('popStatTypeCd');
+		console.log(popStatTypeCd.dataset.value);
+		if (validation('#dataRegistSave')) {
+			if (inputFile) {
+				window.getMaxRowsLength(inputFile, popStatTypeCd.options[popStatTypeCd.selectedIndex].dataset.value)
+					.then(result => {
+						if (result != null) {
+							const popStatTypeCdText = popStatTypeCd.options[popStatTypeCd.selectedIndex].text;
+							const numRows = result['rowAndCols'].numRows;
+							const numCols = result['rowAndCols'].numCols;
+							const maxlength = result['headerSize'];
+							//헤더 개수 안맞음 validation
+							if (numCols == maxlength) {
+
+								new MsgModalBuilder().init().alertBody((message.dataRegist.data_regist_confirm(numRows - 1, popStatTypeCdText))).footer(3, message.common.button_confirm, function (button, modal) {
+									modal.close();
+
+									const formData = new FormData(document.getElementById('dataRegistSave'));
+									formData.append('file', inputFile);
+
+									const loading = new setLoading().start();
+
+									fetch(__contextPath__ + "/datamng/dataregist/save", {
+										method: "POST",
+										body: formData
+									}).then(response => response.json())
+										.then(result => {
+											if (result.code == 200) {
+												new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_complete).footer(4, message.common.button_confirm, function (button, modal) {
+													modal.close();
+													location.href = "/datamng/dataregist";
+												}).open();
+											} else {
+												new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+													modal.close();
+												}).open();
+											}
+										}).catch(error => {
+											new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_fail).footer(4, message.common.button_confirm, function (button, modal) {
+												modal.close();
+											}).open();
+											return;
+										}).finally(() => {
+											loading.end();
+										});
+								}, message.common.button_cancel, function (button, modal) {
+									modal.close();
+								}).open();
+
+
+								/*if (confirm(message.dataRegist.data_regist_confirm(numRows - 1, popStatTypeCdText))) {
+									const formData = new FormData(document.getElementById('dataRegistSave'));
+									formData.append('file', inputFile);
+
+									const loading = new setLoading().start();
+
+									fetch(__contextPath__ + "/datamng/dataregist/save", {
+										method: "POST",
+										body: formData
+									}).then(response => response.json())
+										.then(result => {
+											if (result.code == 200) {
+												new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_complete).footer(4, message.common.button_confirm, function (button, modal) {
+													modal.close();
+													location.href = "/datamng/dataregist";
+												}).open();
+											} else {
+												new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+													modal.close();
+												}).open();
+											}
+										}).catch(error => {
+											new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_fail).footer(4, message.common.button_confirm, function (button, modal) {
+												modal.close();
+											}).open();
+											return;
+										}).finally(() => {
+											loading.end();
+										});
+								}*/
+
+							}
+						}
+					})
+					.catch(error => {
+						new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_excel_fail).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					});
+			} else {
+				new MsgModalBuilder().init().alertBody(message.dataRegist.regist_data_required_file).footer(4, message.common.button_confirm, function (button, modal) {
+					modal.close();
+				}).open();
+			}
+		}
+		// 		}, message.common.button_cancel, function (button, modal) {
+		// 			modal.close();
+		// 		}).open();
+	}
+
+	dateYearSetMinAndMax();
+
+	const fileUploadButton = document.getElementById('fileUpload');
+	const fileInput = document.getElementById('inputFile');
+	const fileText = document.getElementById('fileName');
+	const downloadFormBtn = document.getElementById('downloadFormBtn');
+
+	fileUploadButton.addEventListener('click', () => fileInput.click());
+	fileInput.addEventListener('change', (event) => {
+		//업로드 누르고 취소 누를시
+		if (event.target.files.length === 0) return;
+
+		const fileName = event.target.files[0].name;
+		const fileType = fileName.slice(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+		//파일업로드
+		if (fileType == 'xlsx') {
+			fileText.innerText = fileName;
+		} else {
+			alert(message.dataRegist.file_extension);
+			fileText.innerText = '';
+			fileInput.value = '';
+		}
+	});
+
+	downloadFormBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		const popStatTypeCd = document.getElementById('popStatTypeCd');
+		const popStatTypeCdVal = popStatTypeCd.options[popStatTypeCd.selectedIndex].dataset.value;
+
+		if (popStatTypeCdVal != null && popStatTypeCdVal != '') {
+			location.href = "/datamng/dataregist/excelDownload?popStatTypeCd=" + popStatTypeCdVal;
+		} else {
+			alert(message.dataRegist.select_class);
+		}
+	});
+</script>

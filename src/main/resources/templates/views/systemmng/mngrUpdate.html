@@ -6,50 +6,62 @@
 	<th:block layout:fragment="content">
 		<div class="is-box">
 	        <div>
-	            <h3 id="infoTitle">사용자 수정</h3>
+	            <h3 class="info-title" th:text="#{mngr.mngrUpdate.title}">사용자 수정</h3>
 	        </div>
 	        <div>
 				<div class="infoTableWrap">
 					<form id="mngrUpdataForm" name="mngrUpdataForm">
 						<table class="infoTable table-width">
 							<tr>
-								<th>이름</th>
-								<td th:text="${userInfo.userNm}"></td>
-								<th>ID</th>
+								<th th:text="#{common.id}">ID</th>
 								<td th:text="${userInfo.userId}" id="userId"></td>
+								<th th:text="#{common.name}">이름</th>
+								<td th:text="${userInfo.userNm}"></td>
 							</tr>
 							<tr>
-								<th>연락처</th>
+								<th th:text="#{common.contact}">연락처</th>
 								<td><input type="text" name="userTel" class="input-table-text" th:value="${userInfo.userTel}"/></td>
-								<th>비밀번호</th>
+								<th th:text="#{common.password}">비밀번호</th>
 								<td>
-									<input type="button" name="" class="is-key-button" id="passwordChange" value="비밀번호 변경">
+									<input type="button" name="" class="is-key-button" id="passwordChange" th:value="#{mngr.mngrUpdate.button.password.change}">
 								</td>
 							</tr>
 							<tr>
-								<th>이메일</th>
+								<th th:text="#{common.email}">이메일</th>
 								<td><input type="email" name="userEmail" class="input-table-text" th:value="${userInfo.userEmail}"/></td>
-								<th>소속</th>
+<!-- 								<th>소속</th> -->
+<!-- 								<td> -->
+<!-- 									<div class="select-div-box"> -->
+<!-- 										<select class="select-list-box" name="userBffltd"> -->
+<!-- 				                        	<option th:each="bffltd : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}" th:selected="${userInfo.userBffltd == bffltd.cd}"></option> -->
+<!-- 					                    </select> -->
+<!-- 									</div> -->
+<!-- 								</td> -->
+								<th th:text="#{common.department}">부서</th>
 								<td>
-									<select class="select-list-box" name="userBffltd">
-			                        	<option th:each="bffltd,status : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}" th:selected="${userInfo.userBffltd == bffltd.cd}"></option>
-				                    </select>
+									<div class="select-div-box">
+				                        <select class="select-list-box table-select" name="userDept">
+				                        	<option th:each="dept : ${deptList}" th:value="${dept.cd}" th:text="${dept.cdNm}" th:selected="${userInfo.userDept == dept.cd}"></option>
+				                        </select>
+									</div>
 								</td>
 							</tr>
 							<tr>
-								<th>상태</th>
+								<th th:text="#{common.status}">상태</th>
 								<td>
-									<select name="athrztSttsCd" class="select-list-box">
-										<option th:each="sttsList:${sttsCds}" th:text="${sttsList.name}" th:value="${sttsList.code}" th:selected="${userInfo.athrztStts.code eq sttsList.code}"></option>
-									</select>
+									<div class="select-div-box">
+										<select name="athrztSttsCd" class="select-list-box table-select">
+											<option th:each="sttsList:${sttsCds}" th:text="${sttsList.name}" th:value="${sttsList.code}" th:selected="${userInfo.athrztStts.code eq sttsList.code}"></option>
+										</select>
+									</div>
 								</td>
 							</tr>
 						</table>
 					</form>
 				</div>
 				<div class="info-button-box">
-	                <a id="accountModifySave" class="is-key-button">수정</a>
-	                <a th:href="@{/systemmng/mngr/{usermngId}(usermngId=${userInfo.usermngId})}" class="is-basic-button">취소</a>
+	                <a th:href="@{/systemmng/mngr/{usermngId}(usermngId=${userInfo.usermngId})}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
+	                <a id="accountModifySave" class="is-key-button" th:text="#{common.button.update}">수정</a>
 	            </div>
 	        </div>
 		</div>
@@ -58,35 +70,36 @@
 <script>
 	$('#passwordChange').on('click',function(){
 		var userId = $("#userId").text();
-		new ModalBuilder().init('비밀번호 변경').ajaxBody(__contextPath__+"/systemmng/mngr/pw/update").footer(3,'변경하기',function(button, modal){
+		new ModalBuilder().init(message.mngr.mngrUpdate_password_change).ajaxBody(__contextPath__+"/systemmng/mngr/pw/update").footer(3,message.mngr.mngrUpdate_button_password_change,function(button, modal){
+			var userPswd = $("#userPswd").val();
 			var newUserPswd = $("#newUserPswd").val();
 			var newUserPswdChk = $("#newUserPswdChk").val();
 			if(newUserPswd != newUserPswdChk){
-				new ModalBuilder().init().alertBody("새로운 비밀번호가 일치하지 않습니다. 다시 확인해주세요.").footer(4,'확인',function(button, modal){
-				}).open();
+				alert(message.mngr.mngrUpdate_password_change_mismatch);	
 			} else {
-				fetch(__contextPath__+"/systemmng/mngr/pw/update/"+userId,{
+				var formData = new FormData();
+				formData.append("userId", userId);
+				formData.append("userPswd", userPswd);
+				formData.append("newUserPswd", newUserPswd);
+				
+				fetch(__contextPath__+"/systemmng/mngr/pw/update",{
 	        		method: "PUT",
-	        		body: new FormData($("#pwUpdateForm")[0])
+	        		body: formData
 	        	})
 	        	.then(response => response.json())
 	        	.then(result => {
 	        		if(result.code == '200'){
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
-							modal.close();
-						}).open();
-						modal.close();
+						alert(result.message);
 					}else{
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
-							modal.close();
-						}).open();
+						alert(result.message);
 					}
 	        	})
 			}
-		}, '취소', function(button, modal){
+		}, message.common.button_cancel, function(button, modal){
 			modal.close();
 		}).open();
 	})
+	
 	$('#accountModifySave').on('click', function(){
 //         new ModalBuilder().init().successBody('계정을 수정하시겠습니까?').footer(4,'확인',function(button, modal){
 			const userId = $("#userId").text();
@@ -100,11 +113,12 @@
         	.then(response => response.json())
         	.then(result => {
         		if(result.code == '200'){
-					new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
-			            location.href= __contextPath__+"/systemmng/mngr";
+					new MsgModalBuilder().init().alertBody(result.data.message).footer(4, message.common.button_confirm, function (button, modal) {
+						  location.href= __contextPath__+"/systemmng/mngr";
+						modal.close();
 					}).open();
 				}else{
-					new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+					new MsgModalBuilder().init().alertBody(result.data.message).footer(4, message.common.button_confirm, function (button, modal) {
 						modal.close();
 					}).open();
 				}

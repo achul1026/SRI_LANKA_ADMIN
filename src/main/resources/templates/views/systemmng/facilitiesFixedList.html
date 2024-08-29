@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<form id="searchForm" name="searchForm" onsubmit="return false;">
+	<div id="filterWrap">
+		<div id="filterTitle">
+			<h2 th:text="#{common.search.title}">검색 설정</h2>
+		</div>
+		<table id="filterTable">
+			<colgroup>
+				<col width="15%">
+				<col width="85%">
+			</colgroup>
+			<tr>
+				<th th:text="#{common.search.detail.content}">상세 내용</th>
+				<td>
+					<input type="text" name="searchContent" class="input-text search-input" th:placeholder="#{facilities.placeholder.location}" th:value="${searchInfo.searchContent}">
+				</td>
+			</tr>
+		</table>
+		<div id="filterBtnWrap">
+			<button type="button" id="searchBtn" class="is-key-button" onclick="asynchronousSearchList()"
+				th:text="#{common.button.search}">검색</button>
+		</div>
+	</div>
+</form>
+<div class="list-save-box">
+	<div id="totalList"><span id="totalCount" th:text="${totalCnt}"></span><span th:text="#{common.search.result}">건의 검색 결과를 찾았습니다.</span></div>
+	<div>
+		<a th:href="@{/systemmng/facilities/{typeCd}/save(typeCd=${typeCd})}" class="is-key-button" th:text="#{facilities.facilitiesList.regist.facilities}">시설물 등록</a>
+	</div>
+</div>
+<input type="hidden" id="asynchronousPageNo" name="pageNo" th:value="${paging.pageNo}"/>
+<input type="hidden" id="type" th:value="${typeCd}">
+<div id="listTableContainer">
+	<table id="listTable" class="cm-list-table">
+		<thead>
+			<tr>
+				<th th:text="#{common.table.number}">번호</th>
+<!-- 				<th th:text="#{facilities.table.type}">장비유형</th> -->
+<!-- 				<th th:text="#{facilities.table.number}">장비번호</th> -->
+				<th th:text="#{facilities.table.location}">설치위치</th>
+<!-- 					<th th:text="#{common.table.agency}">담당기관</th> -->
+<!-- 					<th th:text="#{common.table.manager}">관리자</th> -->
+<!-- 					<th th:text="#{common.contact}">연락처</th> -->
+				<th th:text="#{facilities.table.date}">설치일</th>
+				<th th:text="#{common.table.useYn}">사용 여부</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:if="${not #lists.isEmpty(facilitiesList)}">
+				<tr th:each="item, status :${facilitiesList}" class="table-link" th:onclick="|location.href='@{/systemmng/facilities/{type}/{instllcId}(type=${typeCd}, instllcId=${item.instllcId})}'|">
+					<td th:text="${@commonUtils.getRownum(paging, status.index)}">1</td>
+<!-- 					<td th:text="${item.eqpmntClsf}">VDS</td> -->
+<!-- 					<td th:text="${item.cameraId}">VDD124</td> -->
+					<td th:text="${item.instllcNm}">콜롬보 시청 교차로A</td>
+<!-- 					<td></td> -->
+<!-- 					<td></td> -->
+<!-- 					<td></td> -->
+					<td th:text="${#temporals.format(item.registDt, 'yyyy-MM-dd')}"></td>
+					<td th:text="${item.useYn}">정상</td>
+				</tr>
+			</th:block>
+			<th:block th:unless="${not #lists.isEmpty(facilitiesList)}">
+				<tr>
+					<td colspan="6" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+				</tr>
+			</th:block>
+		</tbody>
+	</table>
+</div>
+<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+</html>

@@ -10,42 +10,71 @@
 				<table class="modal-table">
 					<tbody>
 						<tr>
-							<th>메뉴명 <span class="required">*</span></th>
+<!-- 							<th>메뉴 코드<span class="required">*</span></th> -->
+<!-- 							<td><input type="text" id="menuCd" name="menuCd" placeholder="메뉴 코드를 입력하세요."/></td> -->
+							<th th:text="#{menu.common.menu.name}">메뉴명 <span class="required">*</span></th>
 							<td>
-								<select id="menuNm" name="menuNm" class="select-list-box" onchange="menuCdUpdate()">
-									<option>선택</option>
-									<option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}">노출</option>
+<!-- 								<div class="select-div-box"> -->
+<!-- 									<select id="menuNm" name="menuNm" class="select-list-box" onchange="menuCdUpdate()"> -->
+<!-- 										<option>선택</option> -->
+<!-- 										<option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}">노출</option> -->
+<!-- 									</select> -->
+<!-- 									<input type="text" id="menunmEng" name="menunmEng" placeholder="영어 메뉴명을 입력하세요."/> -->
+<!-- 								</div> -->
+								<select id="menuNm" name="menuNm" class="select-list-box" onchange="updateMenuCdAndMenunm()">
+								    <option th:each="item : ${tcCdInfoList}" th:text="${item.cdNm}" th:data-cd="${item.cd}">
+<!-- 								    	th:data-menunmEng="${item.cdnmEng}" th:data-menunmKor="${item.cdnmKor}" th:data-menunmSin="${item.cdnmSin}"> -->
+								    	노출</option>
 								</select>
-								<input type="hidden" id="menuCd" name="menuCd"/>
+								<input type="hidden" id="menuCd" name="menuCd" value=""/>
+<!-- 								<input type="hidden" id="menunmEng" name="menunmEng"/> -->
+<!-- 								<input type="hidden" id="menunmKor" name="menunmKor"/> -->
+<!-- 								<input type="hidden" id="menunmSin" name="menunmSin"/> -->
 							</td>
-							<th>메뉴 URL 패턴 <span class="required">*</span></th>
-							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" placeholder="예) /system/**"></td>
 						</tr>
 						<tr>
-							<th>메뉴 URL <span class="required">*</span></th>
-							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" placeholder="예) /system/main"></td>
-							<th>메뉴 설명</th>
-							<td><input type="text" id="menuDescr" name="menuDescr" placeholder="메뉴 설명을 입력하세요."></td>
+<!-- 							<th>메뉴명 kor<span class="required">*</span></th> -->
+<!-- 							<td><input type="text" id="menunmKor" name="menunmKor" placeholder="한국어 메뉴명을 입력하세요."/></td> -->
+<!-- 							<th>메뉴명 sin<span class="required">*</span></th> -->
+<!-- 							<td><input type="text" id="menunmSin" name="menunmSin" placeholder="싱할라어 메뉴명을 입력하세요."/></td> -->
 						</tr>
 						<tr>
-							<th>메뉴 순서</th>
-							<td><input type="text" id="menuSqno" name="menuSqno" placeholder="메뉴 순서를 입력하세요."></td>
-							<th>노출여부</th>
+							<th th:text="#{menu.common.url.pattern}">메뉴 URL 패턴 <span class="required">*</span></th>
+							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" th:placeholder="#{menu.common.placeholder.url.pattern}"></td>
+							<th th:text="#{menu.common.url}">메뉴 URL <span class="required">*</span></th>
+							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" th:placeholder="#{menu.common.placeholder.url}"></td>
+						</tr>
+<!-- 						<tr> -->
+<!-- 							<th>메뉴 설명 eng</th> -->
+<!-- 							<td><input type="text" id="menudescrEng" name="menudescrEng" placeholder="영어 메뉴 설명을 입력하세요."></td> -->
+<!-- 							<th>메뉴 설명 kor</th> -->
+<!-- 							<td><input type="text" id="menudescrKor" name="menudescrKor" placeholder="한국어 메뉴 설명을 입력하세요."></td> -->
+<!-- 						</tr> -->
+						<tr>
+<!-- 							<th>메뉴 설명 sin</th> -->
+<!-- 							<td><input type="text" id="menudescrSin" name="menudescrSin" placeholder="싱할라어 메뉴 설명을 입력하세요."></td> -->
+							<th th:text="#{menu.common.order}">메뉴 순서</th>
+							<td><input type="text" id="menuSqno" name="menuSqno" oninput="inputOnlyNumber(this)" th:placeholder="#{menu.common.placeholder.order}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{common.table.exposure}">노출여부</th>
 							<td class="text-left">
-								<select id="useYn" name="useYn" class="select-list-box">
-									<option value="Y">노출</option>
-									<option value="N">비노출</option>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<th:block th:if="${uppermenuCd eq 'ALL'}">
-								<th>기본 메뉴 여부</th>
-								<td class="text-left">
-									<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
-										<option value="Y">Y</option>
-										<option value="N">N</option>
+								<div class="select-div-box">
+									<select id="useYn" name="useYn" class="select-list-box">
+										<option value="Y" th:text="#{common.option.dspyYn.y}">노출</option>
+										<option value="N" th:text="#{common.option.dspyYn.n}">비노출</option>
 									</select>
+								</div>
+							</td>
+							<th:block th:if="${uppermenuCd eq 'ALL'}">
+								<th th:text="#{menu.common.default}">기본 메뉴 여부</th>
+								<td class="text-left">
+									<div class="select-div-box">
+										<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
+											<option value="Y" th:text="#{common.option.y}">Y</option>
+											<option value="N" th:text="#{common.option.n}">N</option>
+										</select>
+									</div>
 								</td>
 							</th:block>
 						</tr>
@@ -56,13 +85,13 @@
 	</th:block>
 </html>
 <script>
-	function menuCdUpdate(){
-		// 'menuNm' 셀렉트 박스에서 선택된 옵션의 'data-cd' 속성 값을 가져옵니다.
-	    var menuNmSelect = document.getElementById('menuNm');
-	    var selectedOption = menuNmSelect.options[menuNmSelect.selectedIndex];
-	    var selectedCd = selectedOption.getAttribute('data-cd');
+// 	function menuCdUpdate(){
+// 		// 'menuNm' 셀렉트 박스에서 선택된 옵션의 'data-cd' 속성 값을 가져옵니다.
+// 	    var menuNmSelect = document.getElementById('menuNm');
+// 	    var selectedOption = menuNmSelect.options[menuNmSelect.selectedIndex];
+// 	    var selectedCd = selectedOption.getAttribute('data-cd');
 
-	    // 'menuCd' 인풋 박스의 값을 업데이트합니다.
-	    document.getElementById('menuCd').value = selectedCd;
-	}
+// 	    // 'menuCd' 인풋 박스의 값을 업데이트합니다.
+// 	    document.getElementById('menuCd').value = selectedCd;
+// 	}
 </script>

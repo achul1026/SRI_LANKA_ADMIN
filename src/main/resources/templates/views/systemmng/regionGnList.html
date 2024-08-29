@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="TabBtnWrap">
+			<a th:href="@{/systemmng/region}" class="cm-tab-btn">DSD / TAZ</a>
+			<a th:href="@{/systemmng/region/gn}" class="cm-tab-btn on">GN / TAZ</a>
+		</div>
+		<form id="searchForm" name="searchForm">
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2>지역 관리</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<tr>
+						<th>코드</th>
+						<td>
+							<input type="text" class="input-text search-input" placeholder="코드를 입력해주세요.">
+						</td>
+					</tr>
+					<tr>
+						<th>코드 이름</th>
+						<td>
+							<input type="text" class="input-text search-input" placeholder="코드 이름을 입력해주세요.">
+						</td>
+					</tr>
+				</table>
+				<div id="filterBtnWrap">
+					<button type="submit" id="searchBtn" class="is-key-button"
+						th:text="#{common.button.search}">검색</button>
+				</div>
+			</div>
+		</form>
+		<div class="list-save-box">
+			<h3 class="cm-code-title">- 매핑 코드</h3>
+			<div>
+				<a th:href="@{/systemmng/region/gn/save}" class="is-a-key-button">등록</a>
+			</div>			
+		</div>
+		<div id="listTableContainer">
+			<div class="scroll taz-table-div">
+				<table class="list-table">
+					<tbody id="parentTazTable">
+						<tr>
+							<th>DSD CODE</th>
+							<td>1103</td>
+							<th>DSD NAME</th>
+							<td>western > colombo > colombo</td>
+							<td><a th:href="@{/systemmng/region/gn/detail}" class="is-key-button">상세보기</a></td>
+						</tr>
+					</tbody>
+					<tbody id="findTazTable">
+						<tr>
+							<th colspan="2">TAZ CODE</th>
+							<th colspan="2">TAZ NAME</th>
+							<th>비율(%)</th>
+						</tr>
+						<tr>
+							<td colspan="2">3333</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">4444</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">5555</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">6666</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">7777</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">8888</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+						<tr>
+							<td colspan="2">9999</td>
+							<td colspan="2">NAME</td>
+							<td>%</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+<!-- 	<div th:insert="tags/paging/paging :: pagingFragment"></div> -->
+
+			<!-- <tr class="table-link" th:onclick="|location.href='@{/systemmng/region/gn/detail}'|"> -->
+</th:block>
+
+</html>
+<script th:inline="javascript">
+</script>

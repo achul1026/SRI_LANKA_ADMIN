@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<form id="boardUpdate" name="boardUpdate">
+		<div class="is-box">
+			<div class="flex-between">
+				<h3 class="info-title" th:text="#{board.boardUpdate.title}">게시글 수정</h3>
+			</div>
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{common.table.subject}">제목</th>
+						<td>
+							<input type="text" class="input-text bg-white validation-tag" name="bbsTitle"
+								th:value="${tlBbsInfo.bbsTitle}"
+								th:placeholder="#{alarm.common.placeholder.search.title}">
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<select class="table-select select-list-box" name="bbsType">
+								<option th:each="item:${bbsCdList}" th:text="${item.cdNm}" th:value="${item.cd}"
+									th:selected="${tlBbsInfo.bbsType == item.cd}"></option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.registDate}">작성일</th>
+						<td>
+							<input type="text" class="input-text bg-white"
+								th:value="${@commonUtils.formatLocalDateTime(tlBbsInfo.registDt, 'yyyy-MM-dd')}"
+								readonly>
+						</td>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td>
+							<input type="text" class="input-text bg-white" th:value="${tlBbsInfo.registId}" readonly>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td colspan="3">
+							<div class="select-div-box">
+								<select class="select-list-box table-select" name="dspyYn">
+									<option value="Y" th:text="#{common.option.dspyYn.y}"
+										th:selected="${tlBbsInfo.dspyYn eq 'Y'}">노출</option>
+									<option value="N" th:text="#{common.option.dspyYn.n}"
+										th:selected="${tlBbsInfo.dspyYn eq 'N'}">미노출</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{board.file}">첨부파일</th>
+						<td colspan="3">
+							<div id="fileWrap">
+								<input type="file" id="fileUploadInput" onchange="addFile(this);" multiple
+									name="files" />
+								<label for="fileUploadInput" class="file-upload-btn">
+									<div class="file-up-btn">
+										<img th:src="@{/images/file_upload.png}" alt="fileUpload" class="file-img">
+										<span th:text="#{board.file.upload}">파일 업로드</span>
+									</div>
+								</label>
+							</div>
+							<div id="uploadFileWrap">
+								<div class="file-list" th:each="item, status : ${tlBbsFile}">
+									<span th:text="${item.orgFilenm}"></span>
+									<input type="button" class="file-delete"
+										th:onclick="deleteFileData(this, [[${item.fileId}]], [[${tlBbsInfo.bbsId}]])">
+
+									<!-- 									<button type="button" th:onclick="download([[${item.fileId}]])">다운로드(테스트)</button> -->
+								</div>
+							</div>
+
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.content}">내용</th>
+						<td colspan="3">
+							<textarea class="modal-textarea validation-tag" name="bbsCnts"
+								th:text="${tlBbsInfo.bbsCnts}"
+								th:placeholder="#{common.search.placeholder.content}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</form>
+	<div class="info-button-box">
+		<a th:href="@{/potalmng/board/{bbsId}(bbsId=${tlBbsInfo.bbsId})}" class="is-basic-button"
+			th:text="#{common.button.prePage}">이전 페이지</a>
+		<input type="button" th:onclick="updateBoard([[${tlBbsInfo.bbsId}]])" class="is-key-button overLapping"
+			th:value="#{common.button.update}" autocomplete="off">
+	</div>
+</th:block>
+
+</html>
+<script>
+	(function fileListNone() {
+		let fileWrap = document.getElementById('uploadFileWrap');
+		if (fileWrap.childElementCount === 0) {
+			fileWrap.classList.add('none');
+		}
+	})();
+
+	// DB에서 첨부파일 제거
+	function deleteFileData(closeButton, fileId, bbsId) {
+		let fileWrap = document.getElementById('uploadFileWrap');
+		new MsgModalBuilder().init().alertBody(message.board.boardList_board_file_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+			fetch(__contextPath__ + "/potalmng/board/" + fileId, {
+				method: "DELETE"
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						alert(message.board.boardList_board_file_delete);
+						closeButton.closest('.file-list').remove();
+						if (fileWrap.childElementCount === 0) {
+							fileWrap.classList.add('none');
+						}
+					}
+				})
+			modal.close();
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+
+
+	let filesArr = new Array();
+	/* 첨부파일 추가 */
+	function addFile(obj) {
+		let maxFileCnt = 5;
+		let attFileCnt = document.querySelectorAll('.file-list').length;
+		let remainFileCnt = maxFileCnt - attFileCnt;
+		let curFileCnt = obj.files.length;
+		const fileWrap = document.getElementById('uploadFileWrap');
+
+		// 첨부파일 개수 확인
+		if (curFileCnt > remainFileCnt) {
+			new MsgModalBuilder().init().alertBody(message.board.boardSave_exceed_length(maxFileCnt)).footer(4, message.common.button_confirm, function (button, modal) {
+				modal.close();
+			}).open();
+		} else {
+			for (const file of obj.files) {
+				// 첨부파일 검증
+				if (fileValid(file)) {
+					// 파일 배열에 담기
+					let reader = new FileReader();
+					reader.onload = function () {
+						filesArr.push(file);
+					};
+					reader.readAsDataURL(file);
+					fileWrap.classList.remove('none');
+					// 목록 추가
+					let htmlData = '';
+					htmlData += '<div class="file-list">';
+					htmlData += '   <p class="file-name">' + file.name + '</p>';
+					htmlData += '   <input type="button" class="file-delete" onclick="deleteFile(this);">';
+					htmlData += '</div>';
+					fileWrap.insertAdjacentHTML('beforeend', htmlData);
+				} else {
+					continue;
+				}
+			}
+		}
+	}
+
+	/* 첨부파일 검증 */
+	function fileValid(obj) {
+		//확장자 확인 필요
+		const fileTypes = ['application/pdf', 'image/gif', 'image/jpeg', 'image/png', 'image/bmp', 'image/tif', 'application/haansofthwp', 'application/x-hwp'];
+		// 		if (obj.name.length > 100) {
+		// 			new MsgModalBuilder().init().alertBody("파일명이 100자 이상인 파일은 제외되었습니다.").footer(4, message.common.button_confirm, function (button, modal) {
+		// 				modal.close();
+		// 			}).open();
+		// 			return false;
+		// 		} else 
+		if (obj.size > (25 * 1024 * 1024)) {
+			new MsgModalBuilder().init().alertBody(message.board.boardSave_exceed_size).footer(4, message.common.button_confirm, function (button, modal) {
+				modal.close();
+			}).open();
+			return false;
+			// 		} else if (obj.name.lastIndexOf('.') == -1) {
+			// 			new MsgModalBuilder().init().alertBody("확장자가 없는 파일은 제외되었습니다.").footer(4, message.common.button_confirm, function (button, modal) {
+			// 				modal.close();
+			// 			}).open();
+			// 			return false;
+			// 		} else if (!fileTypes.includes(obj.type)) {
+			// 			new MsgModalBuilder().init().alertBody("첨부가 불가능한 파일은 제외되었습니다.").footer(4, message.common.button_confirm, function (button, modal) {
+			// 				modal.close();
+			// 			}).open();
+			// 			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/* 첨부파일 삭제 */
+	function deleteFile(btnParent) {
+
+		let fileList = btnParent.parentNode;
+		let fileWrap = document.getElementById('uploadFileWrap');
+
+		new MsgModalBuilder().init().alertBody(message.board.boardList_board_file_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+			fileList.remove();
+			modal.close();
+			if (fileWrap.childElementCount === 0) {
+				fileWrap.classList.add('none');
+			}
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+			updateNotice(bbsId);
+		}).open();
+
+	}
+
+	function updateBoard(bbsId) {
+		const inputValidationItem = document.querySelectorAll('.boardValue');
+		let inputValidation = [];
+		inputValidationItem.forEach(input => inputValidation.push(input.value));
+		const inputChecked = inputValidation.some(item => item === '');
+
+		if (!inputChecked) {
+			fetch(__contextPath__ + "/potalmng/board/" + bbsId, {
+				method: "PUT",
+				body: new FormData($("#boardUpdate")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+							window.location.href = "/potalmng/board/" + bbsId;
+						}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+				})
+		} else {
+			alert(message.board.boardList_board_validation);
+		}
+	}
+
+
+
+</script>

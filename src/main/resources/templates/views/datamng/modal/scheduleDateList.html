@@ -6,11 +6,11 @@
 	<th:block layout:fragment="modalContent">
 		<div class="modal-date-wrap scroll">
 			<div id="scheduleTotalListNumberBox">
-				<span>총 조사 개수 : </span>
-				<span id="scheduleTotalListNumber"></span>
+				<span th:text="#{schedule.scheduleDateList.survey.number}">총 조사 개수</span> : 
+				<span id="scheduleTotalListNumber" th:text=${totalCnt}></span>
 			</div>
 			<th:block th:each="item : ${tmExmnScheduleList}"> 
-				<div class="modal-date-box">
+				<div class="modal-date-box" th:onclick="moveScheduleDetail([[${item.tmExmnMng.exmnmngId}]])">
 					<div class="modal-date-title-box">
 						<div class="modal-date-title" th:text="${item.tmExmnMng.exmnNm}"></div>
 						<span class="modal-date-title-bg" th:classappend="${item.tmExmnMng.colrCd.getCode()}"></span>
@@ -18,10 +18,10 @@
 					<table class="list-table">
 						<thead>
 							<tr>
-								<th>조사 지역</th>
-								<th>조사 기간</th>
-								<th>조사 시간</th>
-								<th>조사원</th>
+								<th th:text="#{invst.common.invest.region}">조사 지역</th>
+								<th th:text="#{common.table.investPeriod}">조사 기간</th>
+								<th th:text="#{schedule.common.invest.time}">조사 시간</th>
+								<th th:text="#{schedule.scheduleDateList.investigator}">조사원</th>
 							</tr>
 						</thead>
 						<tbody class="modal-scroll-x">
@@ -37,7 +37,7 @@
 						</th:block>
 						<th:block th:if="${totalCnt == 0}">
 							<tr>
-								<td colspan="4">검색 결과가 없습니다.</td>
+								<td colspan="4" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
 							</tr>
 						</th:block>
 						</tbody>
@@ -48,6 +48,13 @@
 	</th:block>
 </html>
 <script th:inline="javascript">
-	 const totalCnt = /*[[${totalCnt}]]*/
-	 document.getElementById('scheduleTotalListNumber').innerText = totalCnt;
+// 	 const totalCnt = /*[[${totalCnt}]]*/
+// 	 document.getElementById('scheduleTotalListNumber').innerText = totalCnt;
+	 
+	 // 상세 페이지로 이동
+	 function moveScheduleDetail(exmnmngId) {
+		 if(confirm(message.schedule.scheduleDateList_to_detail)){
+			  window.location.href="/datamng/schedule/"+exmnmngId;
+		 };
+	 }
 </script>

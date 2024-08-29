@@ -6,7 +6,7 @@
 	<th:block layout:fragment="content">
 		<div class="is-box">
 	        <div>
-	            <h3 id="infoTitle">조사 설문 등록</h3>
+	            <h3 id="infoTitle" th:text="#{invst.invstSurveySave.title}">조사 설문 등록</h3>
 	            <input type="hidden" id="exmnmngId" th:value="${srvyInvstInfo.exmnmngId}">
 	        </div>
 	        <div id="infoTableWrap">
@@ -22,9 +22,9 @@
 	        </div>
 	    </div>
 		<div class="info-button-box">
-            <a th:href="@{/datamng/invst/{exmnmngId}(exmnmngId=${srvyInvstInfo.exmnmngId})}" id="" class="is-basic-button">이전 페이지</a>
-            <input type="button" class="is-key-button overLapping" onclick="saveInvstMngSurveySctn();" value="등록"/>
-            <a th:href="@{/datamng/invst}" class="is-basic-button">취소</a>
+            <a th:href="@{/datamng/invst/{exmnmngId}(exmnmngId=${srvyInvstInfo.exmnmngId})}" id="" class="is-basic-button cm-leftFix-btn" th:text="#{common.button.prePage}">이전 페이지</a>
+            <input type="button" class="is-key-button overLapping" onclick="saveInvstMngSurveySctn();" th:value="#{common.button.regist}"/>
+            <a th:href="@{/datamng/invst}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
         </div>
 	</th:block>
 </html>

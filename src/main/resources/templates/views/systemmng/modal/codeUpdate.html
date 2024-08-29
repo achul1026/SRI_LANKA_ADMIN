@@ -1,35 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-      
-	<th:block layout:fragment="modalContent">
-		<form id="codeUpdateForm" name="codeUpdateForm">
-			<div>
-				<table class="modal-table">
-					<tr>
-						<th>공통 코드</th>
-						<td th:text="${tcCdGrp.grpCd}"></td>
-						<th>공통 코드명</th>
-						<td th:text="${tcCdGrp.grpcdNm}"></td>
-					</tr>
-					<tr>
-						<th>하위 코드</th>
-						<td><input type="text" th:value="${tcCdInfo.cd}" name="cd"/></td>
-						<th>하위 코드명</th>
-						<td><input type="text" th:value="${tcCdInfo.cdNm}" name="cdNm"/></td>
-					</tr>
-					<tr>
-						<th>사용여부</th>
-						<td class="text-left">
-							<select class="select-list-box" id="useYn" name="useYn">
-								<option value="Y" th:selected="${tcCdInfo.useYn == 'Y'}">사용</option>
-								<option value="N" th:selected="${tcCdInfo.useYn == 'N'}">미사용</option>
-							</select>
-						</td>
-					</tr>
-				</table>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="codeUpdateForm" name="codeUpdateForm">
+		<div id="modalRegistWrap">
+<!-- 			<div class="modal-filter"> -->
+<!-- 				<h3 class="modal-filter-title" th:text="#{code.common.codeGroup}">코드</h3> -->
+<!-- 				<div class="modal-date-show" th:text="${tcCdGrp.grpCd}"></div> -->
+<!-- 			</div> -->
+<!-- 			<div class="modal-filter"> -->
+<!-- 				<h3 class="modal-filter-title" th:text="#{code.common.codeGroup.name}">이름</h3> -->
+<!-- 				<div class="modal-date-show" th:text="${tcCdGrp.grpcdNm}">USERNAME</div> -->
+<!-- 			</div> -->
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.subCode}">소속</h3>
+				<div>
+					<input type="text" class="modal-input input-text code-name" name="cd" 
+						th:value="${tcCdInfo.cd}" >
+				</div>
 			</div>
-		</form>
-	</th:block>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.subCode.name.english}"></h3>
+				<div>
+					<input type="text" class="modal-input input-text code-name-eng" name="cdnmEng"
+						th:value="${tcCdInfo.cdnmEng}">
+				</div>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.subCode.name.korean}"></h3>
+				<div>
+					<input type="text" class="modal-input input-text code-name-kor" name="cdnmKor"
+						th:value="${tcCdInfo.cdnmKor}">
+				</div>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.subCode.name.sinhala}"></h3>
+				<div>
+					<input type="text" class="modal-input input-text code-name-shin" name="cdnmSin"
+						 th:value="${tcCdInfo.cdnmSin}">
+				</div>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{common.table.useYn}"></h3>
+				<div>
+					<div class="select-div-box">
+						<select class="select-list-box modal-select" id="useYn" name="useYn">
+								<option value="Y" th:selected="${tcCdInfo.useYn == 'Y'}"
+									th:text="#{common.option.useYn.y}">사용</option>
+								<option value="N" th:selected="${tcCdInfo.useYn == 'N'}"
+									th:text="#{common.option.useYn.n}">미사용</option>
+							</select>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</th:block>
+
 </html>

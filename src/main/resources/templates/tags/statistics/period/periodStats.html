@@ -1,0 +1,40 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<th:block th:fragment="peroidStats">
+	<div class="statistics-append-box is-box">
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title">교통량</h4>
+					<select id="trfvlmDrctCd" class="scroll select-list-box" onchange="periodStatisticsChartSelect(this)" data-type="trfvlm">
+						<option value="">방향</option>
+					</select>
+				</div>
+				<div id="trfvlm-chart" class="content-chart">
+				</div>
+				<div class="statistics-table-view mt16">
+					<div>
+						<h4 class="statistics-cm-chart-title">교통량</h4>
+					</div>
+					<div id="trfvlm-table"></div>
+				</div>
+			</div>
+			<div class="od-statistics-content-item">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title">평균속도</h4>
+					<select id="avgSpdDrctCd" class="scroll select-list-box" onchange="periodStatisticsChartSelect(this)" data-type="avgSpeed">
+						<option value="">방향</option>
+					</select>
+				</div>
+				<div id="avg-speed-chart" class="content-chart">
+				</div>
+				<div class="statistics-table-view mt16">
+					<div>
+						<h4 class="statistics-cm-chart-title">평균속도(km/h)</h4>
+					</div>
+					<div id="avg-speed-table"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

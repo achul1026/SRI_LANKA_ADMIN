@@ -14,31 +14,29 @@
     <script th:src="@{/js/rda.validation.js}"></script>
     <script th:src="@{/js/rda.modal.js}"></script>
     <title>SRILANKA</title>
+    <script th:src="@{'/js/messages/message_' + ${lang} + '.js'}"></script>
 </head>
-<body>
+<body th:data-prod="${@environment.getProperty('spring.config.activate.on-profile')} eq 'prod'" onload="disableContextAndDrag()">
 	<section id="LoginSection">
 		<div id="loginContainer">
 		    <div class="rda-wrap">
 		        <div id="findTitleBox">
-		            <h1 id="findTitle">비밀번호 변경</h1>
+		            <h1 id="findTitle" th:text="#{login.loginPwChange.changePasswrod}">비밀번호 변경</h1>
 		        </div>
 		        <div id="loginContentBox">
-		            <form id="joinForm">
+		            <form id="changPswdForm">
 		                <div id="pwFind">
 		                    <div class="login-input-box">
-		                        <label for="mngrAccountPwd" class="login-input-title">새 비밀번호 <span class="join-required">*</span></label>
-		                        <input type="password" id="mngrAccountPwd" name="mngrAccountPwd" placeholder="비밀번호를 입력해주세요." class="login-input"
-		                        minlength="8" maxlength="20" pattern="^(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).*$" data-pattern-mismatch-text=" 8~20자리의 영문 소문자+숫자+특수문자로 입력해주세요." required/>
-                                 <div class="error-message" id="mngrAccountPwdTrgt"></div>
+		                        <label for="mngrAccountPwd" class="login-input-title"><span th:text="#{login.loginPwChange.newPassword}">새 비밀번호</span> <span class="join-required">*</span></label>
+		                        <input type="password" id="userPswd" name="userPswd" th:placeholder="#{login.loginPwChange.placeholder.newPassword}" class="login-input validation-tag" data-validation="pw" onkeyup="valid(this)" maxlength="32"/>
 		                    </div>		                    
 							<div class="login-input-box">
-		                        <label for="mngrAccountPwdChk" class="login-input-title">새 비밀번호 확인 <span class="join-required">*</span></label>
-		                        <input type="password" id="mngrAccountPwdChk" placeholder="비밀번호를 입력해주세요." class="login-input" required/>
-		                        <div id="confirmError" class="error-message"></div>
+		                        <label for="mngrAccountPwdChk" class="login-input-title" th:text="#{login.loginPwChange.newPasswordChk}">새 비밀번호 확인 <span class="join-required">*</span></label>
+		                        <input type="password" id="userPswdChk" th:placeholder="#{login.loginPwChange.placeholder.newPassword}" class="login-input validation-tag" data-validation="pwChecked" onkeyup="valid(this)">
 		                    </div>		                    
 		                </div>		                
 			            <div>
-			                <button type="submit" id="pwdChangeButton" class="password-change">비밀번호 변경</button>
+			                <button type="button" onclick="pwChange()" id="pwdChangeButton" class="password-change" th:text="#{login.loginPwChange.changePasswrod}">비밀번호 변경</button>
 			            </div>
 		            </form>
 		        </div>
@@ -47,19 +45,32 @@
 	</section>
 </body>
 <script type="text/javascript">
-	document.getElementById("joinForm").addEventListener("submit", function(event) {
-    	const newPw = document.getElementById("mngrAccountPwd").value;
-    	const confirmPw = document.getElementById("mngrAccountPwdChk").value;
-	    if (newPw !== confirmPw) {
-	        document.getElementById("confirmError").textContent = "새 비밀번호와 비밀번호가 일치하지 않습니다.";
-	        event.preventDefault();
-	    } else {
-	    	new ModalBuilder().init().successBody('비밀번호가 변경되었습니다.').footer(4,'확인',function(button, modal){
-                location.href= "/login";
-                modal.close();
-            }).open();
-			event.preventDefault();			
+	function pwChange(){
+		if(validation('#loginContentBox')) {
+		   	const newPw = document.getElementById("userPswd").value;
+		   	const confirmPw = document.getElementById("userPswdChk").value;
+		    if (newPw !== confirmPw) {
+		        document.getElementById("confirmError").textContent = message.login.loginPwChange_mismatch_password;
+		        event.preventDefault();
+		    } else {
+		    	fetch("/login/find/pw/change", {
+		            method: "POST",
+		            body: new FormData($("#changPswdForm")[0])
+		        })
+		        .then(response => response.json())
+		        .then(result => {
+		            if(result.code == '200'){
+		  				new ModalBuilder().init().alertBody(result.message).footer(1,message.common.button_login,function(button, modal){
+							window.location.href="/login";
+						}).open();
+		            } else {
+		                new ModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function(button, modal){
+		                    modal.close();
+		                }).open();
+		            }
+		        })
+		    }
 		}
-	});	
+	}
 </script>
 </html>

@@ -9,9 +9,9 @@ plugins {
 
 
 
-group = 'com.sri.lanka.traffic.admin'
+group = 'com.sl.tdbms.web.admin'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '11'
 
 configurations {
     compileOnly {
@@ -42,6 +42,8 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	// Validation
 	implementation "org.springframework.boot:spring-boot-starter-validation"
+	// XSS filter
+	implementation 'com.navercorp.lucy:lucy-xss-servlet:2.0.1'
     // Lombok
 	compileOnly "org.projectlombok:lombok"
     // devTools

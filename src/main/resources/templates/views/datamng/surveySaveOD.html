@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box quest-validation">
+	        
+	        <div id="infoTableWrap">
+				<table id="listTable" class="mt16 mb16">
+					<thead>
+						<tr>
+							<th th:text="#{common.table.investType}">조사 유형</th>
+							<th th:text="#{survey.common.invest.name}">설문 명</th>
+							<th th:text="#{common.table.investPeriod.year}">조사 기간(년)</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<th:block th:text="${srvyTypeCd.cdNm}"></th:block>
+								<input type="hidden" id="srvyType" th:value="${srvyTypeCd.cd}">
+							</td>
+							<td>
+								<input type="text" id="srvyTitle" class="input-table-text validation-tag" th:placeholder="#{common.search.placeholder.investName}"/>
+							</td>
+							<td>
+								<div class="select-date-box">
+									<div class="select-div-box">
+										<select id="startDt" class="dateYear survey-select-save scroll select-list-box validation-tag" data-validation="selectDate"></select>
+									</div>
+									<span>~</span>
+									<div class="select-div-box">
+										<select id="endDt" class="dateYear survey-select-save scroll select-list-box validation-tag" data-validation="selectDate"></select>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="questSurveyList">
+					<div id="questDefaultBox" class="quest-add-box text-right none">
+					</div>
+				</div>
+	        </div>
+	    </div>
+		<div class="info-button-box">
+            <a th:href="@{/datamng/survey}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
+            <input type="button" class="is-key-button overLapping" onclick="saveInvstMngSurveySctn();" th:value="#{common.button.regist}"/>
+        </div>
+	</th:block>
+</html>
+<script th:src="@{/js/rda.survey.presets.js}"></script>
+<script th:inline="javascript">
+	dateYearSet();
+	sectTypeCdArray = /*[[${sectTypeCd}]]*/
+	metadataCdArray = /*[[${srvyMetadataCd}]]*/
+	console.log(metadataCdArray);
+	const evt = new Event('change');
+	for(const preset of SURVEY_PRESETS.OD) {
+		console.log(preset);
+		surveySectionHTML("", true, function(containerAddedBox){
+			containerAddedBox.querySelector('.quest-title input').value = preset.title;
+			containerAddedBox.querySelector('.quest-title input').readOnly = true
+			containerAddedBox.querySelector('.quest-sub-title input').value = preset.title;
+			containerAddedBox.querySelector('.quest-sub-title input').readOnly = true
+			containerAddedBox.querySelector('select.sectTypeCd').value = preset.code;
+			for(const qb of preset.question_box) {
+				questBoxAdd(containerAddedBox, true, function (questbox) {
+					questbox.querySelector(".quest-name__input").value = qb.question;
+					questbox.querySelector(".select-meta").value = qb.metadata
+					questbox.querySelector(".select-meta").dispatchEvent(evt);
+					questbox.querySelector(".select-type").value = qb.type;
+					questbox.querySelector(".select-type").dispatchEvent(evt);
+					if(qb.options) {
+						for(const item of qb.options) {
+							optionAdd(questbox, true, item);
+						}
+					}
+				});
+			}
+		});
+	}
+/*
+	surveySectionHTML("", function(containerAddedBox){
+		containerAddedBox.querySelector('.quest-close').remove();
+		containerAddedBox.querySelector('.quest-title input').value = "가구실태조사";
+		containerAddedBox.querySelector('.quest-title input').readOnly = true
+		containerAddedBox.querySelector('.quest-sub-title input').value = "가구실태조사";
+		containerAddedBox.querySelector('.quest-sub-title input').readOnly = true
+		containerAddedBox.querySelector('select.sectTypeCd').value = 'STC001';
+		containerAddedBox.querySelector('.quest-add-box').remove();
+		questBoxAdd(containerAddedBox, function(questAddedBox){
+			questAddedBox.querySelector(".quest-name__input").value = '세대주이름';
+			questAddedBox.querySelector(".select-meta").value = 'SMD001'
+			questAddedBox.querySelector(".select-meta").dispatchEvent(new Event('change'));
+			questAddedBox.querySelector(".select-type").value = 'SUBJECTIVE';
+			questAddedBox.querySelector(".select-type").dispatchEvent(new Event('change'));
+		});
+		questBoxAdd(containerAddedBox, function(questAddedBox){
+			questAddedBox.querySelector(".quest-name__input").value = '세대주이름';
+			questAddedBox.querySelector(".select-meta").value = 'SMD001'
+			questAddedBox.querySelector(".select-meta").dispatchEvent(new Event('change'));
+			questAddedBox.querySelector(".select-type").value = 'SUBJECTIVE';
+			questAddedBox.querySelector(".select-type").dispatchEvent(new Event('change'));
+		})
+	});
+	surveySectionHTML();
+	surveySectionHTML();
+	surveySectionHTML();*/
+</script>

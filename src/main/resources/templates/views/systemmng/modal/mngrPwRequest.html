@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div>
+			<table class="modal-table">
+				<tbody>
+					<tr>
+						<th>ID</th>
+						<td></td>
+						<th>이름</th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>연락처</th>
+						<td></td>
+						<th>이메일</th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>소속</th>
+						<td></td>
+						<th>부서</th>
+						<td></td>
+					</tr>
+					<tr>
+						<th>증빙첨부</th>
+						<td colspan="3"></td>
+					</tr>
+					<tr>
+						<th>신청 비밀번호</th>
+						<td colspan="3"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</th:block>
+</html>

@@ -7,23 +7,22 @@
 		<div class="modal-group-detail-wrap">
 			<ul>
 				<li class="modal-group-detail-box">
-					<span>소속</span>
+					<span th:text="#{common.institution}">소속</span>
 					<span th:text="${authInfo.bffltdNm}">RDA</span>
 				</li>
 				<li class="modal-group-detail-box">
-					<span>그룹유형</span>
+					<span th:text="#{common.authority}">그룹유형</span>
 					<span th:text="${authInfo.authgrpNm}">교통 데이터 관리자</span>
 				</li>
 				<li class="modal-group-detail-box">
-					<span>소속 인원 수</span>
-					<span th:text="${totalCnt}">10명</span>
+					<span th:text="#{menu.common.user.count}">소속 인원 수</span>
+					<span th:text="${totalCnt}">10<span th:text="#{common.unit.person}">명</span></span>
 				</li>
 			</ul>
 		</div>
 		<div class="modal-auth-tree-wrap scroll">
 			<div class="modal-auth-title">
-				<span><img th:src="@{/images/auth_group.png}" alt="auth"></span>
-				<div>권한 상세 설정</div>
+				<div th:text="#{menu.menuGroupAuthUpdate.authority.setting}">권한 상세 설정</div>
 				<input type="hidden" id="authgrpId" th:value="${tcAuthGrp.authgrpId}" />
 <!-- 				<input type="hidden" id="authgrpNm" th:value="${tcAuthGrp.authgrpNm}" /> -->
 <!-- 				<input type="hidden" id="authgrpDescr" th:value="${tcAuthGrp.authgrpDescr}" /> -->
@@ -44,19 +43,19 @@
 									<ul class="modal-auth-depth3-box">
 										<li>
 											<input type="checkbox" class="depth3-checked" name="srchYn" th:checked="${subItem.srchYn eq 'Y'}"/>
-											<span>조회</span>		
+											<span th:text="#{menu.menuGroupAuthUpdate.srchYn}">조회</span>		
 										</li>
 										<li>
 											<input type="checkbox" class="depth3-checked" name="inputYn" th:checked="${subItem.inputYn eq 'Y'}"/>
-											<span>등록</span>		
+											<span th:text="#{menu.menuGroupAuthUpdate.inputYn}">등록</span>		
 										</li>
 										<li>
 											<input type="checkbox" class="depth3-checked" name="updtYn" th:checked="${subItem.updtYn eq 'Y'}"/>
-											<span>수정</span>		
+											<span th:text="#{menu.menuGroupAuthUpdate.updtYn}">수정</span>		
 										</li>
 										<li>
 											<input type="checkbox" class="depth3-checked" name="delYn" th:checked="${subItem.delYn eq 'Y'}"/>
-											<span>삭제</span>		
+											<span th:text="#{menu.menuGroupAuthUpdate.delYn}">삭제</span>		
 										</li>
 									</ul>
 								</li>

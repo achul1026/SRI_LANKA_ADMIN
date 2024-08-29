@@ -1,4 +1,6 @@
-let map, locationLng, locationLat, marker, surveyMapLocation;
+let map, locationLng, locationLat, marker;
+let copyHTML = '';
+let mapboxglToken = 'pk.eyJ1IjoidGFleXUiLCJhIjoiY2xpbzVzcWphMDVlZzNlbndxbzQ4a20zMCJ9.Zy8tFFyQruKS8zQKTh3wKA';
 //center는 조사 정보가 없을때 RDA 사무실
 const mapCenterLng = 79.92619137078884;
 const mapCenterLat = 6.8996839117806275;
@@ -6,88 +8,299 @@ const RDA_ENV = {
 	"MARKERS" : [{
 		"locationUrl" : "/images/map_location_marker.png", 
 	  	"userUrl" : "/images/map_user_marker.png",
-	  	"testImg" : "/images/test_img.png",
-	  	"testImg2" : "/images/test_img2.png"
+	  	"vds" : "/images/marker_vds.png",
+	  	"metro" : "/images/marker_metro.png",
+	  	"metroMove" : "/images/marker_metro_move.png",
+	  	"vdsDanger" : "/images/marker_error_vds.png",
+	  	"metroDanger" : "/images/marker_error_metro.png",
+	  	"metroMoveDanger" : "/images/marker_error_metro_move.png",
+	  	"household" : "/images/marker_od.png",
+	  	"roadside" : "/images/marker_roadside.png",
+	  	"mcc" : "/images/marker_mcc.png",
+	  	"tm" : "/images/marker_tm.png",
+	  	"surveyMulti" : "/images/marker_multi.png"
 	  }]
 }
 
-function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
+function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, zoomLevel = 15, element = 'map'){
 	return new Promise((resolve, reject) => {
-	    mapboxgl.accessToken = 'pk.eyJ1IjoidGFleXUiLCJhIjoiY2xpbzVzcWphMDVlZzNlbndxbzQ4a20zMCJ9.Zy8tFFyQruKS8zQKTh3wKA';
+	    mapboxgl.accessToken = mapboxglToken;
 	    map = window.map = new mapboxgl.Map({
-	        container: 'map',
+	        container: element,
 	        style: 'mapbox://styles/mapbox/streets-v12',
-	        zoom: 15,
+	        zoom: zoomLevel,
+	        minZoom: 8,
 			center:[lng, lat],
+        	maxBounds: [
+				[79.5, 5.8],
+    			[81.9, 9.9]
+    		]
 	    });
-	    
-	    //주소검색
-	    const mapSearch = document.getElementById('mapSearch');
-	    if(mapSearch) {
-			const geocoder = new MapboxGeocoder({
-			    accessToken: mapboxgl.accessToken,
-			    mapboxgl: mapboxgl,
-			    placeholder:'지역명 검색',
-			    countries: 'LK',
-			});
-			
-			map.addControl(geocoder);
-			
-			geocoder.on('result', function(e){
-				map.jumpTo({
-					center:e.result.geometry.coordinates,
-					zoom:13
-				})
-			})
-		}
-	    
-		//좌표 등록한 좌표 입력해줄 element	    
-		const coordinate = document.getElementById('coordinate');
-	    
-	    //조사위치 등록
-	    const mapLocationSave = document.getElementById('mapLocationSave');
-	    if(mapLocationSave){
-		    map.on('click', function(e){
-				const lngLat = e.lngLat;
-				locationLng = e.lngLat.lng;
-				locationLat = e.lngLat.lat;
-				
-				new ModalBuilder().init().alertBody('조사 위치를 등록하시겠습니까?').footer(3,'등록',function(button, modal){
-					modal.close();
-					coordinate.value = `${locationLng}, ${locationLat}`;
-					document.getElementById('lat').value = locationLat;
-					document.getElementById('lon').value = locationLng;
-				    //조사해야할곳위치		
-				    const el = document.createElement('img')
-					el.src = RDA_ENV.MARKERS[0].locationUrl
-					el.style.width = '26px'
-					el.style.height = '36px'
-					markerSet(el, locationLng, locationLat);
-					
-					if(map.getLayer('circle')) {
-						map.removeLayer('circle');
-					    map.removeSource('circle');
-					}
-					
-					
-					document.getElementById('surveyMapLocation').value = surveyMapLocation;
-					}, '취소', function(button, modal){
-						modal.close();	
-				}).open();
-				
-				//위치 등록한곳 주소 받아오기
-				fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
-			    .then(response => response.json())
-			    .then(data => {
-					const mapLocation = data.features[0].place_name;
-			      	surveyMapLocation = mapLocation.replace(', Sri Lanka', '');
-			    });
-			})
-		}
-	    
+		const scale = new mapboxgl.ScaleControl({
+			maxWidth: 80,
+			unit: 'metric'
+		});
+		map.addControl(scale, "bottom-right");
 		map.on('load', () => {
-			//조사반경
-			const turfJs = turf.circle([lng, lat], circleMeters, {units:'meters'});
+			resolve(map);
+			setMapCoordinates(element);
+		});
+		map.on('error', error => reject(error));
+	})
+}
+
+//맵 스타일 변경
+let setMapStyle = (map) => {
+	const mapStyleInput = document.querySelectorAll('.map-style');
+	mapStyleInput.forEach(input => {
+		input.addEventListener('click', (style) => {
+			const styleName = style.target.id;
+			map.setStyle(`mapbox://styles/mapbox/${styleName}`)
+		})
+	})	
+}
+
+//맵 줌
+let setMapZoomControl = (map) => {
+	const zoomIn = document.getElementById('zoomIn');
+	const zoomOut = document.getElementById('zoomOut');
+	if(zoomIn && zoomOut) {
+		zoomIn.addEventListener('click', () => map.zoomIn());
+		zoomOut.addEventListener('click', () => map.zoomOut());
+	}	
+}
+let trafficVolumeGeoJSON = null;
+let findTrafficVolumeLineCoordinates = async (id) => {
+	if(!trafficVolumeGeoJSON) {
+		await fetch("/js/Traffic_Volume_Line.geojson")
+			.then(res => res.json())
+			.then(res => {
+				trafficVolumeGeoJSON = res;
+			})
+	}
+	let features = trafficVolumeGeoJSON.features;
+	let feature = features.find((obj) => obj.properties.id === id);
+	if(!feature) {
+		new MsgModalBuilder().init().alertBody('Not found Line Geometric data').footer(4, message.common.button_confirm, function(button, modal) {
+			modal.close();
+		}).open();		
+		return;
+	}
+	return feature.geometry.coordinates;
+}
+
+//타즈 레이어
+let setTazCodeLayer = (map) => {
+    map.addSource('rda-location', {
+        'type': 'geojson',
+        'data': '/js/rda.tazs.geojson'
+    });
+    
+    map.addLayer({
+        'id': 'rda-location-taz',
+        'type': 'fill',
+        'source': 'rda-location',
+        'paint': {
+            'fill-color': 'rgba(255, 255, 255, 0.1)'
+        }
+    });
+}
+
+//타즈 레이어
+let hoveredTazPolygonId = null;
+let setTazCodeColorEventLayer = (map) => {
+    map.addSource("rda-location", {
+        "type": "vector",
+        "url": "mapbox://taeyu.aqs1v0r0",
+        "promoteId" : {"rdatazs":"RDA_New_1"}
+    });
+
+	map.addLayer({
+		'id': 'rda-location-taz',
+		'type': 'fill',
+		'source': 'rda-location',
+		'source-layer': "rdatazs",
+		'paint': {
+			'fill-color': "#FF8636",
+			'fill-opacity': [
+				'case',
+				['boolean', ['feature-state', 'hover'], false],
+				0.5,
+				0
+			]
+		}
+	});
+	map.addLayer({
+		'id': 'rda-location-taz-line',
+		'type': 'line',
+		'source': 'rda-location',
+		'source-layer': "rdatazs",
+		'layout': {
+			'line-join': 'round',
+			'line-cap': 'round'
+		},
+		'paint': {
+			'line-color': "#FF8636",
+			'line-width': 2,
+			'line-opacity': 0.5,
+		},
+	});
+
+	map.addLayer({
+		'id': 'rda-location-taz-label',
+		'type': 'symbol',
+		'source': 'rda-location',
+		'source-layer': "rdatazs",
+		'layout': {
+			'text-field': ['get','RDA_New_1'],
+		},
+		'paint': {
+			'text-color': '#ffffff',
+			"text-halo-color": "#000",
+			"text-halo-width": 1,
+		}
+	});
+}
+
+
+//맵 주소 검색
+let setMapSearch = (map) => {
+	const geocoder = new MapboxGeocoder({
+	    accessToken: mapboxglToken,
+	    mapboxgl: mapboxgl,
+	    placeholder:message.map.map_js_placeholder_local_name,
+	    language:'en',
+	    countries: 'LK',
+	    autocomplete: true,
+	    
+	});
+	map.addControl(geocoder);
+	
+	geocoder.on('result', function(e){
+		map.jumpTo({
+			center:e.result.geometry.coordinates,
+			zoom:13
+		})
+	})	
+}
+
+let setRoadLayer = (map) => {
+    map.addSource("rda-road-location", {
+        "type": "vector",
+        "url": "mapbox://taeyu.dnhiic8m",
+        "promoteId" : {"road":"roadcd"}
+    });
+    
+    map.addLayer({
+        'id': 'rda-location-road',
+        'type': 'line',
+        'source': 'rda-road-location',
+        'source-layer': "road",
+        'paint': {
+            'line-color': 'rgba(50, 113, 209, 0.4)',
+            'line-width': 20
+        }
+    });
+}
+
+let setLocationKm = (data) => {
+	const queryString = new URLSearchParams(data).toString();
+	fetch(__contextPath__ + '/common/road/location/distance?'+queryString)
+		.then((response) => response.json())
+		.then((resultData) => {
+	    	const exmnDistance = document.getElementById('exmnDistance');
+	    	if(!isNull(resultData.data)) {
+		    	const km = resultData.data / 1000;
+				exmnDistance.value = `${km}`
+			}
+		})
+
+}
+
+//조사등록 조사위치(클릭) 마커등록
+let setTrafficClickMaker = (map, fn) => {
+	const coordinate = document.getElementById('coordinate');
+    map.on('click', function(e){
+		locationLng = e.lngLat.lng;
+		locationLat = e.lngLat.lat;
+		
+		new MsgModalBuilder().init().alertBody(message.map.map_js_regist_invest_region).footer(3,message.common.button_regist,function(button, modal){
+		    const features = map.queryRenderedFeatures(e.point, { layers: ['rda-location-taz'] });
+		    if (!features.length) return;
+		    const feature = features[0];
+		    
+			coordinate.value = `${locationLng}, ${locationLat}, (${feature.properties.RDA_New_1})`;
+			document.getElementById('lat').value = locationLat;
+			document.getElementById('lon').value = locationLng;
+			document.getElementById('tazCode').value = feature.properties.RDA_New_1;
+
+			setMarker(locationLng, locationLat)
+			
+			//조사반경 
+			if(map.getLayer('circle')) {
+				map.removeLayer('circle');
+			    map.removeSource('circle');
+			}
+			document.getElementById('invstLocatRadiusButton').setAttribute('onclick', 'setTrafficCircleMeters()');
+			
+			//validation
+			if(coordinate.classList.contains('tag-invalid')) coordinate.classList.remove('tag-invalid');
+			if(typeof fn === "function") fn(feature.properties.RDA_New_1);
+			
+		    const roadCd = document.getElementById('roadCd');
+		    const roadDescr = document.getElementById('roadDescr');
+		    const exmnDistance = document.getElementById('exmnDistance');
+		    const roadFeatures = map.queryRenderedFeatures(map.project(e.lngLat), { layers: ['rda-location-road'] });
+		    if (roadFeatures.length) {
+			    const roadFeature = roadFeatures[0];
+				roadDescr.value = roadFeature.properties.roaddescr
+				roadCd.value = roadFeature.properties.roadcd
+
+				roadData = {
+					roadCd : roadFeature.properties.roadcd,
+					lon : locationLng,
+					lat : locationLat
+				}
+				setLocationKm(roadData)
+			    
+			    if(roadCd.classList.contains('tag-invalid')) roadCd.classList.remove('tag-invalid');
+			    if(roadDescr.classList.contains('tag-invalid')) roadDescr.classList.remove('tag-invalid');
+			    if(exmnDistance.classList.contains('tag-invalid')) exmnDistance.classList.remove('tag-invalid');
+			} else {
+				if(!window.inputManual) {
+					roadDescr.value = ''
+					roadCd.value = ''
+					exmnDistance.value = ''
+				}
+			}
+			modal.close();
+		}, message.common.button_cancel, function(button, modal){
+			modal.close();	
+		}).open();
+		
+		//위치 등록한곳 주소 받아오기
+		/* fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
+	    .then(response => response.json())
+	    .then(data => {
+			const mapLocation = data.features[0].place_name;
+	      	surveyMapLocation = mapLocation.replace(', Sri Lanka', '');
+	    }); */
+	    
+	})	
+}
+
+//조사등록 조사반경
+let setTrafficCircleMeters = (lng = locationLng, lat = locationLat) => {
+	const coordInateValue = document.getElementById('coordinate').value;
+	const locationCircle = document.getElementById('exmnRange');
+	const locationCircleValue = locationCircle.value;
+	if(coordInateValue !== ''){		
+		if(locationCircleValue !== '') {
+			if(map.getLayer('circle')) {
+				map.removeLayer('circle');
+			    map.removeSource('circle');
+			}			
+			const turfJs = turf.circle([lng, lat], locationCircleValue, {units:'meters'});
 			map.addLayer({
 				id:'circle',
 				type: 'fill',
@@ -100,59 +313,46 @@ function mapboxGl(lng = mapCenterLng, lat = mapCenterLat, circleMeters = 0){
 					'fill-opacity': 0.3
 				}
 			})
-			
-			resolve(map);
-		})
-		
-		
-	    //조사해야할곳위치	
-	    const coordinateDetail = document.getElementById('coordinateDetail'); 	
-		if(coordinateDetail) {
-		    const el = document.createElement('img')
-			el.src = RDA_ENV.MARKERS[0].locationUrl
-			el.style.width = '26px'
-			el.style.height = '36px'
-			markerSet(el, lng, lat);
+			//validation
+			if(locationCircle.classList.contains('tag-invalid')){
+				locationCircle.classList.remove('tag-invalid');
+			}
+		} else {
+			new MsgModalBuilder().init().alertBody(message.map.map_js_coordinate_radius).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 		}
-		
-		
-		//zoomControl
-		const zoomIn = document.getElementById('zoomIn');
-		const zoomOut = document.getElementById('zoomOut');
-		if(zoomIn && zoomOut) {
-			zoomIn.addEventListener('click', () => map.zoomIn());
-			zoomOut.addEventListener('click', () => map.zoomOut());
-		}
-		
-		
-		//VDS, 등등 목록 마커 호출하기
-		const dashBoard = document.getElementById('dashboardSearch');
-		if(dashBoard){
-			dashBoard.addEventListener('click', () => {
-				const testVDS = document.getElementById('TEST_VDS');
-				if(testVDS.checked == true) testFacilityMarkerSet();
-			})
-		}
-	})
+	} else {
+		new MsgModalBuilder().init().alertBody(message.map.map_js_regist_location).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();				
+	}
+	
 }
-    
-    
-function markerSet(el, lng, lat){
+
+/* 마커 start */
+let markerOption = (el, lng, lat) => {
 	if(marker) {
 		const range = document.getElementById('exmnRange');
 		marker.remove();
 		marker = null;
-		marker = new mapboxgl.Marker(el)
+		marker = new mapboxgl.Marker(el, {offset : [0,-18]})
 		.setLngLat([lng, lat])
     	.addTo(map);
-    	range.value = '';
+    	if(range) range.value = '';
 	} else {
-		marker = new mapboxgl.Marker(el)
+		marker = new mapboxgl.Marker(el, {offset : [0,-18]})
 		.setLngLat([lng, lat])
 	    .addTo(map);
 	}
-}    
+}
+    
+let setMarker = (lng, lat) => {
+    const el = document.createElement('img')
+	el.src = RDA_ENV.MARKERS[0].locationUrl
+	el.style.width = '26px'
+	el.style.height = '36px'
+	markerOption(el, lng, lat);
+}
+/* 마커 end */
 
+// 맵 제거
 function mapRemove(){
 	if(map){
 		map.remove();
@@ -160,66 +360,143 @@ function mapRemove(){
 	}
 }
 
-function layerCircle(){
-	const coordInateValue = document.getElementById('coordinate').value;
-	const locationCircleValue = document.getElementById('exmnRange').value;
-	if(coordInateValue !== ''){		
-		if(locationCircleValue !== '') {
-			if(map.getLayer('circle')) {
-				map.removeLayer('circle');
-			    map.removeSource('circle');
-			}			
-			const turfJs = turf.circle([locationLng, locationLat], locationCircleValue, {units:'meters'});
-			map.addLayer({
-				id:'circle',
-				type: 'fill',
-				source: {
-					type:'geojson',
-					data: turfJs
-				},
-				paint: {
-					'fill-color':'#B1B1B1',
-					'fill-opacity': 0.3
-				}
-			})		 	
-		} else {
-			new ModalBuilder().init().alertBody('좌표 반경을 입력해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+// 조사상세 조사반경
+let setTrafficSurveyCircleMeters = (map, lng, lat, circleMeters) => {
+	const turfJs = turf.circle([lng, lat], circleMeters, {units:'meters'});
+	map.addLayer({
+		id:'circle',
+		type: 'fill',
+		source: {
+			type:'geojson',
+			data: turfJs
+		},
+		paint: {
+			'fill-color':'#B1B1B1',
+			'fill-opacity': 0.3
 		}
-	} else {
-		new ModalBuilder().init().alertBody('조사 위치를 등록해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();				
+	})	
+}
+
+// 시설물등록 좌표값 마커 등록
+let setCoordinatesMarker = () => {
+    const lng = document.getElementById('lngCoordinates').value;
+    const lat = document.getElementById('latCoordinates').value;
+    const htmlLng = document.getElementById('facilitiesLocationLng');
+    const htmlLat = document.getElementById('facilitiesLocationLat');
+
+    if (!lat || !lng) {
+        new MsgModalBuilder().init().alertBody(message.map.map_js_coordinate).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+        return;
+    }
+
+    if (lat < -90 || lat > 90) {
+        new MsgModalBuilder().init().alertBody(message.map.map_js_not_valid_coordinate).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+        return;
+    }
+    
+    setMarker(lng, lat)
+    htmlLng.value = lng;
+    htmlLat.value = lat;
+    
+    
+    map.flyTo({
+        center: [lng, lat],
+        essential: true,
+        zoom: 15
+    });
+}
+
+// 팝업 이전으로
+let mapboxPopupPrev = () => {
+	mapboxPopupRemove();
+	surveyDetailInterval.clear();
+	document.querySelector('#map').appendChild(copyHTML);
+}
+
+// 팝업 제거
+let mapboxPopupRemove = (button) => {
+    const popup = document.querySelector('.mapboxgl-popup');
+	if(popup) popup.remove();
+	if(button) {
+		if(surveyDetailInterval != null) surveyDetailInterval.clear();
+		if(facilitiesDetailInterval != null) facilitiesDetailInterval.clear();
 	}
-}			
+}
 
+// 맵 스타일 변경
+let mapStyle = () => {
+	const styleList = document.getElementById('mapStyleList');
+	if(!styleList.classList.contains('active')){
+		styleList.classList.add('active');
+	} else {
+		styleList.classList.remove('active');
+	}
+}
 
-function testFacilityMarkerSet(){
-	const test = [
-		{"lng" : 79.92164938794343, "lat" : 6.899842596750375},
-		{"lng" : 79.91741602134726, "lat" : 6.902225833231256},
-		{"lng" : 79.92172682757621, "lat" : 6.903635268513483},
-		{"lng" : 79.91462819456393, "lat" : 6.9024308422605145},
-		{"lng" : 79.9270443490351, "lat" : 6.90112390817778},
-		{"lng" : 79.92500510536973, "lat" : 6.896511170814321},
-		{"lng" : 79.92064267271763, "lat" : 6.895537364961228}
-	]
+let setMapCoordinates = (el) => {
+	map.on('mousemove', function(e) {
+		const container = document.getElementById(el);
+	    const element = document.querySelector('.coordinates')
+		const coordinatesBox = document.querySelector('.coordinatesBox');
+	    const coordinates = e.lngLat;
+	    const html = `<div class="coordinatesBox">
+						 <div class="coordinates"></div>
+					  </div>`
+					  
+	    if(!coordinatesBox) container.insertAdjacentHTML('beforeend', html);
+	    if(element) element.textContent = `${coordinates.lng}, ${coordinates.lat}`;
+	});
 	
-	const testHTML = `
-		<div>
-			<div>Popup TEST</div>
-			<div>팝업테스트해보는중입니다</div>
-		</div>
-	`
+	map.on('mouseout', function() {
+		const coordinatesBox = document.querySelector('.coordinatesBox');
+		if(coordinatesBox) coordinatesBox.remove();
+	})
+}
+
+//설문조사 GPS
+let setSurveyGps = (map) => {
+    map.addSource("rda-gps", {
+        "type": "vector",
+        "url": "mapbox://taeyu.aqs1v0r0",
+        "promoteId" : {"rdatazs":"RDA_New_1"}
+    });
 	
-	test.forEach(function(marker){
-		const el = document.createElement('img')
-		el.src = RDA_ENV.MARKERS[0].testImg
+    map.addLayer({
+        'id': 'rda-gps',
+        'type': 'fill',
+        'source': 'rda-gps',
+        'source-layer': "rdatazs",
+        'paint': {
+            'fill-color': 'rgba(0, 0, 0, 0)',
+        }
+    });
+    
+    map.on('click', function(e){
+		gpsLng = e.lngLat.lng;
+		gpsLat = e.lngLat.lat;
+		
+	    const features = map.queryRenderedFeatures(e.point, { layers: ['rda-gps'] });
+	    if (!features.length) return;
+	    const feature = features[0];
+	    gpsTaz = feature.properties.RDA_New_1;
+	    
+		//GPS 좌표등록
+	    const el = document.createElement('img')
+		el.src = RDA_ENV.MARKERS[0].locationUrl
 		el.style.width = '26px'
 		el.style.height = '36px'
-		
-		const testPopup = new mapboxgl.Popup({offset:25}).setHTML(testHTML);
-		
-		marker = new mapboxgl.Marker(el)
-		.setLngLat([marker.lng, marker.lat])
-		.setPopup(testPopup)
-		.addTo(map);
-	})
+		if(marker) marker.remove();
+		marker = new mapboxgl.Marker(el, {offset : [0,-18]})
+		.setLngLat([gpsLng, gpsLat])
+	    .addTo(map);
+	    
+		//GPS 좌표등록한곳 주소 받아오기
+		fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${gpsLng},${gpsLat}.json?access_token=${mapboxgl.accessToken}`)
+	    .then(response => response.json())
+	    .then(data => {
+			const mapLocation = data.features[0].place_name;
+			gpsLocation = mapLocation.replace(', Sri Lanka', '');
+	      	document.getElementById('modalGpsLocation').value = gpsLocation;
+	    });					    
+	})	    	
 }

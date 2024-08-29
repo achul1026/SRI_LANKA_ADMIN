@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<form id="apiUpdateForm" name="apiUpdateForm">
+	        <div class="is-box">
+	            <h3 class="info-title">OpenAPI 데이터 수정</h3>
+				<div class="infoTableWrap">
+					<table class="infoTable survey-save-table">
+						<tr>
+							<th th:text="#{api.common.table.serviceName}">서비스명</th>
+							<td><input type="text" class="input-table-text validation-tag" name="srvcNm" th:placeholder="#{api.openApiSave.placeholder.serviceName}" th:value="${openApiDetail.tmApiSrvc.srvcNm}"></td>
+							<th th:text="#{common.table.class}">분류</th>
+							<td>
+								<div class="select-div-box">
+									<select id="srvcClsf" name="srvcClsf" class="select-list-box table-select validation-tag" data-validation="select">
+										<option value="" th:text="#{common.select.select}">선택</option>
+										<th:block th:each="item : ${apiSrvcClsfCd}">
+											<option th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${item.cdNm == openApiDetail.tmApiSrvc.srvcClsf}"></option>
+										</th:block>
+									</select>							
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.apiMngAgency}">제공기관</th>
+							<td><input type="text" class="input-table-text validation-tag" id="pvsnInst" name="pvsnInst" th:placeholder="#{api.openApiSave.placeholder.provider}" th:value="${openApiDetail.tmApiSrvc.pvsnInst}"></td>
+							<th th:text="#{common.table.manager}">관리자</th>
+							<td>
+	                           <span class="table-flex">
+	                              <input type="hidden" class="mngrInfo" id="usermngId" name="mngrId" th:value="${openApiDetail.tmApiSrvc.mngrId}" />
+	                              <input type="hidden" class="mngrInfo" id="exmnpicId" name="exmnpicId" />
+	                              <input type="text" class="mngrInfo input-table-text validation-tag" id="userNm" th:placeholder="#{api.openApiSave.placeholder.manager}" th:value="${openApiDetail.tmApiSrvc.mngrNm}" readonly/>
+	                              <button type="button" id="investigatoBtn" class="modal-find-img" onclick="surveyOfficer();">
+									  <img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+								  </button>
+	                           </span>
+							</td>						
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.serviceContent}">서비스 내용</th>
+							<td colspan="3"><input type="text" class="input-table-text validation-tag" name="srvcDescr" th:placeholder="#{api.openApiSave.placeholder.serviceContent}" th:value="${openApiDetail.tmApiSrvc.srvcDescr}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.serviceUrl}">요청URL</th>
+							<td colspan="3"><input type="text" class="input-table-text validation-tag" name="srvcUrl" th:placeholder="#{api.openApiSave.placeholder.requestUrl}" th:value="${openApiDetail.tmApiSrvc.srvcUrl}"></td>						
+						</tr>
+					</table>
+				</div>
+			</div>			
+			<div class="is-box mt24">
+				<div class="flex-between">
+					<h3 class="info-title" th:text="#{api.openApiSave.secTitle}">요청정보</h3>
+					<input type="button" class="is-key-button" onclick="propertyAppend('requestAppendBox');" th:value="#{api.common.addAttr}"/>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable">
+						<thead>
+							<tr>
+								<th th:text="#{api.common.table.column}">컬럼명</th>
+								<th th:text="#{api.common.table.type}">타입</th>
+								<th th:text="#{api.common.table.length}">길이</th>
+								<th th:text="#{api.common.table.descript}">설명</th>
+								<th th:text="#{api.common.table.sampledata}">샘플데이터</th>
+								<th th:text="#{api.common.table.required}">필수여부</th>
+								<th th:text="#{api.common.table.delete}">삭제</th>
+							</tr>
+						</thead>
+						<tbody id="requestAppendBox">
+							<th:block th:if="${not #lists.isEmpty(openApiDetail?.tmApiRqstitemList)}">
+								<tr class="requestAppendItem requestTotal" data-request="0" th:each="item ,status : ${openApiDetail?.tmApiRqstitemList}">
+									<td>
+										<input type="hidden" class="requestItemId" th:value="${item.itemId}" readonly>
+										<input type="text" class="input-div-show requestItemNm validation-tag" th:value="${item.itemNm}" readonly>
+									</td>
+									<td>
+										<span class="request-itemType" th:text="${item.itemType}"></span>
+										<select class="select-list-box table-select request-itemType-select requestItemType validation-tag none" data-validation="select">
+											<option value="" th:text="#{common.select.select}">선택</option>
+											<th:block th:each="itemType : ${apiItemTypeCd}">
+												<option th:text="${itemType.cdNm}" th:value="${itemType.cd}" th:selected="${itemType.cdNm == item.itemType}"></option>
+											</th:block>
+										</select>
+									</td>
+									<td>
+										<input type="text" class="input-div-show requestItemLen validation-tag" th:value="${item.itemLen}" oninput="inputOnlyNumber(this)" readonly>
+									</td>
+									<td>
+										<input type="text" class="input-div-show requestItemDescr validation-tag" th:value="${item.itemDescr}" readonly>
+									</td>
+									<td>
+										<input type="text" class="input-div-show requestSmplData validation-tag" th:value="${item.smplData}" readonly>
+									</td>
+									<td th:switch="${item.esntlYn}">
+										<span class="request-esntlYn" th:data-esntlYn="${item.esntlYn}"  th:case="Y" th:text="#{api.common.select.required.y}"></span>
+										<span class="request-esntlYn" th:data-esntlYn="${item.esntlYn}"  th:case="N" th:text="#{api.common.select.required.n}"></span>
+										<select class="select-list-box table-select request-esntlYn-select requestEsntlYn none">
+											<option value="Y" th:text="#{api.common.select.required.y}">필수</option>
+											<option value="N" th:text="#{api.common.select.required.n}">필수아님</option>
+										</select>
+									</td>
+									<td class="text-center">
+										<div class="request-button-box">
+											<img src="/images/modify_img.png" class="cm-csimg" onclick="listModify(this);"  th:alt="#{common.imgAlt.update}" data-type="request">
+											<img src="/images/delete_img.png" class="cm-csimg" th:onclick="listRemove(this,[[${item.itemId}]]);" th:alt="#{common.imgAlt.delete}" data-type="request">
+										</div>
+										<span class="request-update-button-box none">
+											<input type="button" class="is-basic-button sm-button" onclick="listCancel(this);" th:value="#{common.button.cancel}" data-type="request">
+										</span>
+									</td>
+								</tr>
+							</th:block>
+<!-- 							<th:block th:unless="${not #lists.isEmpty(openApiDetail?.tmApiRqstitemList)}"> -->
+<!-- 								<tr> -->
+<!-- 									<td colspan="7" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td> -->
+<!-- 								</tr> -->
+<!-- 							</th:block> -->
+						</tbody>
+					</table>
+				</div>
+	        </div>
+			<div class="is-box mt24">
+				<div class="flex-between">
+					<h3 class="info-title" th:text="#{api.openApiSave.thrTitle}">요청정보</h3>
+					<input type="button" class="is-key-button" onclick="propertyAppend('responseAppendBox');" th:value="#{api.common.addAttr}"/>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable">
+						<thead>
+							<tr>
+								<th th:text="#{api.common.table.column}">컬럼명</th>
+								<th th:text="#{api.common.table.type}">타입</th>
+								<th th:text="#{api.common.table.length}">길이</th>
+								<th th:text="#{api.common.table.descript}">설명</th>
+								<th th:text="#{api.common.table.sampledata}">샘플데이터</th>
+								<th th:text="#{api.common.table.required}">필수여부</th>
+								<th th:text="#{api.common.table.delete}">삭제</th>
+							</tr>
+						</thead>
+						<tbody id="responseAppendBox">
+							<th:block th:if="${not #lists.isEmpty(openApiDetail?.tmApiPvsnitemList)}">
+								<tr class="responseAppendItem responseTotal" data-response="0" th:each="item ,status : ${openApiDetail?.tmApiPvsnitemList}">
+									<td>
+										<input type="hidden" class="responseItemId" th:value="${item.itemId}" readonly>
+										<input type="text" class="input-div-show responseItemNm validation-tag" th:value="${item.itemNm}" readonly>
+									</td>
+									<td>
+										<span class="response-itemType" th:text="${item.itemType}"></span>
+										<select class="select-list-box table-select response-itemType-select responseItemType validation-tag none" data-validation="select">
+											<option value="" th:text="#{common.select.select}">선택</option>
+											<th:block th:each="itemType : ${apiItemTypeCd}">
+												<option th:text="${itemType.cdNm}" th:value="${itemType.cd}" th:selected="${itemType.cdNm == item.itemType}"></option>
+											</th:block>
+										</select>
+									</td>
+									<td>
+										<input type="text" class="input-div-show responseItemLen validation-tag" oninput="inputOnlyNumber(this)" th:value="${item.itemLen}" readonly>
+									</td>
+									<td>
+										<input type="text" class="input-div-show responseItemDescr validation-tag" th:value="${item.itemDescr}" readonly>
+									</td>
+									<td>
+										<input type="text" class="input-div-show responseSmplData validation-tag" th:value="${item.smplData}" readonly>
+									</td>
+									<td th:switch="${item.esntlYn}">
+										<span class="response-esntlYn" th:data-esntlYn="${item.esntlYn}"  th:case="Y" th:text="#{api.common.select.required.y}"></span>
+										<span class="response-esntlYn" th:data-esntlYn="${item.esntlYn}"  th:case="N" th:text="#{api.common.select.required.n}"></span>
+										<select class="select-list-box table-select response-esntlYn-select responseEsntlYn none">
+											<option value="Y" th:text="#{api.common.select.required.y}">필수</option>
+											<option value="N" th:text="#{api.common.select.required.n}">필수아님</option>
+										</select>
+									</td>
+									<td class="text-center">
+										<div class="response-button-box">
+											<img src="/images/modify_img.png" class="cm-csimg" onclick="listModify(this);"  th:alt="#{common.imgAlt.update}" data-type="response">
+											<img src="/images/delete_img.png" class="cm-csimg" th:onclick="listRemove(this,[[${item.itemId}]]);" th:alt="#{common.imgAlt.delete}" data-type="response">
+										</div>
+										<span class="response-update-button-box none">
+											<input type="button" class="is-basic-button sm-button" onclick="listCancel(this);" th:value="#{common.button.cancel}" data-type="response">
+										</span>
+									</td>
+								</tr>
+							</th:block>
+<!-- 							<th:block th:unless="${not #lists.isEmpty(openApiDetail?.tmApiPvsnitemList)}"> -->
+<!-- 								<tr> -->
+<!-- 									<td colspan="7" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td> -->
+<!-- 								</tr> -->
+<!-- 							</th:block> -->
+						</tbody>
+					</table>
+				</div>
+	        </div>
+			<div class="info-button-box">
+				<a th:href="@{/datalink/openapi}" th:text="#{common.button.cancel}" class="is-basic-button">취소</a>
+				<button type="button" class="is-key-button" th:text="#{common.button.update}" th:onclick="openApiUpdate([[${openApiDetail.tmApiSrvc.srvcId}]])">저장</button>
+	        </div>
+		</form>
+	</th:block>
+</html>
+<script th:inline="javascript">
+	
+	//DB 삭제용 Array 전역변수
+	let deleteReqItemArray = new Array();
+	let deleteResItemArray = new Array();
+	
+	//추가
+	const apiItemTypeCd = /*[[${apiItemTypeCd}]]*/;
+	
+	const requiredY = /*[[#{api.common.select.required.y}]]*/;
+	const requiredN = /*[[#{api.common.select.required.n}]]*/;
+
+	function propertyAppend(appendId){
+		let type = appendId == 'requestAppendBox'? "request":"response";
+		
+		const appendBox = document.getElementById(appendId);
+		const tr = document.createElement('tr');
+		
+		tr.classList.add(`${type}AppendItem`,`${type}Total`);
+		
+		let html = `<td><input type="text" class="input-table-text ${type}ItemNm validation-tag"></td>
+					<td>
+						<div class="select-div-box">
+							<select class="select-list-box response-itemType-select table-select ${type}ItemType validation-tag" data-validation="select">
+								<option value="">${message.common.select}</option>
+					`
+							for(const item of apiItemTypeCd){
+			html +=				`<option value="${item.cd}">${item.cdNm}</option>`
+							}
+			html +=	`		</select>
+						</div>
+					</td>
+					<td><input type="text" class="input-table-text ${type}ItemLen validation-tag" oninput="inputOnlyNumber(this)"></td>
+					<td><input type="text" class="input-table-text ${type}ItemDescr validation-tag"></td>
+					<td><input type="text" class="input-table-text ${type}SmplData validation-tag"></td>
+					<td>
+						<div class="select-div-box">
+							<select class="select-list-box response-esntlYn-select table-select ${type}EsntlYn validation-tag" data-validation="select">
+								<option value="Y">${requiredY}</option>
+								<option value="N" selected>${requiredN}</option>
+							</select>
+						</div>
+					</td>
+					<td class="text-center">
+						<button type="button" onclick="propertyRemove(this);" data-type="${type}">
+							<img src="/images/delete_img.png" class="cm-csimg" alt="삭제하기">
+						</button>
+					</td>
+				   `
+		appendBox.append(tr);
+		tr.innerHTML = html;
+	}
+	
+	//삭제
+	function propertyRemove(_this){
+		let type = _this.getAttribute('data-type');
+		let varSet = type == 'request'? type:'response';
+		let id = type + "AppendBox";
+		
+		var typeAppendBox = document.getElementById(id);
+		console.log(id);
+		var rowCount = typeAppendBox.getElementsByTagName("tr").length;
+		if (rowCount > 1) {
+			const parent = _this.closest('tr');
+			parent.remove();
+		} else {
+			alert(message.openAPI.openApiUpdate_at_least_one_required);
+		}
+	}
+	
+	//수정
+	let openApiUpdate = (srvcId) => {
+		if (validation('#apiUpdateForm')) {
+			const formData = document.getElementById("apiUpdateForm");
+	
+			const requestAppendBox = document.getElementById("requestAppendBox");
+			const requestList = requestAppendBox.querySelectorAll(".requestAppendItem");
+			
+			const responseAppendBox = document.getElementById("responseAppendBox");
+			const responseList = responseAppendBox.querySelectorAll(".responseAppendItem");
+			
+			let reqArr = new Array();
+			let resArr = new Array();
+			
+			for(let i = 0; i < requestList.length; i++){
+				let tmApiRqstitem = new Object();
+				tmApiRqstitem.srvcId = srvcId;
+				tmApiRqstitem.itemId = requestList[i].querySelector('.requestItemId')? requestList[i].querySelector('.requestItemId').value : null;
+				tmApiRqstitem.itemNm = requestList[i].querySelector('.requestItemNm').value;
+				tmApiRqstitem.itemSqno = i;
+				tmApiRqstitem.itemType = requestList[i].querySelector('.requestItemType').value;
+				tmApiRqstitem.itemLen = requestList[i].querySelector('.requestItemLen').value;
+				tmApiRqstitem.itemDescr = requestList[i].querySelector('.requestItemDescr').value;
+				tmApiRqstitem.smplData = requestList[i].querySelector('.requestSmplData').value;
+				tmApiRqstitem.esntlYn = requestList[i].querySelector('.requestEsntlYn').value;
+				reqArr.push(tmApiRqstitem);
+			}
+	
+			for(let i = 0; i < responseList.length; i++){
+				let tmApiPvsnitem = new Object();
+				tmApiPvsnitem.srvcId = srvcId;
+				tmApiPvsnitem.itemId = responseList[i].querySelector('.responseItemId')? responseList[i].querySelector('.responseItemId').value : null;
+				tmApiPvsnitem.itemNm = responseList[i].querySelector('.responseItemNm').value;
+				tmApiPvsnitem.itemSqno = i;
+				tmApiPvsnitem.itemType = responseList[i].querySelector('.responseItemType').value;
+				tmApiPvsnitem.itemLen = responseList[i].querySelector('.responseItemLen').value;
+				tmApiPvsnitem.itemDescr = responseList[i].querySelector('.responseItemDescr').value;
+				tmApiPvsnitem.smplData = responseList[i].querySelector('.responseSmplData').value;
+				tmApiPvsnitem.esntlYn = responseList[i].querySelector('.responseEsntlYn').value;
+				resArr.push(tmApiPvsnitem);
+			}
+			
+		    const openApiUpdateDTO = {
+		        srvcId: srvcId,
+		        srvcNm: formData.querySelector('input[name="srvcNm"]').value,
+		        srvcClsf: formData.querySelector('select[name="srvcClsf"]').value,
+		        pvsnInst: formData.querySelector('input[name="pvsnInst"]').value,
+		        mngrId: formData.querySelector('input[name="mngrId"]').value,
+		        srvcDescr: formData.querySelector('input[name="srvcDescr"]').value,
+		        srvcUrl: formData.querySelector('input[name="srvcUrl"]').value,
+		        tmApiRqstitemList: reqArr,
+		        tmApiPvsnitemList: resArr,
+		        deleteReqItemArray: deleteReqItemArray,
+		        deleteResItemArray: deleteResItemArray
+	    	};
+			
+			fetch(__contextPath__+"/datalink/openapi/update",{
+				method: "PUT",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(openApiUpdateDTO)
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == '200'){
+					new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
+						modal.close();
+						location.href=`${__contextPath__}/datalink/openapi/detail?srvcId=${srvcId}`;
+					}).open();
+				} else {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
+						modal.close();
+					}).open();
+				}
+			})		
+		}
+	}
+	
+    // 공통 함수
+    function toggleReadOnly(parent, isReadOnly) {
+		if(isReadOnly){
+	        parent.querySelectorAll('.input-table-text').forEach(input => {
+	            input.readOnly = isReadOnly;
+				input.classList.remove('input-table-text');
+				input.classList.add('input-div-show');
+	        });
+		} else {
+	        parent.querySelectorAll('.input-div-show').forEach(input => {
+	            input.readOnly = isReadOnly;
+				input.classList.remove('input-div-show');
+				input.classList.add('input-table-text');
+	        });
+		}
+    }
+
+    function toggleButtons(buttonBox, buttonUpdateBox, isShow) {
+        if (isShow) {
+            buttonBox.classList.add('none');
+            buttonUpdateBox.classList.remove('none');
+        } else {
+            buttonBox.classList.remove('none');
+            buttonUpdateBox.classList.add('none');
+        }
+    }
+
+    function toggleSelectBox(span, selectBox, isShow) {
+        if (isShow) {
+            span.classList.add('none');
+            selectBox.classList.remove('none');
+        } else {
+            span.classList.remove('none');
+            selectBox.classList.add('none');
+        }
+    }
+
+    // 요청 정보 수정
+    let previousValues = {};
+    function listModify(_this) {
+		let type = _this.getAttribute('data-type');
+		let varSet = type == 'request'? type:'response'; 
+		
+        const parent = _this.closest(`.${varSet}AppendItem`);
+        const buttonBox = parent.querySelector(`.${varSet}-button-box`);
+        const buttonUpdateBox = parent.querySelector(`.${varSet}-update-button-box`);
+        const itemTypeBox = parent.querySelector(`.${varSet}-itemType`);
+        const itemTypeSelectBox = parent.querySelector(`.${varSet}-itemType-select`);
+        const esntlYnBox = parent.querySelector(`.${varSet}-esntlYn`);
+        const esntlYnSelectBox = parent.querySelector(`.${varSet}-esntlYn-select`);
+
+        toggleReadOnly(parent, false);
+        toggleButtons(buttonBox, buttonUpdateBox, true);
+        toggleSelectBox(esntlYnBox, esntlYnSelectBox, true);
+        toggleSelectBox(itemTypeBox, itemTypeSelectBox, true);
+
+        const trIndex = document.querySelectorAll(`.${varSet}Total`);
+
+        trIndex.forEach((item, index) => item.setAttribute(`data-${varSet}`, index));
+
+        // 취소시 이전 값 저장
+        previousValues = {
+            itemNm: parent.querySelector(`.${varSet}ItemNm`).value,
+            itemType: parent.querySelector(`.${varSet}-itemType-select`).value,
+            itemLen: parent.querySelector(`.${varSet}ItemLen`).value,
+            itemDescr: parent.querySelector(`.${varSet}ItemDescr`).value,
+            smplData: parent.querySelector(`.${varSet}SmplData`).value,
+            esntlYn: parent.querySelector(`.${varSet}-esntlYn-select`).value
+        };
+    }
+
+    // 취소
+    function listCancel(_this) {
+		let type = _this.getAttribute('data-type');
+		let varSet = type == 'request'? type:'response';
+		
+        const parent = _this.closest(`.${varSet}AppendItem`);
+        const buttonBox = parent.querySelector(`.${varSet}-button-box`);
+        const buttonUpdateBox = parent.querySelector(`.${varSet}-update-button-box`);
+        const itemTypeBox = parent.querySelector(`.${varSet}-itemType`);
+        const itemTypeSelectBox = parent.querySelector(`.${varSet}-itemType-select`);
+        const esntlYnBox = parent.querySelector(`.${varSet}-esntlYn`);
+        const esntlYnSelectBox = parent.querySelector(`.${varSet}-esntlYn-select`);
+
+        // 이전 값 복원
+        parent.querySelector(`.${varSet}ItemNm`).value = previousValues.itemNm;
+        parent.querySelector(`.${varSet}-itemType-select`).value = previousValues.itemType;
+        parent.querySelector(`.${varSet}ItemLen`).value = previousValues.itemLen;
+        parent.querySelector(`.${varSet}ItemDescr`).value = previousValues.itemDescr;
+        parent.querySelector(`.${varSet}SmplData`).value = previousValues.smplData;
+        parent.querySelector(`.${varSet}-esntlYn-select`).value = previousValues.esntlYn;
+
+        toggleReadOnly(parent, true);
+        toggleButtons(buttonBox, buttonUpdateBox, false);
+        toggleSelectBox(esntlYnBox, esntlYnSelectBox, false);
+        toggleSelectBox(itemTypeBox, itemTypeSelectBox, false);
+    }
+    
+    function listRemove(_this,itemId = ''){
+		let type = _this.getAttribute('data-type');
+		let varSet = type == 'request'? type:'response';
+		let id = type + "AppendBox";
+		
+		var typeAppendBox = document.getElementById(id);
+		var rowCount = typeAppendBox.getElementsByTagName("tr").length;
+		
+		new MsgModalBuilder().init().alertBody(message.openAPI.openApiUpdate_resDelete_confirm).footer(3,message.common.button_confirm,function(button, modal){
+			if (rowCount > 1) {
+				if(!isNull(itemId)){
+					if(type == 'request'){
+						deleteReqItemArray.push(itemId);
+					} else {
+						deleteResItemArray.push(itemId);
+					}
+				}
+				_this.closest(`.${varSet}AppendItem`).remove();
+				
+				const trIndex = document.querySelectorAll(`.${varSet}Total`);
+				
+				trIndex.forEach((item, index) => item.setAttribute(`data-${varSet}`, index));
+				modal.close();
+			} else {
+				modal.close();
+				alert(message.openAPI.openApiUpdate_at_least_one_required);
+// 				new MsgModalBuilder().init().alertBody(message.openAPI.openApiUpdate_at_least_one_required).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+			}
+		}, message.common.button_cancel, function(button, modal){
+			modal.close();
+		}).open();
+	}
+</script>

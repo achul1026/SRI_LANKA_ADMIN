@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+	<th:block layout:fragment="content">
+		<div>
+			<div class="is-box">
+				<h3 class="info-title" th:text="#{region.regionGnSave.title}">지역 코드 등록</h3>
+				<div class="cm-table-line">
+					<div class="list-save-box">
+						<h3 class="cm-code-title" th:text="#{region.common.taz}">- TAZ 코드</h3>
+						<input type="button" id="tazRegistBtn" class="is-key-button" th:value="#{region.regionSave.registTaz}">
+					</div>
+					<div class="info-table-wrap">
+						<table class="infoTable table-all-center">
+							<tr>
+								<th th:text="#{region.common.taz}">TAZ CODE</th>
+<!-- 								<th>TAZ NAME</th> -->
+								<th th:text="#{region.common.lat}">중앙 위도</th>
+								<th th:text="#{region.common.lon}">중앙 경도</th>
+								<th th:text="#{invst.common.table.management}">관리</th>
+							<tbody id="appendTbody">
+								<tr>
+									<td colspan="5" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div class="cm-table-line">
+					<div class="list-save-box">
+						<h3 class="cm-code-title" th:text="#{region.common.gn}">- GN 코드</h3>
+						<input type="button" id="gnRegistBtn" class="is-key-button" th:value="#{region.regionGnSave.registGn}">
+					</div>
+					<div class="infoTableWrap">
+						<table class="infoTable table-all-center">
+							<thead>
+								<tr>
+									<th th:text="#{region.common.gn}">GN CODE</th>
+									<th th:text="#{region.common.gn.name}">GN NAME</th>
+									<th th:text="#{region.common.ratio}">비율(%)</th>
+									<th th:text="#{invst.common.table.management}">관리</th>
+								</tr>
+							</thead>
+							<tbody id="regionSelectAddBox">
+								<tr class="regionListNotData">
+									<td colspan="4" th:text="#{common.search.result.notExist}">검색 결과가 없습니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="info-button-box">
+				<a th:href="@{/systemmng/region}" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+				<input type="button" onclick="gnRegionRegist()" class="is-key-button overLapping" th:value="#{common.button.regist}" />
+			</div>
+		</div>
+	</th:block>
+</html>
+
+<script>
+
+document.getElementById('tazRegistBtn').addEventListener('click', () => {
+	pageType = "TAZ";
+	setTazModal(pageType);
+// 	new ModalBuilder().init("TAZ 등록").ajaxBody(__contextPath__ + "/systemmng/region/gn/save/taz").footer(3,message.common.button_regist,function(button, modal){
+// 	}, message.common.button_cancel, function(button, modal){
+// 	}).open();
+});
+document.getElementById('gnRegistBtn').addEventListener('click', () => {
+	pageType = "GN";
+	setTazModal(pageType);
+// 	new ModalBuilder().init("GN 등록", '1200').ajaxBody(__contextPath__ + "/systemmng/region/gn/save/gn").footer(3,message.common.button_regist,function(button, modal){
+// 		if(checkedRegionCodeArray.length == 0) {
+// 			alert('tazcode를 등록해주세요');
+// 			return
+// 		}
+// 		tazModalSave();
+// 		modal.close();
+// 	}, message.common.button_cancel, function(button, modal){
+// 		checkedRegionCodeArray = regionCodeDefaultArray.map(innerArray => innerArray.slice());
+// 		modal.close();
+// 	}).open();
+// 	regionPagingAdd();
+});
+
+function deleteTazInfo(){
+	const appendTbody = document.getElementById('appendTbody');
+	const html =`
+				<tr>
+					<td colspan="6">${message.search.result_not_exist}</td>
+				</tr>
+				`;
+	appendTbody.innerHTML = html;
+}
+
+function asynchronousSearchList(){
+	setTazModal(pageType);
+}
+
+function setTazModal(type){
+	let paramData = $("#searchForm").serialize();
+	const modalContainer = document.querySelector('.modal-container');
+	if(modalContainer) modalContainer.remove();	
+	if(type === 'TAZ'){
+		new ModalBuilder().init(message.region.regionSave_regist_taz).ajaxBody(__contextPath__ + "/systemmng/region/gn/save/taz",paramData).footer(3,message.common.button_regist,function(button, modal){
+			let tazInfo = document.querySelector('input[name="tazInfo"]:checked');
+			const appendTbody = document.getElementById('appendTbody');
+			const html =`
+							<tr>
+								<td><input type="hidden" id="dstrctCd" name="dstrctCd" value="${tazInfo.dataset.dstrctCd}"/>${tazInfo.dataset.dstrctCd}</td>
+								<td>${tazInfo.dataset.cntrLat}</td>
+								<td>${tazInfo.dataset.cntrLon}</td>
+								<td><input type="button" class="input-reset pointer" value="${message.common.button_delete}" onclick="deleteTazInfo();"/></td>
+							</tr>
+						`;
+			appendTbody.innerHTML = html;
+			modal.close();
+		}, message.common.button_cancel, function(button, modal){
+			modal.close();
+		}).open();
+	}else{
+		new ModalBuilder().init(message.code.code_gn_save, "1200").ajaxBody(__contextPath__ + "/systemmng/region/gn/save/gn",paramData).footer(3,message.common.button_regist,function(button, modal){
+			if(checkedRegionDisplayCodeArray.length == 0) {
+				alert(message.code.code_gn_update);
+				return
+			}
+			tazModalSave();
+			modal.close();
+		}, message.common.button_cancel, function(button, modal){
+			checkedRegionDisplayCodeArray = regionCodeDefaultArray.map(innerArray => innerArray.slice());
+			modal.close();
+		}).open();
+		regionPagingAdd();
+	}
+}
+
+function gnRegionRegist(){
+	let dstrctCd = document.getElementById('dstrctCd');
+
+	let regionArray = document.querySelectorAll('.region-select-tr');
+	let gnInfoArr = new Array();
+	
+	if(regionArray.length > 0 && !!dstrctCd){
+		for (let i = 0; i < regionArray.length; i++) {
+            let gnTr = regionArray[i];
+			let gnInfo = new Object();
+
+			let gnId = gnTr.querySelector('.taz-district-code').value;
+			let dstrbCnt = gnTr.querySelector('.region-code-percentage');
+			
+			if (!dstrbCnt.value) {
+                alert(message.authRqst.authSetting_emptyValidation);
+                dstrbCnt.focus();
+                return;
+            }
+			
+			gnInfo.gnId = gnId;
+			gnInfo.dstrbCnt = dstrbCnt.value;
+
+			gnInfoArr.push(gnInfo);		
+		}
+		
+		let data = {
+			dstrctCd: dstrctCd.value,
+		    gnInfoArr: gnInfoArr
+		};
+		
+		const loading = new setLoading().start();
+	
+		fetch(__contextPath__ +"/systemmng/region/gn/save", {
+		method: "POST",
+	    headers: {
+	        'Content-Type': 'application/json'
+	    },
+	    body: JSON.stringify(data)
+		}).then(response => response.json())
+		.then(result => {
+			if(result.code == 200){
+				alert(result.message);
+				location.href="/systemmng/region";
+			} else {
+				throw new Error(result.message);
+			}
+		}).catch (e => {
+			alert(e.message);
+			return;
+		}).finally(() => {
+			loading.end();
+		});
+	} else {
+		alert(message.openAPI.openApiUpdate_at_least_one_required);
+	}
+}
+</script>

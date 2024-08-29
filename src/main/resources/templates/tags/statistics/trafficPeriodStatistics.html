@@ -1,0 +1,91 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	
+<th:block th:fragment="trafficStatisticsFragment">
+	<div class="statisticsInsertBox">
+		<div class="statistics-search-box">
+			<form id="searchSurveyForm">
+				<div id="faciliySearch">
+					<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.type}">Survey Type</h4>
+						<div class="select-div-box">
+							<select id="searchSurveyType" class="select-list-box table-select-97" name="searchSurveyType" onchange="surveyType(this)">
+								<option value="">선택</option>
+								<option value="VDS" th:text="#{facilities.vds}">VDS</option>
+								<option value="METROCOUNT_FIXED" th:text="#{facilities.fixed}">Metro Count(fixed)</option>
+								<option value="METROCOUNT_MOVED" th:text="#{facilities.portable}">Metro Count(moved)</option>
+								<option value="MCC">MCC</option>
+							</select>
+						</div>
+					</div>
+					<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.trafficPeriodStatisics.period}">기간</h4>
+						<div class="select-div-box">
+							<select id="searchDateType" class="select-list-box table-select-97 validation-tag" name="searchDateType" onchange="dateType(this)" data-validation="select">
+								<option value="" th:text="#{common.select.select}">선택</option>
+								<option value="year" th:text="#{statistics.trafficPeriodStatisics.byYear}">년도 별</option>
+								<option value="month" th:text="#{statistics.trafficPeriodStatisics.monthly}">월 별</option>
+								<option value="day" th:text="#{statistics.trafficPeriodStatisics.daily}">일 별</option>
+								<option value="time" th:text="#{statistics.trafficPeriodStatisics.hourly}">시간 별</option>
+							</select>
+						</div>
+						<div id="date-picker-wrap">
+						</div>
+						<div id="select-siteId-wrap" class="none">
+							<h4 class="statistics-search-title">Site Id(Site Nm)</h4>
+							<select id="select-siteId" name="searchContent" data-validation="select" class="select-list-box table-select-97">
+							</select>
+						</div>
+					</div>
+<!--					<div class="statistics-search-item">-->
+<!--						<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.road.name}">Road Name</h4>-->
+<!--						<div class="select-div-box">-->
+<!--							<select class="select-list-box table-select-97">-->
+<!--								<option>road name</option>-->
+<!--							</select>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="statistics-search-item">-->
+<!--						<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.location}">Location</h4>-->
+<!--						<div class="select-div-box">-->
+<!--							<select class="select-list-box table-select-97">-->
+<!--								<option>225km</option>-->
+<!--							</select>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="statistics-search-item">-->
+<!--						<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.year}">Survey Year</h4>-->
+<!--						<div class="select-div-box">-->
+<!--							<select class="dateYear scroll select-list-box table-select-97 validation-tag" id="searchDate" name="searchDate" data-validation="oneDateSelect">-->
+<!--								<option value="" th:text="#{common.select.select}"></option>-->
+<!--								<th:block th:each="item : ${years}">-->
+<!--									<option th:value="${item}" th:text="${item}"></option>-->
+<!--								</th:block>-->
+<!--							</select>-->
+<!--						</div>-->
+<!--					</div>-->
+				</div>
+			</form>
+			<div class="statistics-search-button">
+				<input type="button" id="facilitySearchChange" class="is-key-button wd100" th:value="#{statistics.button.apply}" onclick="searchPeroidStatistics();"/>
+			</div>
+		</div>
+	</div>
+	<div class="statistics-search-view">
+		<div class="statistics-search-img">
+			<img th:src="@{/images/dash_search.png}" alt="serach"/>
+			<div th:text="#{statistics.mccStatisticsDashboard.search}">검색조건을 입력 후 검색해주세요.</div>
+		</div>
+	</div>
+	<div class="statistics-list-box none">
+		<div class="statistics-content">
+			<div class="statistics-sub-header">
+				<div id="downloadTitle"></div>
+				<input type="button" class="is-key-button" value="다운로드"/>
+			</div>
+		</div>
+	</div>
+</th:block>
+<script>
+	//	monthPicker();
+</script>

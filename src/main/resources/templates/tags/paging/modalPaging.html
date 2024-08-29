@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	
+<th:block th:fragment="pagingFragment" th:if="${0 < paging.totalCount}">
+	<ul id="pagination" class="modal-paging">
+		<li class="page-item"><a th:href="|javascript:pageMove('${paging.prevPageNo}')|" class="first"><i id="pageLeftArrow"></i></a></li>
+		<li th:each="pageNum : ${#numbers.sequence(paging.startPageNo, paging.endPageNo)}" class="page-item">
+			<a th:href="|javascript:pageMove('${pageNum}')|" th:text="${pageNum}" th:class="${paging.pageNo == pageNum ? 'active page-number' : 'page-number'}"></a>				
+		</li>
+		<li class="page-item"><a th:href="|javascript:pageMove('${paging.nextPageNo}')|"  class="last"><i id="pageRightArrow"></i></a></li>
+	</ul>
+</th:block>

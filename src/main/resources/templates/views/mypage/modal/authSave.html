@@ -3,17 +3,19 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/modalLayout}">
 	<th:block layout:fragment="modalContent">
-		<div id="infoTableWrap">
-			<table class="modal-auth-table modal-table">
+		<div id="infoTableWrap" class="modal-auth-table-set">
+			<table id="authListTbody" class="modal-auth-table modal-table">
 				<tr>
-					<th rowspan="4" style="border-right:1px solid #d3d3d3">권한종류</th>
-					<th>권한이름</th>
-					<th>권한설명</th>
+					<th rowspan="4" style="border-right:1px solid #d3d3d3" th:text="#{myPage.authSave.authority.type}">권한종류</th>
+					<th th:text="#{authRqst.common.authName}">권한 이름</th>
+					<th th:text="#{authRqst.common.authDescr}">권한 설명</th>
 <!-- 					<th>메뉴권한</th> -->
 				</tr>
 				<tr th:each="item:${authGrp}">
-					<td th:text="${item.authgrpNm}"></td>
-					<td th:text="${item.authgrpDescr}"></td>
+					<td th:text="${item.authgrpNm}" class="text-center"></td>
+					<td>
+						<textarea class="modal-auth-textarea" th:text="${item.authgrpDescr}" readonly></textarea>
+					</td>
 <!-- 					<td> -->
 <!-- 						<ul th:each="menu:${item.subMenuAuthList}"> -->
 <!-- 							<li> -->
@@ -34,15 +36,17 @@
 			<form id="authRequstForm" name="authRequstForm">
 				<table class="modal-table modal-auth-update-table">
 					<tr>
-						<th>신청권한</th>
+						<th th:text="#{authRqst.authRqstDetail.rqstAuth}">신청권한</th>
 						<td>
-							<select class="select-list-box" name="authgrpId">
-								<option th:each="item:${authGrp}" th:text="${item.authgrpNm}" th:value="${item.authgrpId}"></option>
-							</select>
+							<div class="select-div-box">
+								<select class="select-list-box" id="authgrp">
+									<option th:each="item:${authGrp}" th:text="${item.authgrpNm}" th:value="${item.authgrpId}"></option>
+								</select>
+							</div>
 						</td>
-						<th>신청사유</th>
+						<th th:text="#{authRqst.authRqstDetail.rqstRsn}">신청 사유</th>
 						<td>
-							<input type="text" class="input-table-text wd100" name="rqstRsn" placeholder="신청사유를 입력해주세요."/>
+							<input type="text" class="input-table-text wd100" id="rqstRsn" th:placeholder="#{myPage.authSave.placeholder.rqstRsn}"/>
 						</td>
 					</tr>
 				</table>

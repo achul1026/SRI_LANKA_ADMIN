@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{dataRegist.dataRegistUpdate.title}">데이터 수정</h3>
+		</div>
+		<form id="dataRegistUpdate" name="tsPopMng">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{dataRegist.data.name}">데이터명</th>
+						<td>
+							<input type="hidden" id="popmngId" name="popmngId" class="validation-tag"
+								th:value="${tsPopMngDTO.popmngId}" />
+							<input type="text" class="input-text modal-input validation-tag" name="popmngTitle"
+								th:placeholder="#{dataRegist.placeholder.data.name}"
+								th:value="${tsPopMngDTO.popmngTitle}" />
+						</td>
+						<th th:text="#{dataRegist.select.date}">날짜</th>
+						<td>
+							<div class="modal-double-list">
+								<input type="text" class="input-text modal-input" th:value="${tsPopMngDTO.startYear}"
+									readonly />
+								<input type="text" class="input-text modal-input" th:value="${tsPopMngDTO.endYear}"
+									readonly />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.agency}">관리기관</th>
+						<td th:text="${tsPopMngDTO.userBffltdNm}"></td>
+						<th th:text="#{common.table.manager}">관리자</th>
+						<td th:text="${tsPopMngDTO.registId}"></td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.file}">관리기관</th>
+						<td colspan="3">
+							<div class="modal-double-wrap">
+								<span th:text="${tsPopMngDTO.orgFilenm}"></span>
+								<button type="button" th:onclick="fileDownLoad([[${tsPopMngDTO.fileId}]])"
+									class="is-key-button" th:text="#{dataRegist.dataRegistUpdate.button.file}">파일
+									다운로드</button>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{dataRegist.descript}">설명</th>
+						<td colspan="3">
+							<textarea class="popmngCnts input-table-text" name="popmngCnts"
+								th:placeholder="#{dataRegist.placeholder.descript}"
+								th:text="${tsPopMngDTO.popmngCnts}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+	            <a href="/datamng/dataregist" class="is-basic-button cm-leftFix-btn" th:text="#{common.button.prePage}">목록</a>
+	            <input type="button" th:onclick="dataDelete([[${tsPopMngDTO.popmngId}]])" class="is-danger-button overLapping" th:value="#{common.button.delete}" autocomplete="off">
+	            <input type="button" th:onclick="dataUpdate([[${tsPopMngDTO.popmngId}]])" class="is-key-button overLapping" th:value="#{common.button.update}" autocomplete="off">
+    	    </div>
+			<div id="modalRegistWrap">
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.select.date}">날짜</h3>-->
+				<!--					<div class="modal-double-wrap">-->
+				<!--						<div class="modal-double-list">-->
+				<!--							<input type="text" class="input-text modal-input" th:value="${tsPopMngDTO.startYear}"-->
+				<!--								readonly />-->
+				<!--							<input type="text" class="input-text modal-input" th:value="${tsPopMngDTO.endYear}"-->
+				<!--								readonly />-->
+				<!--						</div>-->
+				<!--					</div>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.data.name}">데이터명</h3>-->
+				<!--					<input type="hidden" id="popmngId" name="popmngId" class="validation-tag"-->
+				<!--						th:value="${tsPopMngDTO.popmngId}" />-->
+				<!--					<input type="text" class="input-text modal-input validation-tag" name="popmngTitle"-->
+				<!--						th:placeholder="#{dataRegist.placeholder.data.name}" th:value="${tsPopMngDTO.popmngTitle}" />-->
+				<!--				</div>-->
+
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.agency}">관리기관</h3>-->
+				<!--					<div class="modal-date-show" th:text="${tsPopMngDTO.userBffltdNm}"></div>-->
+				<!--				</div>-->
+				<!--				<div class="modal-filter">-->
+				<!--					<h3 class="modal-filter-title" th:text="#{common.table.manager}">관리자</h3>-->
+				<!--					<div class="modal-date-show" th:text="${tsPopMngDTO.registId}"></div>-->
+				<!--				</div>-->
+<!--				<div class="modal-filter">-->
+<!--					<h3 class="modal-filter-title" th:text="#{common.table.file}">첨부파일</h3>-->
+<!--					<div class="modal-double-wrap">-->
+<!--						<span th:text="${tsPopMngDTO.orgFilenm}"></span>-->
+<!--						<button type="button" th:onclick="fileDownLoad([[${tsPopMngDTO.fileId}]])" class="is-key-button"-->
+<!--							th:text="#{dataRegist.dataRegistUpdate.button.file}">파일 다운로드</button>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--				<div class="modal-filter">-->
+<!--					<h3 class="modal-filter-title" th:text="#{dataRegist.descript}">설명</h3>-->
+<!--					<input type="text" class="input-text modal-input validation-tag" name="popmngCnts"-->
+<!--						th:placeholder="#{dataRegist.placeholder.descript}" th:value="${tsPopMngDTO.popmngCnts}" />-->
+<!--				</div>-->
+			</div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	dateYearSet(30);
+
+	function fileDownLoad(fileId) {
+		location.href = "/datamng/dataregist/fileDownload?fileId=" + fileId;
+	}
+
+	// 버튼 만들어서 붙여주세요.
+	// 데이터 상세
+	function dataUpdate(popmngId) {
+		// 		new ModalBuilder().init(message.dataRegist.data_detail).ajaxBody(__contextPath__ + "/datamng/dataregist/update?popmngId="+popmngId).footer(3, message.common.button_update, function (button, modal) {
+		const popmngTitle = document.querySelector('input[name="popmngTitle"]').value;
+		const popmngCnts = document.querySelector('textarea[name="popmngCnts"]').value;
+		const formData = new FormData(document.getElementById('dataRegistUpdate'));
+
+		const data = {
+			popmngId: popmngId,
+			popmngTitle: popmngTitle,
+			popmngCnts: popmngCnts
+		};
+		fetch(__contextPath__ + "/datamng/dataregist/update", {
+			method: "PUT",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(result => {
+				if (result.code == '200') {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+						window.location.reload();
+						modal.close();
+					}).open();
+				} else {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+				}
+			})
+		// 		}, message.common.button_delete, function (button, modal) {
+		// 		}).open();
+	}
+
+	//삭제 버튼 만들어서 붙여주세요.
+	function dataDelete(popmngId) {
+		new MsgModalBuilder().init().alertBody(message.dataRegist.data_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+				modal.close();
+			fetch(`${__contextPath__}/datamng/dataregist/${popmngId}/delete`, {
+				method: "DELETE"
+			})
+			.then(response => response.json())
+			.then(result => {
+				new MsgModalBuilder().init().alertBody(message.dataRegist.data_delete_complete).footer(4, message.common.button_confirm, function (button, modal) {
+						location.href="/datamng/dataregist";
+						modal.close();
+					}).open();
+			}).catch(error => {
+				new MsgModalBuilder().init().alertBody(message.dataRegist.data_delete_fail).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+			})
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+</script>

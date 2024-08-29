@@ -8,13 +8,15 @@
 			<form id="searchForm" name="searchForm" th:action="@{/systemmng/user}">
 				<input type="hidden" name="pageNo" value="1">
 				<div class="list-search-box">
-					<select name="searchType" class="select-list-box">
-						<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
-						<option value="userId" th:selected="${searchInfo.searchType} == 'userId'">ID</option>
-						<option value="userNm" th:selected="${searchInfo.searchType} == 'userNm'">이름</option>
-						<option value="userTel" th:selected="${searchInfo.searchType} == 'userTel'">연락처</option>
-						<option value="userEmail" th:selected="${searchInfo.searchType} == 'userEmail'">이메일</option>
-					</select>
+					<div class="select-div-box">
+						<select name="searchType" class="select-list-box">
+							<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
+							<option value="userId" th:selected="${searchInfo.searchType} == 'userId'">ID</option>
+							<option value="userNm" th:selected="${searchInfo.searchType} == 'userNm'">이름</option>
+							<option value="userTel" th:selected="${searchInfo.searchType} == 'userTel'">연락처</option>
+							<option value="userEmail" th:selected="${searchInfo.searchType} == 'userEmail'">이메일</option>
+						</select>
+					</div>
 					<input type="text" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
 					<button type="submit" class="is-key-button">검색</button>
 				</div>		
@@ -48,7 +50,7 @@
 	                </th:block>
 	                <th:block th:if="${totalCnt == 0}">
 	                	<tr>
-	                		<td colspan="9">검색된 결과가 없습니다.</td>
+	                		<td colspan="9" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
 	                	</tr>
 	                </th:block>
 				</tbody>

@@ -1,43 +1,37 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-	<th:block layout:fragment="modalContent">
-		<form id="siteSave" name="siteSave">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+<th:block layout:fragment="modalContent">
+	<form id="siteSave" name="siteSave">
 		<input type="hidden" name="brdTypeCd" value="news">
-			<div>
-				<table class="modal-table">
-					<tbody>
-						<tr>
-							<th>사이트명</th>
-							<td><input type="text" name="siteNm" placeholder="사이트명을 입력하세요."></td>
-						</tr>
-						<tr>
-							<th>분류</th>
-							<td>
-								<select name="siteTypeCd">
-									<option value="교통관련기관">교통관련기관</option>
-									<option value="해외교통사이트">해외교통사이트</option>
-									<option value="교통정보제공사이트">교통정보제공사이트</option>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<th>사이트 URL</th>
-							<td><input type="text" name="siteUrl" placeholder="사이트 URL을 입력하세요."></td>
-						</tr>
-						<tr>
-							<th>노출여부</th>
-							<td>
-								<select name="useYn">
-									<option value="Y">노출</option>
-									<option value="N">미노출</option>
-								</select>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+		<div id="modalOneLineWrap">
+			<div class="modal-filter">
+				<h3 class="modal-filter-title">사이트명</h3>
+				<input type="text" class="input-text modal-input boardValue" placeholder="내용을 입력해주세요.">
 			</div>
-		</form>
-	</th:block>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title">분류</h3>
+				<select class="modal-select select-list-box" name="siteTypeCd">
+					<option value="교통관련기관">교통관련기관</option>
+					<option value="해외교통사이트">해외교통사이트</option>
+					<option value="교통정보제공사이트">교통정보제공사이트</option>
+				</select>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title">사이트 URL</h3>
+				<input type="text" class="input-text modal-input" placeholder="내용을 입력해주세요.">
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{common.table.exposure}">노출 여부</h3>
+				<div class="select-div-box">
+					<select class="select-list-box modal-select" name="dspyYn">
+						<option value="Y">노출</option>
+						<option value="N">미노출</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</form>
+</th:block>
+
 </html>

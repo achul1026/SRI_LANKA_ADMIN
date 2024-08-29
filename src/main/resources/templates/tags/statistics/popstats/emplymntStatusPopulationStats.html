@@ -1,0 +1,42 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<th:block th:fragment="RegionPopulationStats">
+	<div id="dashChartWrap">
+		<div class="screen-division menu-container">
+			<div class="dashboard-tab-btn">
+				<th:block th:if="${not #lists.isEmpty(statsList)}">
+					<div class="division-box">
+						<div class="division-title-box"  th:each="item : ${statsList}">
+							<div>
+								<label class="division-title">
+									<input type="radio" th:text="${item.popmngTitle}" class="none" name="popmngId" th:value="${item.popmngId}" onchange="areaRadioChartDraw(this)"/>
+									<span th:text="${item.startYear}"></span>~<span th:text="${item.endYear}"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</th:block>
+				<th:block th:unless="${not #lists.isEmpty(statsList)}">
+					<div class="division-box">
+						<div class="division-title-box">
+							<span class="division-title" th:text="#{common.search.result.notExist}"></span>
+						</div>
+					</div>
+				</th:block>
+			</div>
+		</div>
+		<div id="chartResultWrap" class="population-search-item none">
+			<div class="flex-between">
+				<h4 th:text="${searchDTO.popStatTypeCd.name}"></h4>
+				<input type="button" id="excelDownLoadBtn" class="is-key-button" th:value="#{common.button.download}"/>
+			</div>
+			<div id="pop_chart" class="content-chart"></div>
+			<div id="noneData">
+				<div id="noneDataCon">
+					<img th:src="@{/images/no_data.png}" alt="no data" class="no-data-img"><br>
+					<span th:text="#{statistics.data.not.exist}">데이터가 존재하지 않습니다.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

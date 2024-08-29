@@ -58,11 +58,11 @@
 		.then(response => response.json())
 		.then(result => {
 			if(result.data.code == '200'){
-				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+				new MsgModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
 		            location.href= __contextPath__+"/systemmng/user";
 				}).open();
 			} else {
-				new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+				new MsgModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
 					modal.close();
 				}).open();
 			}
@@ -76,7 +76,8 @@
 			var newUserAccountPwd = $("#newUserAccountPwd").val();
 			var newUserAccountPwdChk = $("#newUserAccountPwdChk").val();
 			if(newUserAccountPwd != newUserAccountPwdChk){
-				new ModalBuilder().init().alertBody("새로운 비밀번호가 일치하지 않습니다. 다시 확인해주세요.").footer(4,'확인',function(button, modal){
+				new MsgModalBuilder().init().alertBody("새로운 비밀번호가 일치하지 않습니다. 다시 확인해주세요.").footer(4,'확인',function(button, modal){
+					modal.close();
 				}).open();
 			} else {
 				fetch(__contextPath__+"/systemmng/user/pw/update/"+userAccountId,{
@@ -86,11 +87,11 @@
 	        	.then(response => response.json())
 	        	.then(result => {
 	        		if(result.code == '200'){
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+						new MsgModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
 							modal.close();
 						}).open();
 					}else{
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+						new MsgModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
 							modal.close();
 						}).open();
 					}

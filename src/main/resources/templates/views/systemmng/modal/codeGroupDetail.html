@@ -1,32 +1,36 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-      
-	<th:block layout:fragment="modalContent">
-		<form id="groupCodeUpdateForm">
-			<input type="hidden" name="grpcdId" th:value="${tcCdGrp.grpcdId}">
-			<div>
-				<table class="modal-table">
-					<tbody>
-						<tr>
-							<th>공통 코드</th>
-							<td><input type="text" name="grpCd" th:value="${tcCdGrp.grpCd}"/></td>
-							<th>사용여부</th>
-							<td>
-								<select class="select-list-box" name="useYn">
-									<option value="Y" th:selected="${tcCdGrp.useYn} == 'Y'">사용</option>
-									<option value="N" th:selected="${tcCdGrp.useYn} == 'N'">미사용</option>
-								</select>
-							</td>
-						</tr>
-						<tr>
-							<th>공통 코드명</th>
-							<td colspan="3"><input type="text" name="grpcdNm" th:value="${tcCdGrp.grpcdNm}"/></td>
-						</tr>
-					</tbody>
-				</table>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+
+<th:block layout:fragment="modalContent">
+	<form id="groupCodeUpdateForm">
+		<input type="hidden" name="grpcdId" th:value="${tcCdGrp.grpcdId}">
+		<div id="modalOneLineWrap">
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.codeGroup}">
+					공통 코드
+				</h3>
+				<input type="text" class="input-text modal-input validation-tag" name="grpCd" th:value="${tcCdGrp.grpCd}"
+					th:placeholder="#{code.codeGroupSave.placeholder.searchCdGrp}">
 			</div>
-		</form>
-	</th:block>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{common.table.useYn}">
+					사용 여부
+				</h3>
+				<div class="select-div-box">
+					<select class="select-list-box modal-select" name="useYn">
+						<option value="Y" th:text="#{common.option.useYn.y}" th:selected="${tcCdGrp.useYn == 'Y'}">사용</option>
+						<option value="N" th:text="#{common.option.useYn.n}" th:selected="${tcCdGrp.useYn == 'N'}">미사용</option>
+					</select>
+				</div>
+			</div>
+			<div class="modal-filter">
+				<h3 class="modal-filter-title" th:text="#{code.common.codeGroup.name}">공통 코드명</h3>
+				<input type="text" class="input-text modal-input validation-tag" name="grpcdNm" th:value="${tcCdGrp.grpcdNm}"
+					th:placeholder="#{code.codeGroupSave.placeholder.searchCdGrp.name}">
+			</div>
+		</div>
+	</form>
+</th:block>
+
 </html>

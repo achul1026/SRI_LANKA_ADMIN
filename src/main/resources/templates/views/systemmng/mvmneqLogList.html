@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<div class="mt32" th:if="${!#lists.isEmpty(mvmneqLogList)}">
+		<h3 class="info-title">LOG</h3>
+		<div class="infoTableWrap">
+			<input type="hidden" id="asynchronousPageNo" name="asynchronousPageNo" value="1">
+			<table id="listTable" class="infoTable">
+				<thead>
+					<tr>
+						<th th:text="#{facilities.table.date}">설치일</th>
+						<th th:text="#{common.table.coordinate.x}">경도</th>
+						<th th:text="#{common.table.coordinate.y}">위도</th>
+					</tr>
+				</thead>
+				<tbody>
+<!-- 				<tbody th:if="${!#lists.isEmpty(mvmneqLogList)}"> -->
+					<tr th:each="item:${mvmneqLogList}">
+						<td th:text="${#temporals.format(item.clctDt, 'yyyy.MM.dd HH:mm:ss')}"></td>
+						<td th:text="${item.lon}"></td>
+						<td th:text="${item.lat}"></td>
+					</tr>
+				</tbody>
+<!-- 				<tbody th:unless="${!#lists.isEmpty(mvmneqLogList)}"> -->
+<!-- 					<tr> -->
+<!-- 						<td colspan="3" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td> -->
+<!-- 					</tr> -->
+<!-- 				</tbody> -->
+			</table>
+		</div>
+		<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+	</div>
+</html>

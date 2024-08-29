@@ -5,86 +5,73 @@
       
 	<th:block layout:fragment="content">
         <div>
-        	<div class='is-box'>
-		        <div>
-		            <h3 id="infoTitle">조사 수정</h3>
-		        </div>
-				<form id="invstSaveForm">
+			<form id="invstSaveForm">
+        		<div class='is-box'>
+			        <div>
+			            <h3 id="infoTitle" th:text="#{invst.invstUpdate.title}">조사 수정</h3>
+			        </div>
 					<input type="hidden" name="sttsCd" th:value="${invstInfo.sttsCd}"/>
 					<div class="infoTableWrap">
 						<table id="mapLocationSave" class="infoTable survey-save-table">
 							<tr>
-								<th>조사 종류</th>
+								<th th:text="#{invst.common.invest.type}">조사 종류</th>
 									<td class="type-box">
-										<select class="select-list-box" id="exmnType" name="exmnType" onchange="typeOption();">
-											<th:block th:each="item : ${cmCdList}">
-												<option th:value="${item}" th:data-invst-type="${item.type}" th:data-invst-typecd="${item.code}" th:text="${item.name}" th:selected="${item eq invstInfo.exmnType}"></option>
-											</th:block>
-										</select>
+										<span class="select-div-box">
+											<select class="select-list-box table-select" id="exmnType" name="exmnType" onchange="typeOption();">
+												<th:block th:each="item : ${cmCdList}">
+													<option th:value="${item}" th:data-invst-type="${item.type}" th:data-invst-typecd="${item.code}" th:data-has-drct="${item.hasDrct}" th:text="${item.name}" th:selected="${item eq invstInfo.exmnType}"></option>
+												</th:block>
+											</select>
+										</span>
 									</td>
-								<th>조사명</th>
+								<th th:text="#{invst.common.invest.name}">조사명</th>
 								<td>
-			                        <input type="text" name="exmnNm" class="input-table-text surveyValue" placeholder="조사명을 입력해주세요." th:value="${invstInfo.exmnNm}"/>
+			                        <input type="text" id="exmnNm" name="exmnNm" class="input-table-text validation-tag" th:placeholder="#{common.search.placeholder.investName}" th:value="${invstInfo.exmnNm}" onkeyup="valid(this);" maxlength="50"/>
 								</td>
 							</tr>
 							<tr>
-								<th>조사 담당자</th>
+								<th th:text="#{invst.common.invest.manager}">조사 담당자</th>
 								<td>
 									<span class="table-flex">
 										<input type="hidden" class="mngrInfo" id="usermngId" name="usermngId" th:value="${invstInfo.usermngId}" />
-										<input type="text" class="mngrInfo input-table-text surveyValue" id="exmnpicId" name="exmnpicId" placeholder="조사 담당자를 검색해주세요." th:value="${invstInfo.exmnpicId}" readonly />
-										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyOfficer();" value="검색"/>
+										<input type="hidden" class="mngrInfo" id="exmnpicId" name="exmnpicId" th:value="${invstInfo.exmnpicId}" />
+										<input type="text" class="mngrInfo input-table-text validation-tag" id="userNm" th:placeholder="#{common.search.placeholder.manager}" th:value="${invstInfo.userNm}" readonly/>
+									
+										  <button type="button" id="investigatoBtn" class="modal-find-img" onclick="surveyOfficer();">
+											  <img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+										  </button>
 									</span>
 								</td>
-								<th>조사 형태</th>
-								<td><input type="text" name="exmnDiv" class="input-table-text surveyValue" placeholder="조사 형태를 입력해주세요." th:value="${invstInfo.exmnDiv}"></td>
+								<th th:text="#{invst.common.invest.form}">조사 형태</th>
+								<td><input type="text" id="exmnDiv" name="exmnDiv" class="input-table-text validation-tag" th:placeholder="#{invst.common.placeholder.form}" th:value="${invstInfo.exmnDiv}" onkeyup="valid(this);" maxlength="20"></td>
 							</tr>
-							<tr class="survey-objectives" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
-								<th>설문 양식</th>
+							<tr class="survey-OD" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
+								<th th:text="#{invst.common.survey.form}">설문 양식</th>
 								<td>
 									<span class="table-flex">
 										<input type="hidden" class="srvyInfo" id="srvyId" name="srvyId" th:value="${invstInfo.srvyId}"/>
-										<input type="text" class="srvyInfo input-table-text" id="srvyTitle" th:value="${invstInfo.srvyTitle}" placeholder="조사 설문지를 검색해주세요." readonly />
-										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyForm();" value="검색"/>
+										<input type="hidden" class="srvyInfo" id="cstmYn" name="cstmYn" th:value="${invstInfo.cstmYn}"/>
+										<input type="text" class="srvyInfo input-table-text" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'validation-tag'" id="srvyTitle" th:value="${invstInfo.srvyTitle}" th:placeholder="#{invst.common.placeholder.survey}" readonly/>
+										<input type="button" id="investigatoBtn" class="is-key-button" onclick="surveyForm();" th:value="#{common.button.search}"/>
 									</span>
 								</td>
-								<th>조사 목표 개수</th>			
+								<th th:text="#{invst.common.invest.target.number}">조사 목표 개수</th>			
 								<td>
 									<span class="table-flex">
-										<input type="text" name="goalCnt" class="input-table-text surveyValue" th:value="${invstInfo.goalCnt}" placeholder="조사 목표 개수를 입력해주세요." />
-										<span>개</span>
+										<input type="text" id="goalCnt" name="goalCnt" class="input-table-text" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'validation-tag'" oninput="inputOnlyNumber(this)" th:value="${invstInfo.goalCnt}" th:placeholder="#{invst.common.placeholder.invest.number}" onkeyup="valid(this);"/>
+										<span th:text="#{common.unit.item}">개</span>
 									</span>
 								</td>
-							</tr>
-							<tr>
-								<th>조사 기간</th>
-								<td>
-									<input type="text" class="input-table-text startPicker ml0 surveyValue" id="invstStrDt" th:value="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')}" th:data-start-date="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')}" placeholder="기간을 설정해주세요.">
-									~
-									<input type="text" class="input-table-text endPicker surveyValue" id="invstEndDt" th:value="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}" th:data-end-date="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}" placeholder="기간을 설정해주세요.">
-								</td>
-								<th>조사 시간</th>
-								<td>						
-									<span class="select-time-box mr8">
-										<select class="select-list-box select-hour startHour" th:data-start-hour="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH')}"></select>
-										<select class="select-list-box select-minute startMinute" th:data-start-minute="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'mm')}"></select>
-									</span>
-									~
-									<span class="select-time-box ml8">
-										<select class="select-list-box select-hour endHour" th:data-end-hour="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH')}"></select>
-										<select class="select-list-box select-minute endMinute" th:data-end-minute="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'mm')}"></select>							
-									</span>
-								</td>		
 							</tr>
 							<tr>	
-								<th>조사 인원</th>			
+								<th th:text="#{invst.common.invest.personel}">조사 인원</th>			
 								<td>
 									<span class="table-flex">
-										<input type="text" name="exmnNop" class="input-table-text surveyValue" th:value="${invstInfo.exmnNop}" placeholder="조사 인원을 입력해주세요." />
-										<span>명</span>
+										<input type="text" id="exmnNop" name="exmnNop" class="input-table-text validation-tag" oninput="inputOnlyNumber(this)" th:value="${invstInfo.exmnNop}" th:placeholder="#{invst.common.placeholder.invest.personel}" onkeyup="valid(this);"/>
+										<span th:text="#{common.unit.person}">명</span>
 									</span>
 								</td>
-								<th>캘린더 색상</th>			
+								<th th:text="#{invst.common.calendar.color}">캘린더 색상</th>			
 								<td id="radioColorSet">
 					            	<span class="radio-color-box">
 										<th:block th:each="item,status : ${colorTypeCd}">
@@ -92,145 +79,219 @@
 										</th:block>
 					            	</span>							
 								</td>	
+							</tr>							
+							<tr>
+								<th th:text="#{common.table.investPeriod}">조사 기간</th>
+								<td colspan="3">
+									<div class="flex-center gap8">
+										<div>
+											<input type="text" class="input-table-text surveyStartPicker ml0 validation-tag" id="invstStrDt" th:value="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')}" th:data-start-date="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')}" th:placeholder="#{common.search.placeholder.date}" onchange="valid(this);">
+											~
+											<input type="text" class="input-table-text endPicker validation-tag" id="invstEndDt" th:value="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}" th:data-end-date="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}" th:placeholder="#{common.search.placeholder.date}" onchange="valid(this);">
+										</div>
+										<div class="select-date-box survey-TM" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+											<select id="startHour" class="select-list-box select-hour table-select startHour validation-tag" th:data-start-hour="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH')}" data-validation="surveyTime"></select>
+											<select class="select-list-box select-minute table-select startMinute" th:data-start-minute="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'mm')}"></select>
+											~
+											<select id="endHour" class="select-list-box select-hour table-select endHour validation-tag" th:data-end-hour="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH')}" data-validation="surveyTime"></select>
+											<select class="select-list-box select-minute table-select endMinute" th:data-end-minute="${@commonUtils.formatLocalDateTime(invstInfo.endDt,'mm')}"></select>
+										</div>
+									</div>
+								</td>
+							</tr>
+							<!-- roadSide -->
+							<tr id="roadSidePoint" class="roadside" th:classappend="${invstInfo.exmnType.getCode()} eq 'ETC003' ? '' : 'none'">
+								<th th:text="#{invst.common.invest.roadName}">조사 지점</th>
+								<td colspan="3">
+									<div class="roadside-pointer-update">
+				                  		<select class="select-list-box table-select" id="regionType" data-validation="select" onchange="roadSideSelect(this)">
+				                  			<option value="" th:text="#{common.select.select}">선택</option>
+				                  			<option th:each="item:${locationPointTypeCd}" th:data-column="${item.column}" th:value="${item.code}" th:text="${item.name}">Cordon Line</option>
+				                  		</select>
+				                  		<select class="select-list-box table-select" data-validation="select" id="surveyRegion" onchange="inputLocationPoint(this)">
+				                  			<option value="" th:text="#{common.select.select}">선택</option>
+				                  		</select>										
+									</div>
+								</td>
+							</tr>
+							
+							<!-- 도로명 -->
+							<tr class="survey-TM" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? '' : 'none'">
+								<th th:text="#{invst.common.invest.roadName}">도로명</th>
+								<td>
+									<div class="flex-center gap8">
+											<input type="hidden" id="locationPointType" th:value="${invstInfo.cordonLine != null ? 'cordonLine' : (invstInfo.screenLine != null ? 'screenLine' : 'tollBooth')}">
+											<input id="surveyPointNameDefault" type="hidden" th:name="${invstInfo.cordonLine != null ? 'cordonLine' : (invstInfo.screenLine != null ? 'screenLine' : 'tollBooth')}" th:value="${invstInfo.cordonLine != null ? invstInfo.cordonLine : (invstInfo.screenLine != null ? invstInfo.screenLine : invstInfo.tollBooth)}">
+											<input id="surveyPointNameInput" type="hidden">
+										<div class="flex-center gap8 roadname-update">
+											<!--	도로명 -->
+					                     	<select class="select-list-box table-select survey-roadname" id="roadNmType" onchange="roadNameSelect(this);" data-validation="select">
+					                     		<option value="" th:text="#{common.select.select}">선택</option>
+					                     		<option th:each="item:${roadNmTypeCd}" th:data-column="${item.column}" th:value="${item.code}" th:text="${item.name}">Cordon Line</option>
+					                     	</select>
+					                     	
+					                     	<select class="select-list-box table-select survey-pointname" id="surveyPointName" data-validation="select" onchange="inputLocationPoint(this)">
+					                     		<option value="" th:text="#{common.select.select}">선택</option>
+					                     	</select>
+						                    <input type="text" id="roadDescr" name="roadDescr" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag' : ''" class="input-table-text" th:value="${invstInfo.roadDescr}" th:placeholder="#{invst.common.placeholder.road.name}" readonly/>
+				                     	</div>
+									</div>
+								</td>
+								<th th:text="#{invst.common.invest.roadcode}">도로 코드</th>
+								<td>
+									<input type="text" id="roadCd" name="roadCd" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag' : ''" class="input-table-text" th:value="${invstInfo.roadCd}" placeholder="좌표를 설정하시면 도로 코드명이 입력됩니다." readonly/>
+								</td>
+							</tr>
+							<tr class="survey-TM" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+								<th th:text="#{invst.common.invest.distance}">조사 위치(km)</th>
+								<td><input type="text" id="exmnDistance" name="exmnDistance" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag'" class="input-table-text" th:value="${invstInfo.exmnDistance}" placeholder="조사 위치를 입력해주세요." readonly/></td>
+								<th th:text="#{invst.common.road.lane.number}">도로 차선 수</th>
+								<td><input type="text" id="laneCnt" class="input-table-text" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag'" name="laneCnt" th:value="${invstInfo.laneCnt}" th:placeholder="#{invst.common.placeholder.road.lane.number}" onkeyup="valid(this);"/></td>
 							</tr>
 							<tr>
-								<th>조사 지역</th>			
-								<td id="tableLocationColSpan">
-									<span class="surveyDirectionBox">
-										<input type="hidden" id="exmnLcValue" th:value="${invstInfo.exmnLc}"/>
-										<input type="text" class="table-input-reset surveyValue surveyLocationValue" id="surveyMapLocation" name="exmnLc" th:value="${invstInfo.exmnLc}" readonly/>
-									</span>
-									<span class="survey-loaction-box flex-between" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
-										<span id="displayExmnLc">
-											<input type="text" class="table-input-reset" th:value="${invstInfo.exmnLc}" readonly>
-											<input type="button" class="is-key-button" value="수정" onclick="displayExmnLc('update')">
-										</span>
-										<span id="updateExmnLc" class="none">
-											<span class="survey-location-list none"></span>
-											<input type="button" class="is-basic-button" value="취소" onclick="displayExmnLc('cancel')"/>
-<!-- 											<input type="hidden" name="exmnLc" class="surveyLocationValue" th:value="${invstInfo.exmnLc}"/> -->
-										</span>
-									</span>
+								<th th:text="#{invst.common.invest.region}">조사 지역</th>			
+ 								<td colspan="3">
+									<input type="hidden" id="exmnLcValue" th:value="${invstInfo.exmnLc}"/>
+									<input type="hidden" id="dsdCd" th:value="${invstInfo.dsdCd}"/>
+									<input type="hidden" id="gnCd" th:value="${invstInfo.gnCd}"/>
+									<div id="surveyLocationSearch" class="location-event"></div>
 								</td>
-								<th class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">도로 차선 수</th>			
-								<td class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-									<input type="text" class="input-table-text surveyValue" name="laneCnt" th:value="${invstInfo.laneCnt}"/>
-								</td>						
-							</tr>
-							<tr class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-								<th>좌표</th>
-								<td>
-									<input type="text" class="locationInfo table-input-reset surveyValue" id="coordinate" th:value="|${invstInfo.lat}, ${invstInfo.lon}|" readonly />
+							</tr>							
+							<tr class="survey-TM" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+								<th th:text="#{common.table.coordinate}">좌표(TAZ CODE)</th>
+								<td id="coordinateDetail">
+									<input type="text" class="locationInfo input-table-text" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag'" id="coordinate" th:value="|${invstInfo.lon}, ${invstInfo.lat} (${invstInfo.tazCd})|" th:placeholder="#{invst.common.placeholder.coordinate}" readonly />
 									<input type="hidden" class="locationInfo" th:value="${invstInfo.lat}" id="lat" name="lat"/>
 									<input type="hidden" class="locationInfo" th:value="${invstInfo.lon}" id="lon" name="lon"/>
+									<input type="hidden" class="locationInfo" th:value="${invstInfo.tazCd}" id="tazCode" name="tazCd"/>
 								</td>
-								<th>좌표 반경(m)</th>
+								<th th:text="#{invst.common.coordinate.radius}">좌표 반경(m)</th>
 								<td>
 									<span class="table-flex">
-										<input type="text" id="exmnRange" class="input-table-text surveyValue" name="exmnRange" th:value="${invstInfo.exmnRange}" />
-										<input type="button" id="invstLocationRadius" class="is-key-button" th:onclick="layerCircle([[${invstInfo.lon}]],[[${invstInfo.lat}]]);" value="등록"/>
+										<input type="text" id="exmnRange" class="input-table-text flex-1" th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'validation-tag'" name="exmnRange" th:value="${invstInfo.exmnRange}" th:placeholder="#{invst.common.placeholder.coordinate.radius}" onkeyup="valid(this);" />
+										<input type="button" id="invstLocatRadiusButton" class="is-key-button" th:onclick="setTrafficCircleMeters([[${invstInfo.lon}]],[[${invstInfo.lat}]]);" th:value="#{common.button.regist}"/>
 									</span>							
 								</td>
 							</tr>
-							<tr id="tableMap" class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-								<th>ස්ථානය</th>
+							<tr id="tableMap" class="survey-TM" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
+								<th th:text="#{common.table.map}">맵</th>
 								<td colspan="3" id="mapSearch">
-									<span id="detailMap">
+									<span id="mapContainer" class="detailMap">
 										<span id="map"></span>
 								    	<span id="zoomBox">
-			    							<span id="zoomIn"><img th:src="@{/images/zoom_in.png}" alt="확대"/></span>
-			    							<span id="zoomOut"><img th:src="@{/images/zoom_out.png}" alt="축소"/></span>
+			    							<span id="zoomIn"><img th:src="@{/images/zoom_in.png}" th:alt="#{common.imgAlt.expansion}"/></span>
+			    							<span id="zoomOut"><img th:src="@{/images/zoom_out.png}" th:alt="#{common.imgAlt.reduce}"/></span>
 		    							</span>									
 									</span>
 								</td>
 							</tr>						
 						</table>
 					</div>
-				</form>
-        	</div>
-			<div id="surveyDirectionBox" class="is-box mt24 surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-				<div class="flex-between">
-					<h3 class="info-title">조사 방향</h3>
-					<input type="button" class="is-key-button" onclick="directionAdd();" value="추가하기"/>	
+	        	</div>
+				<div id="surveyTM" class="is-box mt24 survey-TM" th:classappend="${invstInfo.exmnType.getHasDrct()} eq 'false' ? 'none'">
+					<div class="flex-between">
+						<h3 class="info-title" th:text="#{invst.common.invest.direction}">조사 방향</h3>
+						<input type="button" class="is-key-button" onclick="directionAdd();" th:value="#{invst.common.button.add}"/>	
+					</div>
+					<div class="infoTableWrap" id="surveyDirectionContainer">
+						<table class="infoTable">
+							<thead>
+								<tr>
+									<th th:text="#{common.table.number}">번호</th>
+									<th th:text="#{invst.common.table.from}">From</th>
+									<th th:text="#{invst.common.table.to}">To</th>
+									<th th:text="#{invst.invstUpdate.delete}">삭제</th>
+								</tr>
+							</thead>
+								<tbody id="surveyDirectionAppendBox">
+									<th:block th:if="${not #lists.isEmpty(tmExmnDrctList)}">
+									<tr class="drct-wrap" th:each="item : ${tmExmnDrctList}" th:data-drct-sqno="${item.drctSqno}" th:data-exmndrct-id="${item.exmndrctId}">
+										<td class="text-center directionNumber" th:text="${item.drctSqno}"></td>
+										<td><input type="text" class="input-table-text startlcNm" th:classappend="${invstInfo.exmnType.getHasDrct()} eq 'true' ? 'validation-tag'" id="startlcNm" name="startlcNm" th:value="${item.startlcNm}" th:placeholder="#{invst.common.placeholder.starting.point}" onkeyup="valid(this);"/></td>
+										<td><input type="text"  class="input-table-text endlcNm" th:classappend="${invstInfo.exmnType.getHasDrct()} eq 'true' ? 'validation-tag'" id="endlcNm" name="endlcNm" th:value="${item.endlcNm}" th:placeholder="#{invst.common.placeholder.end.point}" onkeyup="valid(this);"/></td>
+										<td class="text-center">
+											 <button type="button" th:onclick="directionRemove(this,[[${item.exmndrctId}]]);">
+											   <img src="/images/delete_img.png" class="cm-csimg" th:alt="#{common.imgAlt.delete}">
+										   </button>
+										</td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
+					</div>			
 				</div>
-				<div class="infoTableWrap">
-					<table class="infoTable">
-						<thead>
-							<tr>
-								<th>번호</th>
-								<th>From</th>
-								<th>To</th>
-								<th>삭제</th>
-							</tr>
-						</thead>
-						<tbody id="surveyDirectionAppendBox">
-							<tr class="drct-wrap" th:each="item : ${tmExmnDrctList}" th:data-drct-sqno="${item.drctSqno}" th:data-exmndrct-id="${item.exmndrctId}">
-								<td class="text-center directionNumber" th:text="${item.drctSqno}"></td>
-								<td><input type="text" class="input-table-text startlcNm" name="startlcNm" th:value="${item.startlcNm}" placeholder="from"/></td>
-								<td><input type="text"  class="input-table-text endlcNm" name="endlcNm" th:value="${item.endlcNm}" placeholder="to"/></td>
-								<td class="text-center">
-									<input type="button" th:onclick="directionRemove(this,[[${item.exmndrctId}]]);" class="is-key-button direction-remove-button" value="삭제하기"/>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>			
-			</div>
-			<div class="info-button-box">
-                <!-- <a href="javascript:void(0)" th:onclick="updateInvstMngSurvey([[${invstInfo.exmnmngId}]]);" class="is-key-button">저장</a> -->
-                <input type="button" th:onclick="updateInvstMngSurvey([[${invstInfo.exmnmngId}]]);" class="is-key-button overLapping" value="저장"/>
-                <a th:href="@{/datamng/invst/{exmnmngId}(exmnmngId=${invstInfo.exmnmngId})}" class="is-basic-button">취소</a>
-            </div>
+				<div class="info-button-box">
+	                <!-- <a href="javascript:void(0)" th:onclick="updateInvstMngSurvey([[${invstInfo.exmnmngId}]]);" class="is-key-button">저장</a> -->
+	                <a th:href="@{/datamng/invst/{exmnmngId}(exmnmngId=${invstInfo.exmnmngId})}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
+	                <input type="button" th:onclick="updateInvstMngSurvey([[${invstInfo.exmnmngId}]]);" class="is-key-button overLapping" th:value="#{common.button.save}"/>
+	            </div>
+            </form>
         </div>
 	</th:block>
 </html>
-<script type="text/javascript">
+<script th:inline="javascript">
 	const lat 		= document.getElementById('lat').value;
 // 		[[${invstInfo.lat}]];
-	const lon 		= document.getElementById('lon').value;
+	const lng 		= document.getElementById('lon').value;
 // 		[[${invstInfo.lon}]];
 	const exmnRange = document.getElementById('exmnRange').value;
 // 		[[${invstInfo.exmnRange}]];
-
-	const surveyType = document.getElementById('exmnType');
-	const typeValue = surveyType.value;
-	const objective = document.querySelectorAll('.survey-objectives');
-	const directionBox = document.querySelectorAll('.surveyDirectionBox');
-	const locationSelect = document.querySelector('.survey-loaction-box');
+	const locationDsdTazCode = document.getElementById('dsdCd').value;
+	const locationGnTazCode = document.getElementById('gnCd').value;
 	
-	if(typeValue == 'OD' || typeValue == 'AXLELOAD' || typeValue == 'LABORSIDE') {
-		objective.forEach(item => { 
-			item.classList.remove('none')
-			item.querySelectorAll('input').forEach(input => input.classList.add('surveyValue'));
-		});
-		directionBox.forEach(item => {
-			item.classList.add('none')
-			item.querySelectorAll('input').forEach(input => input.classList.remove('surveyValue'));
-			if(typeValue == 'AXLELOAD') {
-				document.getElementById('surveyDirectionBox').classList.remove('none');
-				locationSelect.classList.remove('none');
-			}
-		});
-		document.querySelector('.survey-loaction-box').classList.remove('none');
-		document.getElementById('tableLocationColSpan').setAttribute('colSpan', '2');
-	} else {
-		objective.forEach(item => { 
-			item.classList.add('none')
-			item.querySelectorAll('input').forEach(input => input.classList.remove('surveyValue'));
-		});
-		directionBox.forEach(item => {
-			item.classList.remove('none')
-			item.querySelectorAll('input').forEach(input => input.classList.add('surveyValue'));
-		});
-		document.querySelector('.survey-loaction-box').classList.add('none');
-		document.getElementById('tableLocationColSpan').setAttribute('colSpan', '');
-	}
+	const roadTypeCd = /*[[${roadTypeCd}]]*/
+	const roadTypePointName = document.getElementById('surveyPointNameDefault').value;
+	const roadNmEl = document.querySelector('#roadNmType');
+	const roadNmOption = document.querySelectorAll('#roadNmType option');
+	const roadNmSideEl = document.getElementById('regionType')
+	const roadNmSideOption = document.querySelectorAll('#regionType option');
 	
-	//등록했던 조사마커 담아주기
-	locationLng = lon;
-	locationLat = lat;
-	mapboxGl(lon, lat, exmnRange);
-
+	const chgEvt = new Event('change');
+	roadNmOption.forEach(option => {
+		if(option.value === roadTypeCd) {
+			option.setAttribute('selected', true);
+			roadNmEl.dispatchEvent(chgEvt)
+		}
+	})
+	
+	const roadPointOption = document.querySelectorAll('#surveyPointName option');
+	roadPointOption.forEach(option => {
+		if(option.value === roadTypePointName) option.setAttribute('selected', true);
+	})
+	
+	roadNmSideOption.forEach(option => {
+		if(option.value === roadTypeCd) {
+			option.setAttribute('selected', true);
+			roadNmSideEl.dispatchEvent(chgEvt)
+		}
+	})
+	
+	const roadSidePointOption = document.querySelectorAll('#surveyRegion option');
+	roadSidePointOption.forEach(option => {
+		if(option.value === roadTypePointName) option.setAttribute('selected', true);
+	})
+	
+	rdaLocation('surveyLocationSearch');
+	setTimeout(function(){
+		if(locationGnTazCode === '') {
+			updateLocation(locationDsdTazCode);			
+		} else {
+			updateLocation(locationGnTazCode);
+		}
+	}, 1000);
+	
+	(async () => {
+		let mapgl = await mapboxGl(lng, lat);
+		setTazCodeLayer(mapgl);
+		setMapZoomControl(mapgl);
+		setMapSearch(mapgl);
+		setTrafficClickMaker(mapgl);
+		setMarker(lng, lat);
+		setTrafficSurveyCircleMeters(mapgl, lng, lat, exmnRange);
+		setRoadLayer(mapgl)
+	})();
+	
+	
 	//캘린더 색상
 	const colorSetContainer = document.getElementById('radioColorSet');
 	colorSetContainer.querySelectorAll('input').forEach(input => {
@@ -259,10 +320,12 @@
 		tr.className = 'drct-wrap';
 		let html = `
 			<td class="text-center directionNumber">${tBodyTr.length+1}</td>
-			<td><input type="text" class="input-table-text startlcNm" name="startlcNm" placeholder="from"/></td>
-			<td><input type="text"  class="input-table-text endlcNm" name="endlcNm" placeholder="to"/></td>
+			<td><input type="text" class="input-table-text startlcNm validation-tag" id="startlcNm${tBodyTr.length+1}" name="startlcNm" placeholder="${message.invest.invstSave_placeholder_starting_point}" onkeyup="valid(this);"/></td>
+			<td><input type="text"  class="input-table-text endlcNm validation-tag" id="endlcNm${tBodyTr.length+1}" name="endlcNm" placeholder="${message.invest.invstSave_placeholder_end_point}" onkeyup="valid(this);"/></td>
 			<td class="text-center">
-				<input type="button" onclick="directionRemove(this);" class="is-key-button direction-remove-button" value="삭제하기"/>
+				<button type="button" onclick="directionRemove(this);">
+					<img src="/images/delete_img.png" class="cm-csimg" th:alt="#{common.imgAlt.delete}">
+				</button>
 			</td>`
 		
 		//~방향제한이 있다면
@@ -296,25 +359,52 @@
 		
 		const tr = document.createElement('tr');
 		tr.classList.add('no-additional')
-		let html = `<td colspan="4" class="text-center">추가된 조사 방향이 없습니다.</td>;`
+		let html = `<td colspan="4" class="text-center">${message.invest.invstSave_notExist_directions}</td>`
 		if(tBodyTrAll.length == 0){
 			tBody.append(tr);
 			tr.innerHTML = html;
 		}
 	}
 	
-	locationSearch('survey-location-list');
-	
-	function displayExmnLc(display){
+	/* function displayExmnLc(display){
 		if (display === 'update') {
-			document.querySelector('.survey-location-list.none').classList.remove('none');
 			document.getElementById('displayExmnLc').classList.add('none');
 			document.getElementById('updateExmnLc').classList.remove('none');
 		} else {
-			document.querySelector('.survey-location-list').classList.add('none');
 			document.getElementById('displayExmnLc').classList.remove('none');
 			document.getElementById('updateExmnLc').classList.add('none');
-			document.querySelector('.surveyLocationValue').value = document.getElementById('exmnLcValue').value;
 		}
+	} */
+
+	window.inputManual = false;
+	async function inputLocationPoint(selectElement){
+		window.inputManual = false;
+		var selectedValue = selectElement.value;
+		document.getElementById("surveyPointNameInput").value = selectedValue;
+		let exmnType = document.getElementById("exmnType").value;
+		if(isNull(exmnType) || (exmnType !== 'MCC' && exmnType !== 'TM') ){
+			return;
+		}
+		let valueArr = selectedValue.split(",");
+		let info = await findTrafficVolumeLineCoordinates(valueArr[0]);
+		let coordinates = new mapboxgl.LngLat(info[0], info[1]);
+		window.map.flyTo({
+			center : coordinates,
+			duration : 200
+		});
+		if(valueArr[0] === "13") {
+			// 도로 gis 정보가 없어 하드코딩 - 도로명 Pannala - Kuliyapitiya, code B0356
+			const roadCd = document.getElementById('roadCd');
+			const roadDescr = document.getElementById('roadDescr');
+			const exmnDistance = document.getElementById('exmnDistance');
+			roadCd.value = "B0356";
+			roadDescr.value = "Pannala - Kuliyapitiya";
+			exmnDistance.value = "0";
+			window.inputManual = true;
+		}
+		window.map.fire('click', {
+			lngLat: coordinates
+		});
 	}
+	
 </script>

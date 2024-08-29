@@ -5,70 +5,74 @@
       
 	<th:block layout:fragment="content">
         <div>
-            <h3 data-id="infoTitle">관리자 등록</h3>
+            <h3 data-id="infoTitle" th:text="#{}">관리자 등록</h3>
         </div>
         <div>
 			<div id="infoTableWrap">
 				<form id="mngrSaveForm">
 					<table class="infoTable table-width">
 						<tr>
-							<th>이름</th>
+							<th th:text="#{common.name}">이름</th>
 							<td>
 								<input type="text" id="userNm" name="userNm" placeholder="이름을 입력해주세요." maxlength="32"></input>
 		                        <div class="error-message"></div>
 							</td>
-							<th>ID</th>
+							<th th:text="#{common.id}">ID</th>
 							<td>
 		                        <input type="text" id="userId" name="userId" placeholder="아이디를 입력해주세요." maxlength="32"></input>
 		                        <div class="error-message"></div>						
 							</td>
 						</tr>
 						<tr>
-							<th>비밀번호</th>
+							<th th:text="#{common.password}">비밀번호</th>
 							<td>
 								<input type="password" id="userPswd" name="userPswd" placeholder="비밀번호를 입력해주세요." maxlength="32"></input>
 								<div class="error-message"></div>
 							</td>
-							<th>비밀번호 확인</th>
+							<th th:text="#{common.password.confirm}">비밀번호 확인</th>
 							<td>
 								<input type="password" id="userPswdChk" placeholder="비밀번호를 입력해주세요." maxlength="32"></input>
 								<div class="error-message"></div>
 							</td>
 						</tr>
 						<tr>
-							<th>연락처</th>
+							<th th:text="#{common.contact}">연락처</th>
 							<td>
 								<input type="text" id="userTel" name="userTel" placeholder="연락처를 입력해주세요." maxlength="20"></input>
 								<div class="error-message"></div>
 							</td>
-							<th>이메일</th>
+							<th th:text="#{common.email}">이메일</th>
 							<td>
 								<input type="text" id="userEmail" name="userEmail" placeholder="이메일을 입력해주세요." maxlength="32"></input>
 								<div class="error-message"></div>
 							</td>
 						</tr>
 						<tr>
-							<th>소속</th>
-							<td>						
-								<select class="select-list-box" name=userBffltd>
-		                        	<option value="">선택</option>
-		                        	<option th:each="bffltd,status : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}"></option>
-			                    </select>
-							</td>					
-							<th>권한</th>
+							<th th:text="#{common.institution}">소속</th>
 							<td>
-								<select class="select-list-box" name="authgrpId">
-									<option value="">선택</option>
-									<option th:each="item,status : ${authList}" th:text="${item.authgrpNm}" th:value="${item.authgrpId}"></option>
-								</select>
+								<div class="select-div-box">
+									<select class="select-list-box" name=userBffltd>
+			                        	<option value="" th:text="#{common.select.select}">선택</option>
+			                        	<option th:each="bffltd,status : ${bffltdList}" th:value="${bffltd.cd}" th:text="${bffltd.cdNm}"></option>
+				                    </select>
+								</div>						
+							</td>					
+							<th th:text="#{common.authority}">권한</th>
+							<td>
+								<div class="select-div-box">
+									<select class="select-list-box" name="authgrpId">
+										<option value="" th:text="#{common.select.select}">선택</option>
+										<option th:each="item,status : ${authList}" th:text="${item.authgrpNm}" th:value="${item.authgrpId}"></option>
+									</select>
+								</div>
 							</td>
 						</tr>
 					</table>
 				</form>
 			</div>
 			<div class="info-button-box">
-                <a href="javascript:void(0)" id="mngrSave" class="is-key-button">등록</a>
-                <a th:href="@{/systemmng/mngr}" class="is-basic-button">취소</a>
+                <a href="javascript:void(0)" id="mngrSave" class="is-key-button" th:text="#{common.button.regist}">등록</a>
+                <a th:href="@{/systemmng/mngr}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
             </div>
         </div>
 	</th:block>
@@ -81,7 +85,7 @@
             data: $("#mngrSaveForm").serialize(),
             success: function(data){
                 if(data.code == 200){
-                    new ModalBuilder().init().successBody('승인 완료 시 계정의 이메일/SMS를 통해 알림 메시지가 전달됩니다.').footer(4,'확인',function(button, modal){
+                    new MsgModalBuilder().init().successBody(message.mngr.mngrSave_approval_message).footer(4, message.common.button_confirm,function(button, modal){
 	                    location.href= __contextPath__+"/systemmng/mngr";
                     }).open();
                 }

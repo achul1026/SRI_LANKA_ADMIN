@@ -1,0 +1,83 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	
+<th:block th:fragment="areaStatisticsFragment">
+	<div class="statisticsInsertBox">
+		<div class="statistics-search-box">
+			<form id="searchOption">
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{common.select.class}">Category</h4>
+					<div class="select-div-box wd100">
+						<select class="select-list-box ellipsis table-select-97 validation-tag" id="popStatTypeCd" name="popStatTypeCd" onchange="popStatsRegion(this)" data-validation="select">
+							<option value="" th:text="#{common.select.select}">선택</option>
+							<th:block th:each="item : ${popStatTypeCd}">
+								<option th:value="${item}" th:text="${item.name}" th:data-value="${item.code}">통계 유형</option>
+							</th:block>
+						</select>
+					</div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{common.institution}">관리 기관</h4>
+					<div class="select-div-box">
+						<select class="select-list-box table-select-97 validation-tag" name="bffltdCd" data-validation="select">
+							<th:block th:each="item : ${bffltdCd}">
+								<option th:value="${item.cd}" th:text="${item.cdNm}">통계 유형</option>
+							</th:block>							
+						</select>
+					</div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.year}">Survey Year</h4>
+					<div class="select-div-box">
+						<input type="hidden" id="startYear" th:value="${years.startYear}"/>
+						<input type="hidden" id="endYear" th:value="${years.endYear}"/>
+						<select class="dateYear scroll table-select-97 select-list-box validation-tag" name="searchYear" data-validation="oneDateSelect">
+						</select>
+					</div>
+				</div>
+				<div id="areaSearch" class="statistics-search-item none">
+					<div id="provinceSearch" class="none">
+						<h4 class="statistics-search-title">Province</h4>
+						<div class="select-div-box">
+							<select class="select-list-box table-select-97" name="province" id="provinceSelect">
+							</select>
+						</div>
+					</div>
+					<div id="districtSearch" class="none">
+						<h4 class="statistics-search-title">District</h4>
+						<div class="select-div-box">
+							<select class="select-list-box table-select-97 validation-tag" name="district" id="districtSelect" data-validation="select">
+							</select>
+						</div>
+					</div>
+					<div id="dsdSearch" class="none">
+						<h4 class="statistics-search-title">DsDivision</h4>
+						<div class="select-div-box">
+							<select class="select-list-box table-select-97" name="dsDivision" id="dsDivisionSelect">
+							</select>
+						</div>
+					</div>
+					<div id="gnSearch" class="none">
+						<h4 class="statistics-search-title">GnDivision</h4>
+						<div class="select-div-box">
+							<select class="select-list-box table-select-97" name="gnDivision" id="gnDivisionSelect">
+							</select>
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="statistics-search-button">
+				<input type="button" class="is-key-button wd100" th:value="#{statistics.button.apply}" onclick="areaAppendContentHTML();"/>
+			</div>
+		</div>
+	</div>
+	<div class="statistics-search-view">
+		<div class="statistics-search-img">
+			<img th:src="@{/images/dash_search.png}" alt="serach"/>
+			<div th:text="#{statistics.mccStatisticsDashboard.search}">검색조건을 입력 후 검색해주세요.</div>
+		</div>
+	</div>
+	<div class="statistics-list-box none">
+		<div class="statistics-content"></div>
+	</div>
+</th:block>

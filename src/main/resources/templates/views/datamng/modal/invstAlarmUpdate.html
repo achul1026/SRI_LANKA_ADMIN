@@ -1,50 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-	<th:block layout:fragment="modalContent">
-        <div>
-			<div id="infoTableWrap">
-				<form id="alarmUpdate" name="alarmUpdate">
-				<input type="hidden" name="bbsType" value="alarm">
-					<table class="modal-table">
-						<tr>
-							<th>제목</th>
-							<td>
-								<input type="text" class="wd100" name="bbsTitle" th:value="${tlBbsInfo.bbsTitle}" placeholder="제목을 입력해주세요."/>
-							</td>
-							<th>작성자</th>
-							<td><input type="text" th:value="${tlBbsInfo.registId}" readonly></td>
-						</tr>
-						<tr>
-							<th>작성일</th>
-							<td id="alarmToday"></td>
-							<th>노출 여부</th>
-							<td>						
-								<select class="select-list-box" name="dspyYn">
-									<option value="Y" th:selected="${tlBbsInfo.dspyYn == 'Y'}">노출</option>
-									<option value="N" th:selected="${tlBbsInfo.dspyYn == 'N'}">미노출</option>
-								</select>
-							</td>					
-						</tr>
-						<tr>
-							<th class="vertical-middle">내용</th>
-							<td colspan="3">
-								<textarea class="text-area" name="bbsCnts" th:text="${tlBbsInfo.bbsCnts}" placeholder="내용을 입력해주세요."></textarea>
-							</td>
-						</tr>
-					</table>
-				</form>
-			</div>
-        </div>
-	</th:block>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+<th:block layout:fragment="modalContent">
+	<div>
+		<div id="infoTableWrap">
+			<form id="alarmUpdate" name="alarmUpdate">
+				<input type="hidden" name="bbsType" th:value="${tlBbsInfo.bbsType}">
+				<div id="modalRegistWrap">
+					<div class="modal-filter">
+						<h3 class="modal-filter-title" th:text="#{common.table.subject}">제목</h3>
+						<input type="text" class="input-text modal-input alarmValue" name="bbsTitle"
+							th:value="${tlBbsInfo.bbsTitle}"
+							th:placeholder="#{alarm.common.placeholder.search.title}" />
+					</div>
+					<div class="modal-filter">
+						<h3 class="modal-filter-title" th:text="#{common.table.writer}">작성자</h3>
+						<input type="text" class="input-text modal-input" th:value="${tlBbsInfo.registId}" readonly>
+					</div>
+					<div class="modal-filter">
+						<h3 class="modal-filter-title" th:text="#{common.table.registDate}">작성일</h3>
+						<div id="alarmToday" class="modal-date-show"></div>
+					</div>
+					<div class="modal-filter">
+						<h3 class="modal-filter-title" th:text="#{common.table.exposure}">노출 여부</h3>
+						<div class="select-div-box">
+							<select class="select-list-box modal-select" name="dspyYn">
+								<option value="Y" th:selected="${tlBbsInfo.dspyYn == 'Y'}"
+									th:text="#{common.option.dspyYn.y}">노출</option>
+								<option value="N" th:selected="${tlBbsInfo.dspyYn == 'N'}"
+									th:text="#{common.option.dspyYn.n}">미노출</option>
+							</select>
+						</div>
+					</div>
+					<div class="modal-filter wd100 mg0">
+						<h3 class="modal-filter-title" th:text="#{common.table.content}">상세 내용</h3>
+						<div class="modal-search-wrap">
+							<textarea class="modal-textarea alarmValue" name="bbsCnts" th:text="${tlBbsInfo.bbsCnts}"
+								th:placeholder="#{common.search.placeholder.content}"></textarea>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</th:block>
+
 </html>
 <script type="text/javascript">
 	let today = new Date();
 	let year = today.getFullYear();
-	let month = (today.getMonth() + 1 < 10) ? '0' + (today.getMonth() + 1) : (today.getMonth() + 1); 
+	let month = (today.getMonth() + 1 < 10) ? '0' + (today.getMonth() + 1) : (today.getMonth() + 1);
 	let date = (today.getDate() < 10) ? '0' + (today.getDate()) : (today.getDate());
-	let dateSet = ''+year+'-'+month+'-'+date+'';
-	
+	let dateSet = '' + year + '-' + month + '-' + date + '';
+
 	$('#alarmToday').text(dateSet);
 </script>

@@ -5,24 +5,24 @@
       
 	<th:block layout:fragment="content">
 <!-- 		<div class="clearfix">	 -->
-		<div class="list-save-box">
+		<div class="is-box list-table-container">
+		<div class="menu-list-search-box">
 			<div id="saveRightButton">
-				<input type="button" id="menuSave" class="is-key-button" value="등록하기" onclick="saveMenuInfo('메뉴 등록하기','ALL')"/>
+				<input type="button" id="menuSave" class="is-key-button" th:value="#{common.button.regist}" th:onclick="saveMenuInfo([[#{menu.devMenuList.menu.regist}]],'ALL')"/>
 			</div>
 		</div>
-		<div class="is-box list-table-container">
 			<table class="list-table">
 				<thead>
 	                <tr>
-	                    <th>순서</th>
-	                    <th>메뉴명</th>
-	                    <th>URL 패턴</th>
-	                    <th>URL</th>
-	                    <th>노출여부</th>
-	                    <th>더 보기</th>
+	                    <th th:text="#{common.table.number}">순서</th>
+	                    <th th:text="#{menu.common.menu.name}">메뉴명</th>
+	                    <th th:text="#{menu.common.url.pattern}">URL 패턴</th>
+	                    <th th:text="#{menu.common.url}">URL</th>
+	                    <th th:text="#{common.table.exposure}">노출여부</th>
+	                    <th th:text="#{menu.devMenuList.more}">더 보기</th>
 	                </tr>
 				</thead>
-				<tbody class="table-menu-sub-list" th:each="item, status : ${tcMenuMngList}">
+				<tbody class="table-menu-sub-list" th:each="item, status : ${sideMenuList}">
 					<tr class="table-menu-list" th:id="${item.menuId}">
 			            <td th:text="${status.count}"></td>
 			            <td class="menuDepth1DetailModal" th:text="${item.menuNm}" th:onclick="menuDetail([[${item.menuId}]], 'ALL')"></td>
@@ -38,14 +38,14 @@
 						<td class="menuDepth2DetailModal" th:text="${subItem.menuNm}" th:onclick="menuDetail([[${subItem.menuId}]], [[${item.menuCd}]])"></td>
 						<td th:text="${subItem.uppermenuUrlpttrn}"></td>
 						<td th:text="${subItem.menuUrlpttrn}"></td>
-						<td><input type="checkbox" class="checkbox-toggle-button" th:checked="${subItem.useYn == 'Y'}" th:onchange="updateMenuInfo(this,[[${subItem.menuId}]])"></td>
-						<td th:onclick="deleteSubMenu([[${subItem.menuId}]])">삭제</td>
+						<td><input type="checkbox" class="checkbox-toggle-button" th:checked="${subItem.useYn == 'Y'}" th:onchange="updateMenuInfo(this,[[${subItem.menuId}]],[[${subItem.menuCd}]])"></td>
+						<td th:onclick="deleteSubMenu([[${subItem.menuId}]])" th:text="#{common.button.delete}">삭제</td>
 					</tr>
 	      			<tr class="none">
 	                	<td colspan="7">
-	                		<a href="javascript:void(0)" class="is-key-button subMenuSave" th:onclick="saveMenuInfo('서브 메뉴 등록하기',[[${item.menuCd}]],[[${item.bscmenuYn}]])">
+	                		<a href="javascript:void(0)" class="is-key-button subMenuSave" th:onclick="saveMenuInfo([[#{menu.devMenuList.menu.sub.regist}]],[[${item.menuCd}]],[[${item.bscmenuYn}]])">
 	                			<img th:src="@{/images/table_add.png}" alt="추가" class="table-add-menu-img">
-	                			서브메뉴 추가하기
+	                			<span th:text="#{menu.devMenuList.menu.sub.add}">서브메뉴 추가하기</span>
 	                		</a>
 	                	</td>
 	                </tr>
@@ -66,7 +66,7 @@
 	
 	// 메뉴 등록
 	function saveMenuInfo(modalName,uppermenuCd,menuBaseYn){
-		new ModalBuilder().init(modalName).ajaxBody(__contextPath__+"/developer/menu/save?uppermenuCd="+uppermenuCd).footer(1,'등록',function(button, modal){
+		new ModalBuilder().init(modalName).ajaxBody(__contextPath__+"/developer/menu/save?uppermenuCd="+uppermenuCd).footer(1,message.common.button_regist,function(button, modal){
 			//upperCd or ALL  
 			if(uppermenuCd == 'ALL') uppermenuCd = null;
 			$("#uppermenuCd").val(uppermenuCd);
@@ -80,61 +80,60 @@
 			.then(response => response.json())
   			.then(result => {
 					  			if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+									new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 										modal.close();
 										window.location.reload();
 									}).open();
 								}else{
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){modal.close();}).open();
+									new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 								}
 				  			}
 				  )
 			
 		}).open();
-		
 	}
 	
 	// 메뉴 수정, 삭제
 	function menuDetail(menuId, uppermenuCd){
-		new ModalBuilder().init("메뉴 상세정보", '1000').ajaxBody(__contextPath__+"/developer/menu/" + menuId + "?uppermenuCd=" + uppermenuCd).footer(3,'저장하기',function(button, modal){
+		new ModalBuilder().init(message.menu.devMenuList_menu_detail, '1000').ajaxBody(__contextPath__+"/developer/menu/" + menuId + "?uppermenuCd=" + uppermenuCd).footer(3,message.common.button_regist,function(button, modal){
 	        fetch(__contextPath__+"/developer/menu/"+menuId,{
 				method: "PUT",
-				body: new FormData($("#menuDetailForm")[0]),
+				body: new FormData($("#menuDetailForm")[0])
 			})
 			.then(response => response.json())
   			.then(result => {	
 					  			if(result.code == '200'){
-									  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+									  new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 										  modal.close();
 										  window.location.reload();
 									  }).open();
 								}else{
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+									new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 										  modal.close();
 									  }).open();
 								}
 				  			}
 				  )
-		}, '삭제하기', function(button, modal){
+		}, message.common.button_delete, function(button, modal){
 			fetch(__contextPath__ + "/developer/menu/" + menuId,{
 				method: "DELETE",
 			})
 			.then(response => response.json())
   			.then(result => {	
 					  			if(result.code == '200'){
-									  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+									  new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 										  modal.close();
 										  window.location.reload();
 									  }).open();
 								}else{
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+									new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 										  modal.close();
 									  }).open();
 								}
 				  			}
 				  )
 		}).open();
-		updateMenuCd();
+		updateMenuCdAndMenunm();
 	}
 	
 	// 사용여부 변경
@@ -150,12 +149,12 @@
 		.then(response => response.json())
 		.then(result => {	
 				  			if(result.code == '200'){
-								  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+								  new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 									  modal.close();
 									  window.location.reload();
 								  }).open();
 							}else{
-								new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+								new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 									  modal.close();
 								  }).open();
 							}
@@ -171,12 +170,12 @@
 		.then(response => response.json())
 		.then(result => {	
 				  			if(result.code == '200'){
-								  new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+								  new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 									  modal.close();
 									  window.location.reload();
 								  }).open();
 							}else{
-								new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+								new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 									  modal.close();
 								  }).open();
 							}
@@ -185,11 +184,18 @@
 	}
 	
 	// 코드 네임은 그대로지만 코드 값이 변경 되었을 경우 변경된 코드값을 정상적으로 적용하기 위해 페이지 로드시에 값을 할당하는 스크립트
-	function updateMenuCd(){
+	function updateMenuCdAndMenunm(){
 		// 'menuNm' 셀렉트 박스에서 현재 선택된 옵션의 'data-cd' 값을 가져옵니다.
-	    var selectedMenuCd = document.querySelector('#menuNm option:checked').getAttribute('data-cd');
+		var selectedMenu = document.querySelector('#menuNm option:checked');
+	    var selectedMenuCd = selectedMenu.getAttribute('data-cd');
+// 	    var selectedMenunmEng = selectedMenu.getAttribute('data-menunmEng');
+// 	    var selectedMenunmKor = selectedMenu.getAttribute('data-menunmKor');
+// 	    var selectedMenunmSin = selectedMenu.getAttribute('data-menunmSin');
 	    // 가져온 'data-cd' 값을 'menuCd' 인풋 필드의 'value'로 설정합니다.
 	    document.getElementById('menuCd').value = selectedMenuCd;
+// 	    document.getElementById('menunmEng').value = selectedMenunmEng;
+// 	    document.getElementById('menunmKor').value = selectedMenunmKor;
+// 	    document.getElementById('menunmSin').value = selectedMenunmSin;
 	}
 	
 </script>

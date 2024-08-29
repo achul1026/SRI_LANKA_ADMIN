@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+	<th:block layout:fragment="content">
+		<form id="apiSaveForm" name="apiSaveForm">
+			<input type="hidden" id="generatingKeyDate" th:value="${certKeyDetail.endYmd}"/>
+			<input type="hidden" id="certkeyId" th:value="${certKeyDetail.certkeyId}"/>
+			<input type="hidden" th:value="${certKeyDetail.aplyRsn}" />	
+ 			<div class="is-box">
+				<h3 class="info-title">인증키 상세</h3>
+				<table id="filterTable" class="api-detail-table">
+					<tbody>
+						<tr>
+							<th th:text="#{common.email}"></th>
+							<td th:text="${certKeyDetail.email}"></td>
+							<th>인증키</th>
+							<td>
+								<div class="flex-between">
+									<input type="text" id="generatingKey" class="table-input-reset flex-1" th:value="${certKeyDetail.apiKey}" readonly/>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th th:text="#{api.authenticationKeyDetail.authenticationKey.expirationDate}"></th>
+							<td th:text="${certKeyDetail.endYmd}"></td>
+							<th th:text="#{common.table.applicationReason}"></th>
+							<td th:text="${certKeyDetail.aplyRsn}"></td>
+						</tr>
+						<tr>
+							<th>발급상태</th>
+							<td th:switch="${certKeyDetail.sttsCd}">
+								<span th:case="0" th:text="#{api.authenticationKeyList.option.issuanceStatus.wait}"></span>
+								<span th:case="1" th:text="#{api.authenticationKeyList.option.issuanceStatus.complete}"></span>
+								<span th:case="2" th:text="#{api.authenticationKeyList.option.issuanceStatus.expired}"></span>
+							</td>
+							<th>상태변경</th>
+							<td>
+								<button type="button" th:if="${certKeyDetail.sttsCd != '0'}" class="is-sub-button" onclick="changeApiStatus('wait')" th:text="#{api.authenticationKeyList.option.issuanceStatus.wait}">대기(보류)보류</button>
+								<button type="button" th:if="${certKeyDetail.sttsCd != '1'}" class="is-button" onclick="changeApiStatus('complete')" th:text="#{api.authenticationKeyList.option.issuanceStatus.complete}">승인</button>
+								<button type="button" th:if="${certKeyDetail.sttsCd != '2'}" class="is-danger-button" onclick="changeApiStatus('expired')" th:text="#{api.authenticationKeyList.option.issuanceStatus.expired}">만료</button>							
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</form>
+		<div class="is-box mt24">
+			<div class="list-save-box">
+				<h3 class="cm-code-title">API 서비스 목록</h3>
+				<input type="button" class="is-key-button" onclick="apiKeySrvcRegist()" value="API 서비스 추가"/>
+			</div>
+			<th:block th:if="${not #lists.isEmpty(apiSrvcList)}">
+				<table id="listTable">
+					<colgroup>
+					</colgroup>
+					<thead>
+						<tr>
+							<th>서비스명</th>
+							<th>서비스 분류</th>
+							<th>서비스url</th>
+							<th>제공 기관</th>
+							<th>기능</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item ,status : ${apiSrvcList}">
+							<td th:text="${item.srvcNm}"></td>
+							<td th:text="${item.srvcClsf}"></td>
+							<td th:text="${item.srvcUrl}"></td>
+							<td th:text="${item.pvsnInst}"></td>
+							<td class="text-center">
+						    	<button type="button" th:onclick="apiSrvcDelete([[${item.srvcId}]])">
+						        	<img src="/images/delete_img.png" class="cm-csimg" th:alt="#{common.imgAlt.delete}">
+						    	</button>
+						    </td>
+						</tr>
+					</tbody>
+				</table>
+			</th:block>
+			<th:block th:unless="${not #lists.isEmpty(apiSrvcList)}">
+				<div>
+					아직 추가된 API 서비스가 없습니다.
+				</div>
+			</th:block>
+			<div class="info-button-box mj0">
+	            <a href="/datalink/authentication" class="is-basic-button mt32" th:text="#{common.button.prePage}">이전 페이지</a>
+<!--	            <button type="button" class="is-key-button">메일 전송</button>-->
+    	    </div>
+		</div>
+	</th:block>
+</html>
+<script>
+	const certkeyId = document.getElementById('certkeyId').value;
+	function asynchronousSearchList(){
+		apiKeySrvcRegist();
+	}
+	
+	
+	const addSrvcArr = [];
+	
+    function checkBoxInit() {
+        if (addSrvcArr.length > 0) {
+            let srvcList = document.querySelectorAll('.srvcList');
+
+            srvcList.forEach(row => {
+                let checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    let srvcId = checkbox.getAttribute('data-srvcId');
+                    if (addSrvcArr.includes(srvcId)) {
+                        checkbox.checked = true;
+                    } else {
+                        checkbox.checked = false;
+					}
+                }
+            });
+        } else {
+			let srvcList = document.querySelectorAll('.srvcList');
+			
+			 srvcList.forEach(row => {
+                let checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+            });
+            
+	        document.getElementById('apiSelectNotdata').classList.remove('none');
+		}
+    }
+    
+    function removeTr(_this){
+		let srvcId = _this.getAttribute('data-srvcId');
+		if(addSrvcArr.length > 0){
+		    const idx = addSrvcArr.indexOf(srvcId);
+		    
+		    if (idx > -1) {
+		        addSrvcArr.splice(idx, 1); // 배열에서 해당 값 제거
+		    }
+		}
+		_this.closest('tr').remove();
+
+	    checkBoxInit();
+	}
+	
+    function checkedApiSrvc(_this) {
+        const checkbox = _this.querySelector('input[type="checkbox"]');
+        const srvcId = checkbox.getAttribute('data-srvcId');
+        const srvcNm = checkbox.getAttribute('data-srvcNm');
+        const srvcClsf = checkbox.getAttribute('data-srvcClsf');
+        const srvcUrl = checkbox.getAttribute('data-srvcUrl');
+        const pvsnInst = checkbox.getAttribute('data-pvsnInst');
+        
+        if (checkbox) {
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                addSrvcArr.push(srvcId);
+                let appendTr = document.createElement('tr');
+                appendTr.classList.add('appendSrvcList');
+                appendTr.setAttribute('data-srvcId',srvcId);
+                
+                appendTr.innerHTML = 
+							`
+							<td>${srvcNm}</td>
+							<td>${srvcClsf}</td>
+							<td>${srvcUrl}</td>
+							<td>${pvsnInst}</td>
+							<td>
+								<input type="button" class="taz-button-reset" data-srvcId="${srvcId}" value="삭제" onclick="removeTr(this)">
+							</td>
+						`;
+				document.getElementById('modalSelectTbody').appendChild(appendTr);
+				
+				document.getElementById('apiSelectNotdata').classList.add('none');
+            } else {
+                let appendSrvcList = document.querySelectorAll('.appendSrvcList');
+                
+                appendSrvcList.forEach(appendTr => {
+					let appendTrSrvcId = appendTr.getAttribute('data-srvcid');
+					if(appendTrSrvcId == srvcId){
+						appendTr.remove();						
+					}
+				});
+
+                const idx = addSrvcArr.indexOf(srvcId);
+                if (idx > -1) {
+                    addSrvcArr.splice(idx, 1);
+                }
+            }
+        }
+        checkBoxInit();
+    }
+	
+	function changeApiStatus(status){
+		if(confirm(message.openAPI.authenticationKeyDetail_status_change)){
+			let sttsCd = '0';
+			
+			switch(status){
+				case 'wait':
+					sttsCd = '0';
+				break;
+				case 'complete':
+					sttsCd = '1';
+				break;
+				case 'expired':
+					sttsCd = '2';
+				break;
+			}
+			const data = {
+				certkeyId: certkeyId,
+				sttsCd: sttsCd
+			};
+			
+			const loading = new setLoading().start();
+			
+			fetch(`${__contextPath__}/datalink/authentication/status/update` , {
+			method: "PUT",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+			}).then(response => response.json())
+			.then(result => {
+				if(result.code == 200){
+					alert(message.openAPI.authenticationKeyDetail_status_change_complete);
+					location.reload();
+				} 
+			}).catch(error => {
+				alert(message.openAPI.authenticationKeyDetail_status_change_fail);
+				return;
+			}).finally(() => {
+				loading.end();
+			});
+		}
+	}
+	
+	function apiSrvcDelete(srvcId){
+		new MsgModalBuilder().init().alertBody(message.openAPI.authenticationKeyDetail_confirm_delete).footer(3, message.common.button_confirm, function (button, modal) {
+			modal.close();
+			
+			const loading = new setLoading().start();
+			
+			fetch(`${__contextPath__}/datalink/authentication/${certkeyId}/${srvcId}/delete`, {
+				method: "DELETE"
+			})
+			.then(response => response.json())
+			.then(result => {
+				if (result.code == '200') {
+					new MsgModalBuilder().init().alertBody(message.openAPI.authenticationKeyDetail_delete_complete).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+						window.location.reload();
+					}).open();
+				} else {
+					new MsgModalBuilder().init().alertBody(message.openAPI.authenticationKeyDetail_delete_fail).footer(4, message.common.button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+				}
+			}).catch(error => {
+				alert(message.openAPI.authenticationKeyDetail_delete_fail);
+			}).finally(() => {
+				loading.end();
+			});
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+	
+	function apiKeySrvcRegist(){
+		const asynchronousPageNo = document.getElementById('asynchronousPageNo') != null? document.getElementById('asynchronousPageNo').value:1;
+		const searchType = document.getElementById('searchType')?document.getElementById('searchType').value:'';
+		const searchContent = document.getElementById('searchContent')?document.getElementById('searchContent').value:'';
+		let cloneTbody = null;
+		
+		const modalContainer = document.querySelector('.modal-container');
+		if(modalContainer) {
+			const modalSelectTbody = document.getElementById('modalSelectTbody');
+			
+			cloneTbody = modalSelectTbody.cloneNode(true);
+			modalContainer.remove();
+		}
+			new ModalBuilder().init(message.openAPI.authenticationKeyDetail_add_service)
+				.ajaxBody(`${__contextPath__}/datalink/authentication/srvckey/save?certkeyId=${certkeyId}&pageNo=${asynchronousPageNo}&searchContent=${searchContent}&searchType=${searchType}`).footer(3, "추가", function (button, modal) {
+			if(addSrvcArr.length > 0){
+				if(confirm(message.openAPI.authenticationKeyDetail_add_service_comfirm)){
+					const loading = new setLoading().start();
+			
+					const data = {
+						addSrvcArr : addSrvcArr,
+						certkeyId : certkeyId
+					}
+			
+					fetch(`${__contextPath__}/datalink/authentication/srvckey/save`, {
+		               method: 'POST',
+		                headers: {
+		                    'Content-Type': 'application/json'
+		                },
+		                body: JSON.stringify(data)
+					})
+					.then(response => response.json())
+					.then(result => {
+						if (result.code == '200') {
+							alert(message.openAPI.authenticationKeyDetail_add_service_complete);
+							modal.close();
+							window.location.reload();
+						} else {
+							alert(message.openAPI.authenticationKeyDetail_add_service_fail);
+						}
+					}).catch(error => {
+						alert(message.openAPI.authenticationKeyDetail_add_service_fail)
+					}).finally(() => {
+						loading.end();
+					});
+				}
+			} else {
+				alert(message.openAPI.authenticationKeyDetail_select_service)	
+			}
+			
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+		
+        const selectApiTable = document.getElementById('select-api-table');
+        if(cloneTbody){
+			document.getElementById('modalSelectTbody').remove();
+			selectApiTable.appendChild(cloneTbody);
+		}
+		checkBoxInit();
+	}
+</script>

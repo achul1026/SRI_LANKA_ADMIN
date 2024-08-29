@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/statisticsLayout}">
+      
+	<th:block layout:fragment="content">
+		<div class="statistics-box">
+			<div class="statistics-search-box">
+				<form id="searchTrfvlForm">
+					<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.region}">Region</h4>
+						<div id="surveyLocationSearch" class="location-event"></div>
+					</div>
+					<!--추후 결정 후 주석 해제-->
+					<!--<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.road.name}">Road Name</h4>
+						<div class="select-div-box">
+							<select class="select-list-box">
+								<option>road name</option>
+							</select>
+						</div>
+					</div>
+					<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.location}">Location</h4>
+						<div class="select-div-box">
+							<select class="select-list-box">
+								<option>225km</option>
+							</select>
+						</div>
+					</div>-->
+					<div class="statistics-search-item">
+						<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.year}">Survey Year</h4>
+						<div class="select-div-box">
+							<select class="dateYear scroll select-list-box validation-tag" name="searchDate" data-validation="oneDateSelect"></select>
+						</div>
+					</div>
+				</form>
+				<div class="staristics-search-button">
+					<input type="button" class="is-key-button wd100" th:value="#{statistics.button.apply}" onclick="searchTrfvlStatistics();"/>
+				</div>
+			</div>
+			<div class="statistics-search-view">
+				<div class="statistics-search-img">
+					<img th:src="@{/images/dash_search.png}" alt="serach"/>
+					<div th:text="#{statistics.mccStatisticsDashboard.search}">검색조건을 입력 후 검색해주세요.</div>
+				</div>
+			</div>
+			<div class="statistics-list-box none"></div>
+		</div>
+	</th:block>
+</html>
+<script th:inline="javascript">
+
+	rdaLocation('surveyLocationSearch');
+	dateYearSet();
+
+	let searchTrfvlStatistics = (startlcNm = null , endlcNm = null) => {
+		if(validation('#searchTrfvlForm')){
+			const locationSelectList = document.querySelectorAll(".location-select");
+			let searchTrfvlForm = new FormData($("#searchTrfvlForm")[0]);
+	
+			let dsdCd = null;
+			let gnCd = null;
+			let code = '';
+			let exmnLc = '';
+			locationSelectList.forEach((locationSelectItem,idx) => {
+				const dataType = locationSelectItem.dataset.type;
+				const selectedOption = locationSelectItem.querySelector('option:checked');
+				if(!isNull(selectedOption.value)) {
+					if(idx === 0){
+						exmnLc = `${selectedOption.value}`;
+					}else{
+						exmnLc += `, ${selectedOption.value}`;
+					}
+	
+					//dsd/gn
+					code += `${selectedOption.dataset.cd}`;
+					if(dataType === 'dsdNm'){
+						dsdCd = code;
+					}else if(dataType === 'gnNm'){
+						gnCd = code;
+						dsdCd = null;
+					}
+				}
+			});
+		searchTrfvlForm.append('exmnLc',exmnLc);
+		searchTrfvlForm.append('dsdCd',dsdCd);
+		searchTrfvlForm.append('gnCd',gnCd);
+		searchTrfvlForm.append('startlcNm',startlcNm);
+		searchTrfvlForm.append('endlcNm',endlcNm);
+		const queryString = new URLSearchParams(searchTrfvlForm).toString();
+		fetch(__contextPath__ + "/statistics/dashboard/search?"+queryString)
+		.then((response) => response.json())
+		.then((result) => {
+			const statisticsList = result.data.statisticsList;
+			const statisticsListBox = document.querySelector(".statistics-list-box");
+			const statisticsSearchBox = document.querySelector('.statistics-search-view');
+			
+			if(!isNull(statisticsList)){
+				const searchDTO = result.data.searchDTO;
+				const directionList = result.data.directionList;
+				const html = appendContentHTML(statisticsList,directionList,searchDTO);
+				statisticsListBox.classList.remove('none');
+				statisticsSearchBox.classList.add('none');
+				statisticsListBox.innerHTML = html;
+				drawPieChart(	'trafficStatistics',
+								statisticsList,
+								["#1c4e80","#ef7758","#a5d8dd","#556B2F","#5F9EA0","#00BFFF","#EE82EE","#FDF5E6","#778899","#E6E6FA"]
+							);
+
+			}else{
+					statisticsListBox.classList.add('none');
+					statisticsSearchBox.classList.remove('none');
+			}
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+		
+		}
+	}
+
+
+	let appendContentHTML = (data,directionList,searchDTO) => {
+		let result =		`<div class="statistics-sub-header">
+								<div>MCC > ${searchDTO.exmnLc} > ${searchDTO.searchDate}</div>
+								<input type="button" class="is-key-button" value="${message.common.button_download}"/>
+							</div>
+							<div class="statistics-content">
+								<div class="statistics-content-item-box">
+									<div class="content-chart-box">
+										<div class="select-div-box">
+											<select class="select-list-box" onchange="changeDirection(this)">
+												<option value="" startlc-nm="" data-endlc-nm="" text="${message.common.select}">선택</option>`;
+		for (const item of directionList) {
+			result += 							`<option data-startlc-nm="${item.startlcNm}" data-endlc-nm="${item.endlcNm}">${item.startlcNm} -> ${item.endlcNm}</option>`;
+		}
+			result +=						`</select>
+										</div>
+										<!-- chart ADD -->
+										<div class="content-chart">
+											<div id="trafficStatistics" class="pie-chart"></div>
+											<div id="chartTooltip">
+												<p><span id="color"></span></span><span id="name">N/A</span>:<span id="value">0</span></p>
+										</div>
+										<div class="chart-legend" id="chartLegend"></div>
+									</div>
+								</div>
+								<div class="content-table-box">
+									<div class="scroll statistics-mcc">
+										<table class="list-table">
+											<thead>
+											<tr>
+												<th>${message.statistics.mccStatisticsDashboard_rank}</th>
+												<th>${message.statistics.mccStatisticsDashboard_transportation}</th>
+												<th>${message.statistics.mccStatisticsDashboard_number_of_vehicles}</th>
+												<th>${message.statistics.mccStatisticsDashboard_ratio}</th>
+											</tr>
+											</thead>
+											<tbody>`;
+			for (const [index, item] of data.entries()) {
+				result += 					`<tr>
+												<td>${index+1}</td>
+												<td>${item.name}</td>
+												<td>${item.value}</td>
+												<td>${item.rate}%</td>
+											</tr>`;
+
+			}
+			result +=						`</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>`
+		return result;
+	}
+
+	let changeDirection = (_this) => {
+		const startlcNm = _this.querySelector('option:checked').dataset.startlcNm;
+		const endlcNm = _this.querySelector('option:checked').dataset.endlcNm;
+		searchTrfvlStatistics(startlcNm,endlcNm)
+	}
+</script>

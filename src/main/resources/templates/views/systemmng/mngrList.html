@@ -1,78 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-      
-	<th:block layout:fragment="content">
-		<div class="is-box">
-			<div class="list-search-wrap">
-				<form id="searchForm" name="searchForm" th:action="@{/systemmng/mngr}">
-					<input type="hidden" name="pageNo" value="1">
-					<div class="list-search-box">
-						<!--
-						04.03 기획서 반영 주석  
-						<select name="searchType" class="select-list-box">
-							<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
-							<option value="userId" th:selected="${searchInfo.searchType} == 'userId'">ID</option>
-							<option value="userNm" th:selected="${searchInfo.searchType} == 'userNm'">이름</option>
-							<option value="userTel" th:selected="${searchInfo.searchType} == 'userTel'">연락처</option>
-							<option value="userEmail" th:selected="${searchInfo.searchType} == 'userEmail'">이메일</option>
-						</select> -->
-						<th:block th:if="${loginUser.userBffltd == 'BFC001'} or ${loginUser.userType.code == 'UTC001'}">
-							<select class="select-list-box" name="searchTypeCd">
-								<option value="">소속</option>
-								<option th:each="item:${bffltdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${searchInfo.searchTypeCd eq item.cd}"></option>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<form id="searchForm" name="searchForm" th:action="@{/systemmng/mngr}">
+			<input type="hidden" name="pageNo" value="1">
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2 th:text="#{common.search.title}">검색 설정</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<th:block th:if="${loginUser.userBffltd == 'BFC001'} or ${loginUser.userType.code == 'UTC001'}">
+						<tr>
+							<th th:text="#{mngr.mngrList.institution.select}">소속 선택</th>
+							<td>
+									<select class="select-list-box" name="searchTypeCd">
+										<option value="" th:text="#{common.select.select}">소속</option>
+										<option th:each="item:${bffltdList}" th:text="${item.cdNm}" th:value="${item.cd}"
+											th:selected="${searchInfo.searchTypeCd eq item.cd}">
+										</option>
+									</select>
+							</td>
+						</tr>
+					</th:block>
+					<tr>
+						<th th:text="#{common.select.status}">상태 선택</th>
+						<td>
+							<select class="select-list-box" name="searchSttsCd">
+								<option value="" th:text="#{common.select.select}">승인상태</option>
+								<option th:each="item:${sttsCds}" th:text="${item.name}" th:value="${item.code}"
+									th:selected="${searchInfo.searchSttsCd eq item.code}"></option>
 							</select>
-						</th:block>
-						<select class="select-list-box ml8" name="searchSttsCd">
-							<option value="">승인상태</option>
-							<option th:each="item:${sttsCds}" th:text="${item.name}" th:value="${item.code}" th:selected="${searchInfo.searchSttsCd eq item.code}"></option>
-						</select>
-						<input type="text" name="searchContent" class="input-text" placeholder="검색어를 입력해주세요." th:value="${searchInfo.searchContent}">
-						<button type="submit" class="is-key-button">검색</button>
-					</div>		
-				</form>
-			</div>
-			<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
-			<div id="listTableContainer">
-				<table id="listTable">
-					<thead>
-		                <tr>
-		                    <th>번호</th>
-		                    <th>ID</th>
-		                    <th>이름</th>
-		                    <th>연락처</th>
-		                    <th>이메일</th>
-		                    <th>소속</th>
-		                    <th>상태</th>
-		                    <th>가입 신청일</th>
-		                </tr>
-					</thead>
-					<tbody>
-		                <th:block th:if="${totalCnt > 0}">
-			                <tr class="table-link" th:each="item,status : ${userList}" th:onclick="|location.href='@{/systemmng/mngr/{usermngId}(usermngId=${item.usermngId})}'|">
-			                    <td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
-			                    <td th:text="${item.userId}"></td>
-			                    <td th:text="${item.userNm}"></td>
-			                    <td th:text="${item.userTel}"></td>
-			                    <td th:text="${item.userEmail}"></td>
-			                    <td th:text="${item.bffltdNm}"></td>
-			                    <!-- 
-			                    04.03 기획서 반영 주석
-			                    <td th:text="${item.authgrpNm}"></td> -->
-			                    <td th:text="${item.athrztStts.name}"></td>
-			                    <td th:text="${@commonUtils.formatLocalDateTime(item.registDt)}"></td>
-			                </tr>
-		                </th:block>
-		                <th:block th:if="${totalCnt == 0}">
-		                	<tr>
-		                		<td colspan="9">검색된 결과가 없습니다.</td>
-		                	</tr>
-		                </th:block>
-					</tbody>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.search.detail.content}">상세 내용</th>
+						<td>
+							<input type="text" name="searchContent" class="input-text search-input"
+								th:placeholder="#{common.search.placeholder.searchContext}" th:value="${searchInfo.searchContent}">
+						</td>
+					</tr>
 				</table>
+				<div id="filterBtnWrap">
+					<button type="submit" class="is-key-button" th:text="#{common.button.search}">검색</button>
+				</div>
 			</div>
-			<div th:insert="tags/paging/paging :: pagingFragment"></div>
+		</form>
+		<div class="list-save-box">
+			<div id="totalList"><span id="totalCount" th:text="${totalCnt}"></span><span
+					th:text="#{common.search.result}">건의 검색 결과를 찾았습니다.</span></div>
 		</div>
-	</th:block>
+		<div id="listTableContainer">
+			<table id="listTable" class="cm-list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.number}">번호</th>
+						<th th:text="#{common.id}">ID</th>
+						<th th:text="#{common.name}">이름</th>
+						<th th:text="#{common.contact}">연락처</th>
+						<th th:text="#{common.email}">이메일</th>
+						<th th:text="#{common.institution}">소속</th>
+						<th th:text="#{common.department}">부서</th>
+						<th th:text="#{common.status}">상태</th>
+						<th th:text="#{common.joinDate}">가입 신청일</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${totalCnt > 0}">
+						<tr class="table-link" th:each="item,status : ${userList}"
+							th:onclick="|location.href='@{/systemmng/mngr/{usermngId}(usermngId=${item.usermngId})}'|">
+							<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+							<td th:text="${item.userId}"></td>
+							<td th:text="${item.userNm}"></td>
+							<td th:text="${item.userTel}"></td>
+							<td th:text="${item.userEmail}"></td>
+							<td th:text="${item.bffltdNm}"></td>
+							<td th:text="${item.deptNm}"></td>
+							<td th:text="${item.athrztStts.name}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(item.registDt)}"></td>
+						</tr>
+					</th:block>
+					<th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="10" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+		<div th:insert="tags/paging/paging :: pagingFragment"></div>
+	</div>
+</th:block>
+
 </html>
+<script>
+	/* mngrPwRequest = () => {
+		new ModalBuilder().init('비밀번호 초기화 요청').ajaxBody("/systemmng/mngr/pw/request").footer(3,'승인',function(button, modal){
+			modal.close();
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	} */
+</script>

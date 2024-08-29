@@ -23,7 +23,7 @@
 					<tr>
 						<th>발생일시</th>
 						<td>
-							<input type="text" class="input-text startPicker" placeholder="기간을 설정해주세요.">
+							<input type="text" class="input-text startPicker" th:placeholder="#{common.search.placeholder.date}">
 							<span class="select-time-box mr8">
 								<select class="select-list-box select-hour startHour"></select>
 								<select class="select-list-box select-minute-unit"></select>
@@ -39,7 +39,7 @@
 					<tr>
 						<th>처리일시</th>
 						<td>
-							<input type="text" class="input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+							<input type="text" class="input-text endPicker ml0" th:placeholder="#{common.search.placeholder.date}">
 							<span class="select-time-box mr8">
 								<select class="select-list-box select-hour endHour"></select>
 								<select class="select-list-box select-minute-unit"></select>

@@ -1,169 +1,209 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
 <body>
 	<th:block layout:fragment="content">
-		<form id="searchForm" name="searchForm" action="/potalmng/relatedsite" method="get">
-			<input type="hidden" name="pageNo" value="1">
-			<div>
-				<select name="searchType">
-					<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
-					<option value="siteNm" th:selected="${searchInfo.searchType} == 'siteNm'">관련사이트</option>
-					<option value="crtId" th:selected="${searchInfo.searchType} == 'crtId'">작성자</option>
-				</select>
-				<input id="searchContent" name="searchContent" placeholder="검색어를 입력해 주세요."/>
-				<input type="submit" value="검색" id="searchBtn"/>
-			</div>
-		</form>
-		<div>
-			<input type="button" value="전체선택" th:onclick="selectAll()"/>
-			<input type="button" value="선택삭제" th:onclick="deleteSite()" />
-		</div>
-		<div>
-			<input type="button" value="등록하기" th:onclick="saveSite()" />
-		</div>
-		<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
-		<table>
-			<thead>
-				<tr>
-					<th>선택</th>
-					<th>번호</th>
-					<th>관련사이트</th>
-					<th>분류
-						<form id="typeFilter" action="/potalmng/relatedsite" method="get">
-								<input type="hidden" name="searchType" value="siteTypeCd"/>
-								<select name="searchContent" th:onchange="typeFilterSearch()">
-									<option value="">전체</option>
-									<option value="교통관련기관" th:selected="${searchInfo.searchContent} == '교통관련기관'">교통관련기관</option>
-									<option value="해외교통사이트" th:selected="${searchInfo.searchContent} == '해외교통사이트'">해외교통사이트</option>
-									<option value="교통정보제공사이트" th:selected="${searchInfo.searchContent} == '교통정보제공사이트'">교통정보제공사이트</option>
+		<div class="is-box">
+			<form id="searchForm" name="searchForm" action="/potalmng/relatedsite" method="get">
+				<div id="filterWrap">
+					<div id="filterTitle">
+						<h2>검색 설정</h2>
+					</div>
+					<table id="filterTable">
+						<colgroup>
+							<col width="15%">
+							<col width="85%">
+						</colgroup>
+						<tr>
+							<th>작성자 선택</th>
+							<td>
+								<select name="searchType" class="select-list-box">
+									<option value="all" th:selected="${searchInfo.searchType} == 'all'">전체</option>
+									<option value="siteNm" th:selected="${searchInfo.searchType} == 'siteNm'">관련사이트
+									</option>
+									<option value="crtId" th:selected="${searchInfo.searchType} == 'crtId'">작성자</option>
 								</select>
-						</form>
-					</th>
-					<th>등록일</th>
-					<th>작성자</th>
-					<th>노출여부</th>
-				</tr>
-			</thead>
-			<tbody>
-				<th:block th:if="${totalCnt > 0}">
-					<tr th:each="item, status : ${tcSiteMngList}">
-						<td><input type="checkbox" name="checkbox" th:value="${item.siteId}"/></td>
-						<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
-						<td th:text="${item.siteNm}" th:onclick="updateSite([[${item.siteId}]])"></td>
-						<td th:text="${item.siteTypeCd}"></td>
-						<td th:text="${@commonUtils.formatLocalDateTime(item.crtDt)}"></td>
-						<td th:text="${item.crtId}"></td>
-						<td th:text="${item.useYn} == 'Y' ? '노출' : '미노출'"></td>
+							</td>
+						</tr>
+
+						<tr>
+							<th>상세 내용</th>
+							<td>
+								<input id="searchContent" class="input-text search-input"
+									name="searchContent search-input" placeholder="검색어를 입력해 주세요." />
+							</td>
+						</tr>
+					</table>
+					<div id="filterBtnWrap">
+						<button type="submit" id="searchBtn" class="is-key-button"
+							th:text="#{common.button.search}">검색</button>
+					</div>
+				</div>
+				<input type="hidden" name="pageNo" value="1">
+			</form>
+			<div class="list-save-box">
+				<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
+				<div class="flex-center gap8">
+					<input type="button" class="is-danger-button" value="선택삭제" th:onclick="deleteSite()" />
+					<input type="button" class="is-key-button" value="등록하기" th:onclick="saveSite()" />
+				</div>
+			</div>
+			<!--			<div>-->
+			<!--				<input type="checkbox" class="is-sub-button" value="전체선택" th:onclick="selectAll()" />-->
+			<!--				<input type="button" value="등록하기" th:onclick="saveSite()" />-->
+			<!--				<input type="button" class="is-danger-button" value="선택삭제" th:onclick="deleteSite()" />-->
+			<!--			</div>-->
+
+
+			<table id="listTable">
+				<thead>
+					<tr>
+						<th>
+							<input type="checkbox" value="전체선택" th:onclick="selectAll()" />
+						</th>
+						<th>번호</th>
+						<th>관련사이트</th>
+						<th>
+							<form id="typeFilter" action="/potalmng/relatedsite" method="get">
+								<input type="hidden" name="searchType" value="siteTypeCd" />
+								<select class="select-list-box table-select th-select" name="searchContent"
+									th:onchange="typeFilterSearch()">
+									<option value="">분류</option>
+									<option value="교통관련기관" th:selected="${searchInfo.searchContent} == '교통관련기관'">교통관련기관
+									</option>
+									<option value="해외교통사이트" th:selected="${searchInfo.searchContent} == '해외교통사이트'">
+										해외교통사이트</option>
+									<option value="교통정보제공사이트" th:selected="${searchInfo.searchContent} == '교통정보제공사이트'">
+										교통정보제공사이트</option>
+								</select>
+							</form>
+						</th>
+						<th>등록일</th>
+						<th>작성자</th>
+						<th>노출여부</th>
 					</tr>
-				</th:block>
-				<th:block th:if="${totalCnt == 0}">
-                	<tr>
-                		<td colspan="9">검색된 결과가 없습니다.</td>
-                	</tr>
-                </th:block>
-			</tbody>
-		</table>
-		<div th:insert="tags/paging/paging :: pagingFragment"></div>
+				</thead>
+				<tbody>
+					<th:block th:if="${totalCnt > 0}">
+						<tr th:each="item, status : ${tcSiteMngList}">
+							<td><input type="checkbox" name="checkbox" th:value="${item.siteId}" /></td>
+							<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+							<td th:text="${item.siteNm}" th:onclick="updateSite([[${item.siteId}]])"></td>
+							<td th:text="${item.siteTypeCd}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(item.crtDt)}"></td>
+							<td th:text="${item.crtId}"></td>
+							<td th:text="${item.useYn} == 'Y' ? '노출' : '미노출'"></td>
+						</tr>
+					</th:block>
+					<th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="9" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<div th:insert="tags/paging/paging :: pagingFragment"></div>
+		</div>
 	</th:block>
 </body>
+
 </html>
 <script type="text/javascript">
 	// 관련사이트 등록
-	function saveSite(){
-		new ModalBuilder().init("관련사이트 등록").ajaxBody(__contextPath__+"/potalmng/relatedsite/save").footer(2,'등록',function(button, modal){
-			fetch(__contextPath__+"/potalmng/relatedsite/save",{
+	function saveSite() {
+		new ModalBuilder().init("관련사이트 등록").ajaxBody(__contextPath__ + "/potalmng/relatedsite/save").footer(2, '등록', function (button, modal) {
+			fetch(__contextPath__ + "/potalmng/relatedsite/save", {
 				method: "POST",
 				body: new FormData($("#siteSave")[0])
 			})
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new ModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+							modal.close();
+							window.location.reload();
+						}).open();
+					} else {
+						new ModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+
+				})
+		}, '취소', function (button, modal) {
 			modal.close();
 		}).open();
 	}
-	
+
 	// 관련사이트 수정
-	function updateSite(brdId){
-		new ModalBuilder().init("관련사이트 수정").ajaxBody(__contextPath__+"/potalmng/relatedsite/"+brdId).footer(2,"수정",function(button,modal){
-			fetch(__contextPath__+"/potalmng/relatedsite/"+brdId,{
+	function updateSite(brdId) {
+		new ModalBuilder().init("관련사이트 수정").ajaxBody(__contextPath__ + "/potalmng/relatedsite/" + brdId).footer(2, "수정", function (button, modal) {
+			fetch(__contextPath__ + "/potalmng/relatedsite/" + brdId, {
 				method: "PUT",
 				body: new FormData($("#siteUpdate")[0])
 			})
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new ModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+							modal.close();
+							window.location.reload();
+						}).open();
+					} else {
+						new ModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+
+				})
+		}, '취소', function (button, modal) {
 			modal.close();
 		}).open();
-		
+
 	}
-	
+
 	// 관련사이트 삭제
-	function deleteSite(){
+	function deleteSite() {
 		var selectedElements = document.querySelectorAll('input[name="checkbox"]:checked');
-	    var siteIds = Array.from(selectedElements).map(el => el.value);
-	    
-        fetch(__contextPath__+"/potalmng/relatedsite",{
+		var siteIds = Array.from(selectedElements).map(el => el.value);
+
+		fetch(__contextPath__ + "/potalmng/relatedsite", {
 			method: "DELETE",
 			headers: {
-	            'Content-Type': 'application/json',
-	        },
-	        body: JSON.stringify({ siteIds: siteIds })
-	    })
-		.then(response => response.json())
-		.then(result => {
-							if(result.code == '200'){
-								new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-									modal.close();
-									window.location.reload();
-								}).open();
-							} else {
-								new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-									modal.close();
-								}).open();
-							}
-			
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({siteIds: siteIds})
 		})
+			.then(response => response.json())
+			.then(result => {
+				if (result.code == '200') {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+						modal.close();
+						window.location.reload();
+					}).open();
+				} else {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4, button_confirm, function (button, modal) {
+						modal.close();
+					}).open();
+				}
+
+			})
 	}
-	
+
 	// 전체선택
-	function selectAll()  {
-		if($('input:checkbox').is(':checked') == true){
+	function selectAll() {
+		if ($('input:checkbox').is(':checked') == true) {
 			$('input:checkbox').prop('checked', false);
 		} else {
-			$('input:checkbox').prop('checked', true);				
+			$('input:checkbox').prop('checked', true);
 		}
-// 	  	var checkboxes = document.getElementsByName('checkbox');
-// 	  	checkboxes.forEach((checkbox) => {
-// 	  		checkbox.checked = !checkbox.checked;
-//   		})
+		// 	  	var checkboxes = document.getElementsByName('checkbox');
+		// 	  	checkboxes.forEach((checkbox) => {
+		// 	  		checkbox.checked = !checkbox.checked;
+		//   		})
 	}
-	
+
 	// 필터 서치
 	function typeFilterSearch() {
 		document.getElementById('typeFilter').submit();

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<div class="list-save-box">
+		<h3 class="cm-code-title" th:text="#{region.common.mapping}">- 매핑 코드</h3>
+		<div>
+			<a th:href="@{/systemmng/region/save}" class="is-a-key-button" th:text="#{common.button.regist}">등록</a>
+		</div>
+	</div>
+	<div id="listTableContainer">
+		<div class="scroll taz-table-div">
+			<input type="hidden" id="asynchronousPageNo" name="pageNo" th:value="${paging.pageNo}"/>
+			<input type="hidden" id="type" th:value="${type}">
+<!-- 			<input type="hidden" id="regionNameList" th:data-data-list="${dataList}"> -->
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.number}">No.</th>
+						<th th:text="#{region.common.dsd}">DSD CODE</th>
+						<th th:text="#{region.common.dsd.name}">DSD NAME</th>
+						<th th:text="#{region.common.province.code}">Province CODE</th>
+						<th th:text="#{region.common.district.code}">District CODE</th>
+					</tr>
+				</thead>
+				<tbody>
+				<th:block th:if="${not #lists.isEmpty(regionList)}">
+					<tr th:each="item,status : ${regionList}" th:onclick="viewDetailPage('dsd',[[${item.dsdId}]])">
+						<td th:text="${@commonUtils.getRownum(paging, status.index)}"></td>
+						<td th:text="${item.dsdId}">11030</td>
+						<td th:text="|${item.provinNm} > ${item.districtNm} > ${item.dsdNm}|">westrn>colombo>colombo</td>
+						<td th:text="${item.provinCd}">1</td>
+						<td th:text="${item.dstrctCd}">1</td>
+					</tr>
+				</th:block>
+				<th:block th:unless="${not #lists.isEmpty(regionList)}">
+					<tr>
+						<td colspan="5" th:text="#{common.search.result.notExist}">데이터없음</td>
+					</tr>
+				</th:block>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+</html>

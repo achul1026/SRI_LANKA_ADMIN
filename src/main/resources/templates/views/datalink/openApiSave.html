@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<form id="apiSaveForm" name="apiSaveForm">
+	        <div class="is-box">
+	            <h3 class="info-title" th:text="#{api.openApiSave.title}">OpenAPI 데이터 등록</h3>
+				<div class="infoTableWrap">
+					<table class="infoTable survey-save-table">
+						<tr>
+							<th th:text="#{api.common.table.serviceName}">서비스 명</th>
+							<td><input type="text" class="input-table-text validation-tag" id="srvcNm" name="srvcNm" th:placeholder="#{api.openApiSave.placeholder.serviceName}" onkeyup="valid(this);"></td>
+							<th th:text="#{common.table.class}">분류</th>
+							<td>
+								<div class="select-div-box">
+									<select class="select-list-box table-select validation-tag" id="srvcClsf" data-validation="select" name="srvcClsf">
+										<option value="" th:text="#{common.select.select}">선택</option>
+										<th:block th:each="item : ${apiSrvcClsfCd}">
+											<option th:text="${item.cdNm}" th:value="${item.cd}"></option>
+										</th:block>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.apiMngAgency}">제공기관</th>
+							<td><input type="text" class="input-table-text validation-tag" id="pvsnInst" name="pvsnInst" th:placeholder="#{api.openApiSave.placeholder.provider}"></td>
+							<th th:text="#{common.table.manager}">관리자</th>
+							<td>
+	                           <span class="table-flex">
+	                              <input type="hidden" class="mngrInfo" id="usermngId" name="mngrId" />
+	                              <input type="hidden" class="mngrInfo" id="exmnpicId" name="exmnpicId" />
+	                              <input type="text" class="mngrInfo input-table-text validation-tag" id="userNm" th:placeholder="#{api.openApiSave.placeholder.manager}" readonly/>
+	                              <button type="button" id="investigatoBtn" class="modal-find-img" onclick="surveyOfficer();">
+									  <img src="/images/search.png" class="cm-csimg find-img" th:alt="#{common.button.search}">
+								  </button>
+	                           </span>
+							</td>
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.serviceContent}">서비스 내용</th>
+							<td colspan="3"><input type="text" class="input-table-text validation-tag" name="srvcDescr" th:placeholder="#{api.openApiSave.placeholder.serviceContent}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{api.common.table.serviceUrl}">요청URL</th>
+							<td colspan="3"><input type="text" class="input-table-text validation-tag" name="srvcUrl" th:placeholder="#{api.openApiSave.placeholder.requestUrl}"></td>						
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="is-box mt24">
+				<div class="flex-between">
+					<h3 class="info-title" th:text="#{api.openApiSave.secTitle}">요청정보</h3>
+					<input type="button" class="is-key-button" onclick="propertyAppend('requestAppendBox');" th:value="#{api.common.addAttr}"/>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable">
+						<thead>
+							<tr>
+								<th th:text="#{api.common.table.column}">컬럼명</th>
+								<th th:text="#{api.common.table.type}">타입</th>
+								<th th:text="#{api.common.table.length}">길이</th>
+								<th th:text="#{api.common.table.descript}">설명</th>
+								<th th:text="#{api.common.table.sampledata}">샘플데이터</th> 
+								<th th:text="#{api.common.table.required}">필수여부</th>
+								<th th:text="#{api.common.table.delete}">삭제</th>
+							</tr>
+						</thead>
+						<tbody id="requestAppendBox" class="col-table">
+							<tr class="request">
+								<td><input type="text" class="input-table-text reqItemNm validation-tag" th:placeholder="#{api.openApiSave.placeholder.requestUrl}"></td>
+								<td>
+									<div class="select-div-box">
+										<select class="select-list-box table-select reqItemType validation-tag" data-validation="select">
+											<option value="" th:text="#{common.select.select}">선택</option>
+											<th:block th:each="item : ${apiItemTypeCd}">
+												<option th:text="${item.cdNm}" th:value="${item.cd}"></option>
+											</th:block>
+										</select>
+									</div>
+								</td>
+								<td><input type="text" class="input-table-text reqItemLen validation-tag" th:placeholder="#{api.openApiSave.placeholder.length}" oninput="inputOnlyNumber(this)"></td>
+								<td><input type="text" class="input-table-text reqItemDescr validation-tag" th:placeholder="#{api.openApiSave.placeholder.explanation}"></td>
+								<td><input type="text" class="input-table-text reqSmplData validation-tag" th:placeholder="#{api.openApiSave.placeholder.sampleData}"></td>
+								<td>
+									<div class="select-div-box">
+										<select class="select-list-box table-select reqEsntlYn validation-tag" data-validation="select">
+											<option value="Y" th:text="#{api.common.select.required.y}">Y</option>
+											<option value="N" th:text="#{api.common.select.required.n}">N</option>
+										</select>
+									</div>
+								</td>
+								<td class="text-center">
+									<button type="button" onclick="propertyRemove(this);" data-type="request">
+										<img src="/images/delete_img.png" class="cm-csimg" alt="삭제하기">
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="is-box mt24">
+				<div class="flex-between">
+					<h3 class="info-title" th:text="#{api.openApiSave.thrTitle}">응답정보</h3>
+					<input type="button" class="is-key-button" onclick="propertyAppend('responseAppendBox');" th:value="#{api.openApiSave.button.addResponse}"/>
+				</div>
+				<div class="infoTableWrap">
+					<table class="infoTable col-table">
+						<thead>
+							<tr>
+								<th th:text="#{api.common.table.column}">컬럼명</th>
+								<th th:text="#{api.common.table.type}">타입</th>
+								<th th:text="#{api.common.table.length}">길이</th>
+								<th th:text="#{api.common.table.descript}">설명</th>
+								<th th:text="#{api.common.table.sampledata}">샘플데이터</th>
+								<th th:text="#{api.common.table.required}">필수여부</th>
+								<th th:text="#{api.common.table.delete}">삭제</th>
+							</tr>
+						</thead>
+						<tbody id="responseAppendBox">
+							<tr class="response">
+								<td><input type="text" class="input-table-text pvsnItemNm validation-tag" th:placeholder="#{api.openApiSave.placeholder.column}"></td>
+								<td>
+									<div class="select-div-box">
+										<select class="select-list-box table-select pvsnItemType validation-tag" data-validation="select">
+											<option value="" th:text="#{common.select.select}">선택</option>
+											<th:block th:each="item : ${apiItemTypeCd}">
+												<option th:text="${item.cdNm}" th:value="${item.cd}"></option>
+											</th:block>
+										</select>
+									</div>
+								</td>
+								<td><input type="text" class="input-table-text pvsnItemLen validation-tag" th:placeholder="#{api.openApiSave.placeholder.length}" oninput="inputOnlyNumber(this)"></td>
+								<td><input type="text" class="input-table-text pvsnItemDescr validation-tag" th:placeholder="#{api.openApiSave.placeholder.explanation}"></td>
+								<td><input type="text" class="input-table-text pvsnSmplData validation-tag" th:placeholder="#{api.openApiSave.placeholder.sampleData}"></td>
+								<td>
+									<div class="select-div-box">
+										<select class="select-list-box table-select pvsnEsntlYn validation-tag" data-validation="select">
+											<option value="Y" th:text="#{api.common.select.required.y}">Y</option>
+											<option value="N" th:text="#{api.common.select.required.n}">N</option>
+										</select>
+									</div>
+								</td>
+								<td class="text-center">
+									<button type="button" onclick="propertyRemove(this);" data-type="response">
+										<img src="/images/delete_img.png" class="cm-csimg" alt="삭제하기">
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</form>
+		<div class="info-button-box">
+			<a th:href="@{/datalink/openapi}" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+			<button type="button" class="is-key-button" onclick="openApiSave()" th:text="#{common.button.save}">저장</button>
+		</div>
+	</th:block>
+</html>
+<script th:inline="javascript">
+	const apiItemTypeCd = /*[[${apiItemTypeCd}]]*/;
+	
+	const requiredY = /*[[#{api.common.select.required.y}]]*/;
+	const requiredN = /*[[#{api.common.select.required.n}]]*/;
+
+	function propertyAppend(appendId){
+		let type = appendId == 'requestAppendBox'?'request':'response';
+	
+		const appendBox = document.getElementById(appendId);
+		const tr = document.createElement('tr');
+		tr.classList.add(`${type}`);
+		
+		let html = `<td><input type="text" class="input-table-text ${type}ItemNm validation-tag"></td>
+					<td>
+						<div class="select-div-box">
+							<select class="select-list-box table-select ${type}ItemType validation-tag" data-validation="select">
+								<option value="">${message.common.select}</option>
+					`
+							for(const item of apiItemTypeCd){
+			html +=				`<option value="${item.cd}">${item.cdNm}</option>`
+							}
+			html +=	`		</select>
+						</div>
+					</td>
+					<td><input type="text" class="input-table-text ${type}ItemLen validation-tag" oninput="inputOnlyNumber(this)"></td>
+					<td><input type="text" class="input-table-text ${type}ItemDescr validation-tag"></td>
+					<td><input type="text" class="input-table-text ${type}SmplData validation-tag"></td>
+					<td>
+						<div class="select-div-box">
+							<select class="select-list-box table-select ${type}EsntlYn validation-tag" data-validation="select">
+								<option value="Y">${requiredY}</option>
+								<option value="N" selected>${requiredN}</option>
+							</select>
+						</div>
+					</td>
+					<td class="text-center">
+						<button type="button" onclick="propertyRemove(this);" data-type="${type}">
+							<img src="/images/delete_img.png" class="cm-csimg" alt="삭제하기">
+						</button>
+					</td>
+				   `
+		appendBox.append(tr);
+		tr.innerHTML = html;
+	}
+
+	//삭제
+	function propertyRemove(_this){
+		let type = _this.getAttribute('data-type');
+		let varSet = type == 'request'? type:'response';
+		let id = type + "AppendBox";
+		
+		var typeAppendBox = document.getElementById(id);
+		var rowCount = typeAppendBox.getElementsByTagName("tr").length;
+		if (rowCount > 1) {
+			const parent = _this.closest('tr');
+			parent.remove();
+		} else {
+			alert(message.openAPI.openApiUpdate_at_least_one_required);
+		}
+	}
+	// API 등록
+	let openApiSave = () => {
+		if (validation('#apiSaveForm')) {
+			const openApiRegistDTO = new FormData(document.getElementById("apiSaveForm"));
+	
+			const requestAppendBox = document.getElementById("requestAppendBox");
+			const requestList = requestAppendBox.querySelectorAll(".req");
+			
+			const responseAppendBox = document.getElementById("responseAppendBox");
+			const responseList = responseAppendBox.querySelectorAll(".pvsn");
+			
+			let reqArr = new Array();
+			let resArr = new Array();
+			
+			for(let i = 0; i < requestList.length; i++){
+				let tmApiRqstitem = new Object();
+				tmApiRqstitem.itemNm = requestList[i].querySelector('.reqItemNm').value;
+				tmApiRqstitem.itemSqno = i;
+				tmApiRqstitem.itemType = requestList[i].querySelector('.reqItemType').value;
+				tmApiRqstitem.itemLen = requestList[i].querySelector('.reqItemLen').value;
+				tmApiRqstitem.itemDescr = requestList[i].querySelector('.reqItemDescr').value;
+				tmApiRqstitem.smplData = requestList[i].querySelector('.reqSmplData').value;
+				tmApiRqstitem.esntlYn = requestList[i].querySelector('.reqEsntlYn').value;
+				reqArr.push(tmApiRqstitem);
+			}
+	
+			for(let i = 0; i < responseList.length; i++){
+				let tmApiPvsnitem = new Object();
+				tmApiPvsnitem.itemNm = responseList[i].querySelector('.pvsnItemNm').value;
+				tmApiPvsnitem.itemSqno = i;
+				tmApiPvsnitem.itemType = responseList[i].querySelector('.pvsnItemType').value;
+				tmApiPvsnitem.itemLen = responseList[i].querySelector('.pvsnItemLen').value;
+				tmApiPvsnitem.itemDescr = responseList[i].querySelector('.pvsnItemDescr').value;
+				tmApiPvsnitem.smplData = responseList[i].querySelector('.pvsnSmplData').value;
+				tmApiPvsnitem.esntlYn = responseList[i].querySelector('.pvsnEsntlYn').value;
+				resArr.push(tmApiPvsnitem);
+			}
+			
+			openApiRegistDTO.append("tmApiRqstitemListJSON", JSON.stringify(reqArr));
+			openApiRegistDTO.append("tmApiPvsnitemListJSON", JSON.stringify(resArr));
+			
+			fetch(__contextPath__+"/datalink/openapi/save",{
+				method: "POST",
+				body: openApiRegistDTO
+			})
+			.then(response => response.json())
+			.then(result => {
+				if(result.code == '200'){
+					new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
+	                	location.href= __contextPath__+"/datalink/openapi";
+	                	modal.close();
+	                }).open();
+				} else {
+					throw new Error(result.message);
+				}
+			}).catch (e => {
+				alert(e.message);
+			})
+		}
+	}
+</script>

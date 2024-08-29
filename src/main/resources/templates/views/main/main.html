@@ -1,48 +1,279 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-      
-	<th:block layout:fragment="content">
-		<div id="mapContainer">
-			<div id="map"></div>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div id="mapContainer">
+		<div id="map"></div>
+		<div id="zoomBox">
+			<span id="zoomIn" class="cm-box-shadow"><img th:src="@{/images/zoom_in.png}"
+					th:alt="#{common.imgAlt.expansion}" /></span>
+			<span id="zoomOut" class="cm-box-shadow"><img th:src="@{/images/zoom_out.png}"
+					th:alt="#{common.imgAlt.reduce}" /></span>
 		</div>
-		<button type="button" id="sideBarButton">
-			<img th:src="@{images/white_arrow2.png}" alt="arrow">
-		</button>
-		<div class="is-box" style="position:relative; width:200px;">
-			<div>테스트박스입니다.</div>
-			<div>
-				<label>
-					<input type="checkbox" id="TEST_VDS"/>
-					<span>VDS</span>
+		<div id="mapStyle">
+			<button type="button" class="map-style-main-btn cm-box-shadow" onclick="mapStyle();">
+				<img th:src="@{/images/main_lc_img03.png}" th:alt="#{common.imgAlt.expansion}" />
+				<span th:text="#{main.map.style}">map Style</span>
+			</button>
+			<div id="mapStyleList">
+				<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+					<img th:src="@{/images/map_style_01.png}" th:alt="#{common.imgAlt.expansion}"
+						class="map__style_img" />
+					<input type="button" id="satellite-streets-v12" class="map-style input-reset"
+						th:value="#{main.map.satellite}" />
+				</label>
+				<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+					<img th:src="@{/images/map_style_02.png}" th:alt="#{common.imgAlt.expansion}"
+						class="map__style_img" />
+					<input type="button" id="light-v11" class="map-style input-reset"
+						th:value="#{main.map.light}" />
+				</label>
+				<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+					<img th:src="@{/images/map_style_03.png}" th:alt="#{common.imgAlt.expansion}"
+						class="map__style_img" />
+					<input type="button" id="dark-v11" class="map-style input-reset" th:value="#{main.map.dark}" />
+				</label>
+				<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+					<img th:src="@{/images/map_style_04.png}" th:alt="#{common.imgAlt.expansion}"
+						class="map__style_img" />
+					<input type="button" id="streets-v12" class="map-style input-reset"
+						th:value="#{main.map.streets}" />
+				</label>
+				<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+					<img th:src="@{/images/map_style_05.png}" th:alt="#{common.imgAlt.expansion}"
+						class="map__style_img" />
+					<input type="button" id="outdoors-v12" class="map-style input-reset"
+						th:value="#{main.map.outdoors}" />
 				</label>
 			</div>
-			<input type="button" class="is-key-button" id="dashboardSearch" value="찾기"/>
 		</div>
-	</th:block>
-</html>
-<script>
-	const body = document.body
-	body.classList.add('dashboard');
-	document.getElementById('header').remove();
+		<div id="mapLegend">
+			<div class="map-legend-title-box" onclick="legendToggle(this);">
+				<h4 class="legend-title" th:text="#{common.table.legend}">범례</h4>
+				<button type="button" class="map-legend-arrow">
+					<img th:src="@{/images/right_arrow.png}" alt="arrow" />
+				</button>
+			</div>
+			<ul class="map-legend-list">
+				<li id="facilitiesLegendBox">
+					<ul>
+						<li data-legend-type="VDS">
+							<img th:src="@{/images/marker_vds.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{facilities.vds}">VDS</span>
+						</li>
+						<li data-legend-type="METRO">
+							<img th:src="@{/images/marker_metro.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{facilities.fixed}">Metro Count 고정식</span>
+						</li>
+						<li data-legend-type="METRO-MOVE">
+							<img th:src="@{/images/marker_metro_move.png}" alt="arrow" class="legend-img"/> 
+							<span class="map-legend-list-name" th:text="#{facilities.portable}">Metro Count 이동식</span>
+						</li>
+					</ul>
+				</li>
+				<li id="surveyLegendBox">
+					<ul>
+						<li data-legend-type="multi">
+							<img th:src="@{/images/marker_multi.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{main.legend.multiSurvey}">Multi Survey</span>
+						</li>
+						<li data-legend-type="ETC001">
+							<img th:src="@{/images/marker_mcc.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{main.legend.mcc}">MCC</span>
+						</li>
+						<li data-legend-type="ETC002">
+							<img th:src="@{/images/marker_tm.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{main.legend.tm}">TM</span>
+						</li>
+						<li data-legend-type="ETC004">
+							<img th:src="@{/images/marker_od.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{main.legend.od}">OD</span>
+						</li>
+						<li data-legend-type="ETC003">
+							<img th:src="@{/images/marker_roadside.png}" alt="arrow" class="legend-img"/>
+							<span class="map-legend-list-name" th:text="#{main.legend.roadSide}">RoadSide</span>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<button type="button" id="sideBarButton">
+		<img th:src="@{/images/white_arrow2.png}" th:alt="#{common.imgAlt.arrow}">
+	</button>
+	<div class="dashboard-content-wrap">
+		<div class="dashboard-button-search-box">
+			<!--			<button type="button" id="dbfacilitiesButton" class="dashboard-search-button" >-->
+			<!--				<img th:src="@{/images/main_lc_img01.png}" th:alt="#{common.imgAlt.expansion}" />-->
+			<!--				<span th:text="#{main.facility.location}">시설물 위치</span>-->
+			<!--			</button>-->
+			<!--			<button type="button" id="dbSurveyButton" class="dashboard-search-button" >-->
+			<!--				<img th:src="@{/images/main_lc_img02.png}" th:alt="#{common.imgAlt.expansion}" />-->
+			<!--				<span th:text="#{main.survey.location}">시설물 위치</span>-->
+			<!--			</button>-->
+
+			<!--				<img th:src="@{/images/main_lc_img01.png}" th:alt="#{common.imgAlt.expansion}" class=""/>-->
+			<input type="button" th:value="#{main.facility.location}" id="dbfacilitiesButton"
+				class="is-basic-button dashboard-search-button cm-box-shadow" />
+
+			<!--				<img th:src="@{/images/main_lc_img02.png}" th:alt="#{common.imgAlt.expansion}" class=""/>-->
+			<input type="button" th:value="#{main.survey.location}" id="dbSurveyButton"
+				class="is-basic-button dashboard-search-button search-survey-location cm-box-shadow" />
+		</div>
+
+		<div id="facilitiesSearchBox" class="dashborad-search-box none cm-box-shadow">
+			<form id="facilitiesSearchForm">
+				<div id="facilitiesSearchHeader">
+					<h4 th:text="#{main.facility.search.location}" class="facilities-search-title">시설물 위치 검색</h4>
+					<button type="button" class="facilities-search-close" onclick="facilitiesClose();"><img
+							th:src="@{/images/close_light.png}" th:alt="close" /></button>
+				</div>
+				<div class="map-filter-wrap">
+					<div class="facilities-search-item">
+						<h4 th:text="#{common.table.region}" class="facilities-search-item-title">지역 선택</h4>
+						<div id="facilitiesLocationSearch" class="location-event main-location-event"></div>
+					</div>
+					<div class="facilities-search-item">
+						<h4 th:text="#{facilities.facility}">시설물 선택</h4>
+						<select id="facilitiesType" class="select-list-box table-select filter-table" onchange="setFacilitiesSelectType(this);">
+							<option value="" th:text="#{common.select.select}">선택</option>
+							<option value="VDS" th:text="#{facilities.vds}">VDS</option>
+							<option value="METRO" th:text="#{facilities.fixed}">Metro Count 고정식</option>
+							<option value="METRO-MOVE" th:text="#{facilities.portable}">Metro Count 이동식</option>
+						</select>
+					</div>
+					<div class="facilities-search-button-box">
+						<input type="button" id="facilitiesSearchBtn" class="is-key-button dashborad-search-button"
+							th:value="#{common.button.search}" onclick="setFacilitySearch('ONLY', false);" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div id="surveySearchBox" class="dashborad-search-box none cm-box-shadow">
+			<form id="surveySearchForm">
+				<div id="facilitiesSearchHeader">
+					<h4 class="facilities-search-title" th:text="#{main.survey.location}">설문형 조사 위치</h4>
+					<button type="button" class="facilities-search-close" onclick="facilitiesClose();"><img
+							th:src="@{/images/close_light.png}" th:alt="close" /></button>
+				</div>
+				<div class="map-filter-wrap">
+					<div class="facilities-search-item">
+						<h4 th:text="#{common.table.region}">지역 선택</h4>
+						<div id="surveyLocationSearch" class="location-event main-location-event"></div>
+					</div>
+					<div class="facilities-search-item">
+						<h4 th:text="#{common.table.surveyType}">설문 유형 선택</h4>
+						<select id="gisSurveySearchType" class="select-list-box table-select filter-table">
+							<option value="" th:text="#{common.select.select}">선택</option>
+							<option value="ETC001" th:text="#{main.legend.mcc}">MCC</option>
+							<option value="ETC002" th:text="#{main.legend.tm}">TM</option>
+							<option value="ETC003" th:text="#{main.legend.roadSide}">ROADSIDE</option>
+							<option value="ETC004" th:text="#{main.legend.od}">OD</option>
+						</select>
+					</div>
+					<div class="facilities-search-item">
+						<h4 th:text="#{common.table.agency}">기관 선택</h4>
+						<select id="gisSurveySearchAgency" class="select-list-box table-select filter-table">
+							<th:block th:if="${not #lists.isEmpty(bffltdCdList)}">
+								<option value="" th:text="#{common.select.select}">선택</option>
+								<th:block th:each="item : ${bffltdCdList}">
+									<option th:value="${item.cd}" th:text="${item.cdNm}"></option>
+								</th:block>
+							</th:block>
+							<th:block th:if="${#lists.isEmpty(bffltdCdList)}">
+								<option th:text="${loginMngrDTO.bffltdNm}"></option>
+							</th:block>
 	
+						</select>
+					</div>
+					<div class="facilities-search-button-box">
+						<input type="button" class="is-key-button dashborad-search-button" onclick="setSurveyInterval(setSurveySearch, 'button')"
+							th:value="#{common.button.search}" />
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</th:block>
+
+</html>
+<script th:inline="javascript">
+	gisViewStyle();
+	rdaLocation('facilitiesLocationSearch', null,2);
+	rdaLocation('surveyLocationSearch', null,2);
+
+	const baseAuthYn = /*[[${baseAuthYn}]]*/
+	if (!!baseAuthYn || baseAuthYn === "Y") {
+		new MsgModalBuilder().init().alertBody(message.main.main_go_to_mypage).footer(4, message.common.button_confirm, function (button, modal) {modal.close();}).open();
+	}
+
 	(async () => {
-		let mapgl = await mapboxGl();
+		let mapgl = await mapboxGl('79.99374055806919', '6.907945540421579', 11);
+		setMapStyle(mapgl);
+		setMapZoomControl(mapgl);
+		
+		//조사 위치
+		setSurveyInterval(setSurveySearch);
+		//시설물 위치
+		setFacilitySearch();
 		
 		//sidebar control
 		const sideBarButton = document.getElementById('sideBarButton');
 		sideBarButton.addEventListener('click', () => {
+			const body = document.body;
 			const sideBar = document.getElementById('sideBar');
 			const mainContent = document.getElementById('mainContent');
-			if(body.classList.contains('sidebarActive')){
+			if (body.classList.contains('sidebarActive')) {
 				body.classList.remove('sidebarActive');
 			} else {
 				body.classList.add('sidebarActive')
 			}
-	        setTimeout(() => {
-	        	mapgl.resize();
-	        }, 400);
+			setTimeout(() => {
+				mapgl.resize();
+			}, 400);
 		})
+		
+		const legendItem = document.querySelectorAll('.map-legend-list > li > ul > li');
+		legendItem.forEach(li => {
+			li.classList.remove('none')
+		})
+		
 	})();
+
+	//상단 button event
+	const searchButton = document.querySelectorAll('.dashboard-search-button');
+	searchButton.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const _this = e.target;
+			const allItem = _this.closest('.dashboard-button-search-box').querySelectorAll('.dashboard-search-button');
+			if (!_this.classList.contains('active')) {
+				facilitiesClose();
+				allItem.forEach(item => item.classList.remove('active'));
+				_this.classList.add('active');
+				if (_this.getAttribute('id') == 'dbfacilitiesButton') {
+					document.getElementById('facilitiesSearchBox').classList.remove('none');
+				} else if (_this.getAttribute('id') == 'dbSurveyButton') {
+					document.getElementById('surveySearchBox').classList.remove('none');
+				}
+			} else {
+				facilitiesClose();
+			}
+		})
+	})
+
+	function mapStyleBtn() {
+	    const mapStyleButtons = document.querySelectorAll('.map-style');
+	    const clickedButton = event.target;
+	
+	    mapStyleButtons.forEach(btn => {
+	        if (btn === clickedButton) {
+	            btn.classList.add('active');
+	        } else {
+	            btn.classList.remove('active');
+	        }
+	    });
+	}
+	
+	
 </script>

@@ -8,65 +8,75 @@
 			<div id="scheduleDetailContainer">
 		        <div class="is-box">
 		        	<div class="flex-between">
-			            <h3 class="info-title">조사 현황 및 일정 상세</h3>
-			            <div>
-			            	<input type="button" class="is-key-button" onclick="historyView();" value="이력 보기"/>
-			            </div>
+			            <h3 class="info-title" th:text="#{schedule.scheduleDetail.title}">조사 현황 및 일정 상세</h3>
 		        	</div>
 					<div class="infoTableWrap">
 						<input type="hidden" id="exmnmngId" th:value="${invstInfo.exmnmngId}">
 						<table class="infoTable survey-save-table">
 							<tr>
-								<th>조사 종류</th>
+								<th th:text="#{invst.common.invest.type}">조사 종류</th>
 								<td th:text="${invstInfo.exmnType.getName()}"></td>
-								<th>조사명</th>
+								<th th:text="#{invst.common.invest.name}">조사명</th>
 								<td th:text="${invstInfo.exmnNm}"></td>
 							</tr>
 							<tr>
-								<th>조사 담당자</th>
+								<th th:text="#{invst.common.invest.manager}">조사 담당자</th>
 								<td th:text="${invstInfo.exmnpicId}"></td>
-								<th>조사 형태</th>
+								<th th:text="#{invst.common.invest.form}">조사 형태</th>
 								<td th:text="${invstInfo.exmnDiv}"></td>
 							</tr>
 							<tr th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? 'none'">
-								<th>설문 양식</th>
+								<th th:text="#{invst.common.survey.form}">설문 양식</th>
 								<td th:text="${invstInfo.srvyTitle}"></td>
-								<th class="survey-objectives">조사 목표 개수</th>
+								<th class="survey-objectives" th:text="#{invst.common.invest.target.number}">조사 목표 개수</th>
 								<td class="survey-objectives" th:text="${invstInfo.goalCnt}"></td>
 							</tr>
 							<tr>
-								<th>조사 기간</th>
-								<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'YYYY-MM-dd')}"></td>					
-								<th>조사 시간</th>
-								<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH:mm')}"></td>
+								<th th:text="#{common.table.investPeriod}">조사 기간</th>
+								<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'YYYY-MM-dd')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'yyyy-MM-dd')}"></td>					
+								<th:block th:if="${invstInfo.exmnType.getType() eq 'traffic'}">
+									<th th:text="#{schedule.common.invest.time}">조사 시간</th>
+									<td th:text="${@commonUtils.formatLocalDateTime(invstInfo.startDt,'HH:mm')} +' ~ '+ ${@commonUtils.formatLocalDateTime(invstInfo.endDt,'HH:mm')}"></td>
+								</th:block>
 							</tr>
 							<tr>
-								<th>조사 인원</th>
+								<th th:text="#{invst.common.invest.personel}">조사 인원</th>
 								<td th:text="${invstInfo.exmnNop}"></td>						
-								<th>캘린더 색상</th>
+								<th th:text="#{invst.common.calendar.color}">캘린더 색상</th>
 								<td><span id="scheduleColor" th:class="${invstInfo.colrCd.getCode()}"></span></td>
 							</tr>
 							<tr>
-								<th>조사 지역</th>
+								<th th:text="#{invst.common.invest.region}">조사 지역</th>
 								<td th:text="${invstInfo.exmnLc}"></td>	
-								<th class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">도로 차선 수</th>			
+								<th class="surveyDirectionBox" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'" th:text="#{invst.common.road.lane.number}">도로 차선 수</th>			
 								<td th:text="${invstInfo.laneCnt}" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'"></td>	
 							</tr>
+							<!-- ROADSIDE -->
+							<tr th:classappend="${invstInfo.exmnType.getCode()} eq 'ETC003' ? '' : 'none'">
+								<th th:text="#{invst.common.invest.roadName}">조사 지점</th>
+								<td th:text="${invstInfo.cordonLine != null ? invstInfo.cordonLine : invstInfo.tollBooth}">조사 지점 들어갈곳</td>
+							</tr>
+							<!-- 도로명 -->
+							<tr th:classappend="${invstInfo.exmnType.getType()} eq 'traffic' ? '' : 'none'">
+								<th th:text="#{invst.common.invest.roadName}">도로명</th>
+								<td colspan="3" th:text="|${invstInfo.cordonLine != null ? invstInfo.cordonLine : invstInfo.screenLine} ${invstInfo.roadDescr}|"></td>
+							</tr>		
 							<tr th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-								<th>좌표</th>
-								<td id="coordinateDetail" th:text="${invstInfo.lat} +','+ ${invstInfo.lon}"></td>					
-								<th>좌표 반경(m)</th>
-								<td>
-									<span class="locationCircle">
-										<input type="text" id="exmnRange" class="input-table-text" th:value="${invstInfo.exmnRange}" />
-										<input type="button" id="mapCircleUpdate" class="is-key-button overLapping" value="저장" th:onclick="updateExmnRange([[${exmnmngId}]]);"/>
-									</span>
-								</td>
+								<th th:text="#{common.table.coordinate}">좌표(TAZ CODE)</th>
+								<td id="coordinateDetail" th:text="|${invstInfo.lon}, ${invstInfo.lat} (${invstInfo.tazCd})|"></td>
+								<th th:text="#{invst.common.coordinate.radius}">좌표 반경(m)</th>
+								<th:block th:if="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'}">
+									<td th:text="${invstInfo.exmnRange}"></td>
+								</th:block>
+								<th:block th:unless="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'}">
+									<td th:text="${invstInfo.exmnRange}">
+									</td>
+								</th:block>
 							</tr>
 							<tr id="tableMap" th:classappend="${invstInfo.exmnType.getType()} eq 'survey' ? 'none'">
-								<th>ස්ථානය</th>
+								<th th:text="#{common.table.map}">맵</th>
 								<td colspan="3">
-									<span id="detailMap">
+									<span id="mapContainer" class="detailMap">
 										<span id="map"></span>
 									</span>
 								</td>
@@ -78,15 +88,15 @@
 				<th:block th:if="${invstInfo.exmnType.getHasDrct() eq 'true'}">
 					<div id="surveyDirectionBox" class="is-box mt24">
 						<div>
-							<h3 class="info-title">조사 방향</h3>
+							<h3 class="info-title" th:text="#{invst.common.invest.direction}">조사 방향</h3>
 						</div>
 						<div class="infoTableWrap">
 							<table class="infoTable">
 								<thead>
 									<tr>
-										<th>번호</th>
-										<th>From</th>
-										<th>To</th>
+										<th th:text="#{common.table.number}">번호</th>
+										<th th:text="#{invst.common.table.from}">From</th>
+										<th th:text="#{invst.common.table.to}">To</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -102,109 +112,201 @@
 				</th:block>		
 				<div class="is-box mt24">
 					<div>
-						<h3 class="info-title">කාලසටහනේ විස්තර</h3>	
+						<h3 class="info-title" th:text="#{schedule.common.investigators.regist}">조사원 등록</h3>	
 					</div>
 					<div class="infoTableWrap">
 						<div class="survey-update">
-							<div class="flex-center">
-								<span>총 조사원</span>
-								<img th:src="@{/images/investigator.png}" alt="user" class="survey-user-img"/>							 
-								<strong id="totalCount" th:text="${invstInfo.exmnNop}"></strong>
+							<div class="flex-center gap8">
+								<div class="flex-center survey-button-box">
+									<span th:text="#{schedule.scheduleDetail.investigator.number}">총 조사원</span> : 	  	 
+									<strong id="totalIvtigator" th:text="${invstInfo.exmnNop}"></strong>
+								</div>
+								<div class="survey-button-box">
+									<span th:text="#{schedule.scheduleDetail.invest.code}">조사코드</span> : 
+									<input type="text" class="input-text" id="partcptCd" th:value="${invstInfo.partcptCd}" readonly/>
+									<th:block th:if="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'
+									 and invstInfo.sttsCdNm ne 'notComplete'
+									 and (currentMenuAuthInfo.inputYn eq 'Y' or currentMenuAuthInfo.updtYn eq 'Y')
+									 }">
+										<button type="button" id="partcptCdBtn" th:data-exist-partcptcd="${invstInfo.partcptCd ne null ? true : false}"
+										th:onclick="partcptCdSave([[${invstInfo.exmnmngId}]]);" 
+										th:value="${invstInfo.partcptCd ne null} ? #{schedule.scheduleDetail.invest.code.update} : #{schedule.scheduleDetail.invest.code.regist}">
+											<img src="/images/code_re.png" th:alt="#{schedule.scheduleDetail.invest.code.update}" class="code-img">
+										</button>
+									</th:block>
+								</div>
 							</div>
-							<div class="survey-button-box">
-								<input type="text" class="input-text" id="partcptCd" th:value="${invstInfo.partcptCd}" readonly/>
-								<input type="button" class="is-key-button" id="partcptCdBtn" th:data-exist-partcptcd="${invstInfo.partcptCd ne null ? true : false}" th:value="${invstInfo.partcptCd ne null ? '조사코드 수정' : '조사코드 생성'}" th:onclick="partcptCdSave([[${invstInfo.exmnmngId}]]);"/>
-							</div>
+							<input type="button" id="surveyorListAddAllButton" th:value="#{schedule.scheduleDetail.investigator.excelAdd}"
+							class="is-key-button" onclick="surveyorListAddAll();" th:classappend="${invstInfo.exmnNop eq pollsterCnt ? 'none' : ''}"
+							th:if="${invstInfo.sttsCdNm ne 'notComplete' and (currentMenuAuthInfo.inputYn eq 'Y')}"
+							/>
+							<input type="button" id="surveyorListAddButton" th:value="#{schedule.scheduleDetail.investigator.add}"
+							 class="is-key-button" onclick="surveyorListAdd();" th:classappend="${invstInfo.exmnNop eq pollsterCnt ? 'none' : ''}"
+							 th:if="${invstInfo.sttsCdNm ne 'notComplete' and (currentMenuAuthInfo.inputYn eq 'Y')}"
+							 />
 						</div>			
-						<table class="infoTable">
+						<table id="surveyorTable" class="infoTable quest-validation">
 							<thead>
 								<tr>
-									<th>번호</th>
-									<th>이름</th>
-									<th>연락처</th>
-									<th>이메일</th>
-									<th>역할</th>
-									<th>등록/추가/삭제</th>
+<!-- 									<th th:text="#{common.table.number}">번호</th> -->
+									<th th:text="#{common.name}">이름</th>
+									<th th:text="#{common.contact}">연락처</th>
+									<th th:text="#{common.email}">이메일</th>
+									<th th:text="#{schedule.scheduleDetail.role}">역할</th>
+									<th:block th:if="${invstInfo.sttsCdNm ne 'notComplete'}">
+										<th th:text="#{invst.common.table.management}">관리</th>
+									</th:block>
 								</tr>
 							</thead>
 							<tbody id="surveyorAppendBox">
 								<th:block th:if="${tmExmnPollsterList != null}">
-									<tr th:data-surveyor="${status.index+1}" class="surveyorAppendItem addSurveyor" th:each="item,status : ${tmExmnPollsterList}" th:data-pollster-id="${item.pollsterId}">
-										<td class="surveyorNumber" th:text="${status.index+1}"></td>
-										<td><input type="text" class="input-table-text surveyorName" name="pollsterNm" th:value="${item.pollsterNm}" readonly=""></td>
-										<td><input type="tel" class="input-table-text surveyorPhone" name="pollsterTel" th:value="${item.pollsterTel}" readonly=""></td>
-										<td><input type="email" class="input-table-text surveyorMail" name="pollsterEmail" th:value="${item.pollsterEmail}" readonly=""></td>
+									<tr th:data-surveyor="${status.index+1}" class="surveyorAppendItem addSurveyor surveyorTotal" th:each="item,status : ${tmExmnPollsterList}" th:data-pollster-id="${item.pollsterId}">
+<!-- 										<td class="surveyorNumber" th:text="${status.index+1}"></td> -->
+										<td><input type="text" class="input-div-show surveyorName validation-tag" id="pollsterNm" name="pollsterNm" th:value="${item.pollsterNm}" th:placeholder="#{login.common.placeholder.name}" data-validation="name" readonly></td>
+										<td><input type="tel" class="input-div-show surveyorPhone validation-tag" name="pollsterTel" th:value="${item.pollsterTel}" th:placeholder="#{login.join.placeholder.contact}" oninput="inputOnlyNumber(this)" readonly></td>
+										<td><input type="email" class="input-div-show surveyorMail validation-tag" name="pollsterEmail" th:value="${item.pollsterEmail}" th:placeholder="#{login.common.placeholder.email}" data-validation="email" readonly></td>
 										<td class="text-center">
 											<span class="surveyor-role add-role" th:data-pollster-type="${item.pollsterType}" th:text="${item.pollsterType.getName}"></span>
-											<span class="surveyor-role-select none">
-												<select class="select-list-box">
-													<option value="MEMBER">팀원</option>
-													<option value="LEADER">팀장</option>
-												</select>
-											</span>
-										
+											<select class="select-list-box table-select surveyor-role-select surveyorRole none">
+												<option value="MEMBER" th:text="#{schedule.scheduleDetail.member}">팀원</option>
+												<option value="LEADER" th:text="#{schedule.scheduleDetail.leader}">팀장</option>
+											</select>
 										</td>
-										<td class="text-center">
-											<span class="surveyor-button-box">
-												<input type="button" class="is-key-button" onclick="listModify(this);" value="수정">
-												<input type="button" class="is-danger-button" th:onclick="listRemove(this,[[${item.pollsterId}]]);" value="삭제">
-											</span>
-											<span class="surveyor-update-button-box none">
-												<input type="button" class="is-key-button" onclick="listUpdate(this);" value="저장">
-												<input type="button" class="is-basic-button" onclick="listCancel(this);" value="취소">
-											</span>
-										</td>
+										<th:block th:if="${invstInfo.sttsCdNm ne 'notComplete' and (currentMenuAuthInfo.inputYn eq 'Y' or currentMenuAuthInfo.updtYn eq 'Y')}">
+											<td class="text-center">
+												<div class="surveyor-button-box">
+												<th:block th:if="${item.pollsterYn eq 'Y'}">
+													<img src="/images/search_finish_img.png" class="cm-csimg" th:alt="#{common.imgAlt.update}">
+												</th:block>
+												<th:block th:unless="${item.pollsterYn eq 'Y'}">
+													<img src="/images/modify_img.png" class="cm-csimg" onclick="listModify(this);"  th:alt="#{common.imgAlt.update}">
+													<img src="/images/delete_img.png" class="cm-csimg" th:onclick="listRemove(this,[[${item.pollsterId}]]);" th:alt="#{common.imgAlt.delete}">
+<!--												<input type="button" class="is-key-button sm-button" onclick="listModify(this);" value="수정">-->
+<!--												<input type="button" class="is-danger-button sm-button" th:onclick="listRemove(this,[[${item.pollsterId}]]);" value="삭제">-->
+												</th:block>
+												</div>
+												<span class="surveyor-update-button-box none">
+													<input type="button" class="is-key-button sm-button surveyorUpdate" onclick="listUpdate(this);" th:value="#{common.button.save}">
+													<input type="button" class="is-basic-button sm-button" onclick="listCancel(this);" th:value="#{common.button.cancel}">
+												</span>
+											</td>
+										</th:block>
 									</tr>
 								</th:block>
 							</tbody>
-							<tbody id="surveyorAppendUpdateBox">
-								<tr class="surveyorAppendItem">
-									<td></td>
-									<td><input type="text" id="surveyorName" class="input-table-text surveyorName" placeholder="이름을 입력해주세요."/></td>
-									<td><input type="tel" id="surveyorPhone" class="input-table-text surveyorPhone" placeholder="연락처를 입력해주세요."/></td>
-									<td><input type="email" id="surveyorMail" class="input-table-text surveyorMail" placeholder="이메일을 입력해주세요."/></td>
-									<td class="text-center">
-										<select class="select-list-box" id="surveyorRole">
-											<option value="MEMBER">팀원</option>
-											<option value="LEADER">팀장</option>
-										</select>							
-									</td>
-									<td class="text-center"><input type="button" id="surveyorSaveButton" onclick="listAdd(this);" class="is-key-button" value="추가하기"/></td>
-								</tr>
+<!-- 							<tbody id="surveyorAppendUpdateBox"> -->
+<!-- 								<th:block th:unless="${invstInfo.exmnNop eq pollsterCnt}"> -->
+<!-- 									<tr class="surveyorAppendList surveyorTotal" data-surveyor="0"> -->
+<!-- 										<td><input type="text" class="input-table-text surveyorName validation-tag" th:placeholder="#{login.common.placeholder.name}" data-validation="name"/></td> -->
+<!-- 										<td><input type="tel"  data-value="0" class="input-table-text surveyorPhone validation-tag" oninput="inputOnlyNumber(this)" th:placeholder="#{login.join.placeholder.contact}"/></td> -->
+<!-- 										<td><input type="email" data-value="0" class="input-table-text surveyorMail validation-tag" th:placeholder="#{login.common.placeholder.email}" data-validation="email"/></td> -->
+<!-- 										<td class="text-center"> -->
+<!-- 											<select class="select-list-box table-select surveyorRole"> -->
+<!-- 												<option value="MEMBER" th:text="#{schedule.scheduleDetail.member}">팀원</option> -->
+<!-- 												<option value="LEADER" th:text="#{schedule.scheduleDetail.leader}">팀장</option> -->
+<!-- 											</select>						 -->
+<!-- 										</td> -->
+<!-- 										<td class="text-center"> -->
+<!-- 											<input type="button" id="surveyorSaveButton" onclick="listAdd(this);" class="is-key-button sm-button" value="추가"/>-->
+<!-- 											<img src="/images/add_img.png" class="cm-csimg surveyorUpdate surveyorAdd" onclick="listAdd(this, 0);" th:alt="#{invst.common.button.add}"> -->
+<!-- 										</td> -->
+<!-- 									</tr> -->
+<!-- 								</th:block> -->
+<!-- 							</tbody> -->
+							
+							<tbody id="surveyorAppendUpdateBox" th:if="${currentMenuAuthInfo.inputYn eq 'Y'}">
+								<th:block th:if="${invstInfo.exmnNop ne pollsterCnt and invstInfo.sttsCdNm ne 'notComplete'}">
+									<tr class="surveyorAppendList surveyorTotal" data-surveyor="0">
+										<td><input type="text" class="input-table-text surveyorName validation-tag" th:placeholder="#{login.common.placeholder.name}" data-validation="name"/></td>
+										<td><input type="tel"  data-value="0" class="input-table-text surveyorPhone validation-tag" oninput="inputOnlyNumber(this)" th:placeholder="#{login.join.placeholder.contact}"/></td>
+										<td><input type="email" data-value="0" class="input-table-text surveyorMail validation-tag" th:placeholder="#{login.common.placeholder.email}" data-validation="email"/></td>
+										<td class="text-center">
+											<select class="select-list-box table-select surveyorRole">
+												<option value="MEMBER" th:text="#{schedule.scheduleDetail.member}">팀원</option>
+												<option value="LEADER" th:text="#{schedule.scheduleDetail.leader}">팀장</option>
+											</select>						
+										</td>
+										<td class="text-center">
+<!-- 											<input type="button" id="surveyorSaveButton" onclick="listAdd(this);" class="is-key-button sm-button" value="추가"/> -->
+											<img src="/images/add_img.png" class="cm-csimg surveyorUpdate surveyorAdd" onclick="listAdd(this, 0);" th:alt="#{invst.common.button.add}">
+										</td>
+									</tr>
+								</th:block>
+								<th:block th:if="${pollsterCnt eq 0 and invstInfo.sttsCdNm eq 'notComplete'}">
+									<tr>
+										<td colspan="4" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+									</tr>
+								</th:block>
 							</tbody>
 						</table>
 					</div>
 		        </div>
 	        </div>
-	        <div id="historyDiv"></div>
-<!--	       	<th:block th:if="${invstInfo.exmnType.getType() eq 'traffic'}" >-->
-<!--	       		<th:block th:insert="tags/datamng/scheduleTrafficDetail :: scheduleTrafficFragment"></th:block>-->
-<!--	        </th:block>-->
-<!--	       	<th:block th:if="${invstInfo.exmnType.getType() eq 'survey'}" >-->
-<!--	       		<th:block th:insert="tags/datamng/scheduleSurveyDetail :: scheduleSurveyFragment"></th:block>-->
-<!--	        </th:block>-->
+	        <div id="historyDiv" class="is-box mt24" th:if="${invstInfo.sttsCd.getStatus() eq 'progress' or invstInfo.sttsCd.getStatus() eq 'progressComplete'}"></div>
 		</div>
 		<div class="info-button-box">
-			<a th:href="@{/datamng/schedule}" class="is-basic-button">이전 페이지</a>
-			<th:block th:if="${invstInfo.sttsCd.getStatus() eq 'notYetProgress'}">
-				<a href="javascript:void(0)" class="is-key-button" onclick="invstScheduleSave()">저장</a>
+			<!-- <a href="javascript:toList()" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a> -->
+			<input type="button" th:value="#{common.button.prePage}" class="is-basic-button cm-leftFix-btn" onclick="historyBack()"/>
+			<th:block th:if="${@commonUtils.compareSurveyEndDtAndToday(invstInfo.endDt)} and (${invstInfo.sttsCd.getCode() eq 'ESC004'} or ${invstInfo.sttsCd.getCode() eq 'ESC003'})">
+				<input type="button" th:value="${invstInfo.sttsCd.getCode()} eq 'ESC004' ? #{schedule.common.button.progress} : #{schedule.common.button.complete}" class="is-key-button" th:onclick="updateSurveyStts([[${invstInfo.exmnmngId}]],[[${invstInfo.sttsCd.getCode()}]])"/>
+			</th:block>
+
+			<th:block th:if="${invstInfo.sttsCd.getStatus() ne 'progressComplete' and invstInfo.sttsCdNm ne 'notComplete' and invstInfo.exmnNop gt registExmnPollsterCnt} and ${currentMenuAuthInfo.inputYn eq 'Y'}">
+				<a href="javascript:void(0)" class="is-key-button" onclick="invstScheduleSave()" th:text="#{common.button.save}">저장</a>
 			</th:block>
         </div>
 	</th:block>
 </html>
 <script th:inline="javascript">
-
+	/* const totalAppendValue = document.getElementById('totalCount').innerText;
+	const surveyorTotal = document.querySeletorAll('.surveyorTotal').length-1;
+	if(surveyorTotal == totalAppendValue) {
+		document.querySelector('.surveyorAppendList').remove();
+	} */
+	
 	//container view toggle
 	let container = document.getElementById('scheduleContainer');
-	//chart
-	const exmnType 		= [[${invstInfo.exmnType.getType()}]];
 	
-	historyView = () => {
-		const exmnmngId = document.getElementById('exmnmngId').value;
-		let url = __contextPath__ + "/datamng/schedule/traffic/"+exmnmngId+"/history";
-		if(exmnType === 'survey') {
-			url = __contextPath__ + "/datamng/schedule/survey/"+exmnmngId+"/history";
+	const exmnType 		= [[${invstInfo.exmnType.getType()}]];
+	const hasDrct 		= [[${invstInfo.exmnType.getHasDrct()}]];
+	const exmnmngId 	= [[${invstInfo.exmnmngId}]];
+	const exmnStts	 	= [[${invstInfo.sttsCd.getStatus()}]];
+	
+	const urlType = exmnType === 'traffic'? 'traffic' : 'survey';
+	let url = `${__contextPath__}/datamng/schedule/${urlType}/${exmnmngId}/history`;
+	
+	let asynchronousSearchList = (searchDate = '',pageNo = 1) => {
+		
+		const params = new URLSearchParams();
+		
+		if(exmnType === 'traffic'){
+			const searchHiddenDate = document.getElementById('searchDate').value;
+			if(!isNull(searchHiddenDate) && isNull(searchDate)){
+				searchDate = searchHiddenDate;
+			}
+		}		
+		if(!isNull(searchDate)){
+		 	params.append('searchDate', searchDate);	
+		}		
+		if(pageNo === 1){
+			pageNo = document.getElementById('asynchronousPageNo').value;
 		}
+		params.append('pageNo', pageNo);
+		
+		if(hasDrct === 'true'){
+			const exmndrctId = document.getElementById('exmndrctId').value;
+			params.append('exmndrctId', exmndrctId);			
+		}
+		
+			url = __contextPath__ + "/datamng/schedule/survey/"+exmnmngId+"/history?"+params.toString();
+		if(exmnType === 'traffic') {
+			url = __contextPath__ + "/datamng/schedule/traffic/"+exmnmngId+"/history?"+params.toString();	
+		}
+		
+		getHistoryHtml(url);
+	}
+	
+	let getHistoryHtml = (url) =>{
 		fetch(url)
 		.then((response) => {
 	    	return response.text();
@@ -213,153 +315,151 @@
 			document.querySelector("#historyDiv").innerHTML = html;
 			container.classList.add('active');
 			if(exmnType === 'survey'){
-				chartCustom("historyChart", "#FF8636", 90, 150);
+				const totalCnt = document.getElementById("surveyTotalNumber").innerText;
+				const completedCnt = document.getElementById("surveyTargetNumber").innerText;
+				chartCustom("historyChart", "#03bbaa", completedCnt, totalCnt);
+			}else{
+				const searchDate = document.getElementById("searchDate").value;
+				
+				const allTr = document.querySelectorAll('.table-link');
+				allTr.forEach(tr => {
+					if(tr.dataset.invstDt === searchDate){
+						tr.classList.add('active');
+					}
+				})
+				
 			}
-	  	});
-	}
-	detailView = () => {
-		container.classList.remove('active');
+	  	});	
 	}
 	
+	if(exmnStts == 'progress' || exmnStts == 'progressComplete') getHistoryHtml(url);
 	
 	//tablaDate
-	 tableTcDate = (_this) => {
-		 const tcDate = document.getElementById('tcDate');
-		 const date = _this.querySelector('.table-tc-date').value;
-		 
-		 tcDate.textContent = date;
-		 
-		 //table event
-		 const allTr = _this.closest('table').querySelectorAll('tr');
-		 const tr = _this.closest('tr');
-		 allTr.forEach(tr => {
-			 tr.classList.remove('active');
-		 })
-		 tr.classList.add('active');
-	 }
+	tableTcDate = (_this,searchDate,pageNo = 1) => {
+		asynchronousSearchList(searchDate,pageNo,_this)
+	}
 	
+	const lng 		= [[${invstInfo.lon}]];
 	const lat 		= [[${invstInfo.lat}]];
-	const lon 		= [[${invstInfo.lon}]];
 	const exmnRange = [[${invstInfo.exmnRange}]];
-	mapboxGl(lon, lat, exmnRange);
+	
+	(async () => {
+		let mapgl = await mapboxGl(lng, lat);
+		setMarker(lng, lat);
+		setTrafficSurveyCircleMeters(mapgl, lng, lat, exmnRange);
+	})();	
+	
 	
 	//DB 삭제용 Array 전역변수
 	let deletePollsterIdArray = new Array();
-		
-	//좌표반경 변경버튼
-	const mapCircleUpdate = document.getElementById('mapCircleUpdate');
-	const exmnRangeElement = document.getElementById('exmnRange');
-	mapCircleUpdate.addEventListener('click', () => {
-		const value =  exmnRangeElement.value;
-		if(value !== '') {
-			mapRemove();
-			mapboxGl(79.88617717550125, 6.9218463186791155, value);			
-		}
-	})
 	
-	//조사원 추가 전역 변수
-	let nameRegExp = /^[a-zA-Z]+$/;
-	let phoneRegExp = /^(010{1})[0-9]{3,4}[0-9]{4}$/i;
-	let emailRegExp = /^[a-z0-9A-Z._-]+@[a-z0-9A-Z_-]+\.[a-zA-Z.]*$/i;	
+	const invstStatus = /*[[${invstInfo.sttsCd.status}]]*/;
+	//좌표반경 변경버튼
+	if (invstStatus === 'notYetProgress') {
+		const mapCircleUpdate = document.getElementById('mapCircleUpdate');
+		const exmnRangeElement = document.getElementById('exmnRange');
+		if(mapCircleUpdate) {
+			mapCircleUpdate.addEventListener('click', () => {
+				const value =  exmnRangeElement.value;
+				if(value !== '') {
+					mapRemove();
+					mapboxGl(79.88617717550125, 6.9218463186791155, value);			
+				}
+			});
+		}
+	}	
+	
 	//조사원추가
-	function listAdd(_this){
-		const parent = _this.closest('.surveyorAppendItem');
-		const name = parent.querySelector('#surveyorName').value;
-		const nameValidation = name.replace(/\s/g, '');
-		const phone = parent.querySelector('#surveyorPhone').value;
+	function listAdd(_this, index = 0){
+		const parent = _this.closest('.surveyorAppendList');
+		const name = parent.querySelector('.surveyorName').value;
+		const phone = parent.querySelector('.surveyorPhone').value;
 		const phoneValidation = phone.replace(/\s/g, '');
-		const mail = parent.querySelector('#surveyorMail').value;
-		const role = document.getElementById('surveyorRole');
+		const mail = parent.querySelector('.surveyorMail').value;
+		const role = document.querySelector('.surveyorRole');
 		const roleText = role.options[role.selectedIndex].innerText; 
-		const roleValue = role.options[role.selectedIndex].value; 
+		const roleValue = role.options[role.selectedIndex].value;
 		const validationItemBox = _this.closest('#surveyorAppendUpdateBox');
 		const tbody = document.querySelector('#surveyorAppendBox');
-		const totalAppendValue = document.getElementById('totalCount').innerText;
-		const surveroyInputList = ['surveyorName', 'surveyorPhone', 'surveyorMail'];
-		
+		const totalAppendValue = document.getElementById('totalIvtigator').innerText;
 		const trIndex = document.querySelectorAll('.surveyorAppendItem');
 		
-		const tr = document.createElement('tr');
-		tr.setAttribute('data-surveyor', trIndex.length)
-		tr.classList.add('surveyorAppendItem');
-		tr.classList.add('addSurveyor');
-		let html = `<td class="surveyorNumber">${trIndex.length}</td>
-					<td><input type="text" class="input-table-text surveyorName" name="pollsterNm" value="${nameValidation}" readonly/></td>
-					<td><input type="tel" class="input-table-text surveyorPhone" name="pollsterTel" value="${phoneValidation}" readonly/></td>
-					<td><input type="email" class="input-table-text surveyorMail" name="pollsterEmail" value="${mail}" readonly/></td>
-					<td class="text-center">
-						<span class="surveyor-role add-role" data-pollster-type="${roleValue}">${roleText}</span>
-						<span class="surveyor-role-select none">
-							<select class="select-list-box">
-								<option value="MEMBER">팀원</option>
-								<option value="LEADER">팀장</option>
+		if(validation(parent, 1)){
+			const tr = document.createElement('tr');
+			tr.setAttribute('data-surveyor', index)
+			tr.classList.add('surveyorAppendItem', 'addSurveyor', 'surveyorTotal');
+			let html = `
+						<td><input type="text" class="input-div-show surveyorName validation-tag" id="pollsterNm${index}" name="pollsterNm" value="${name}" data-validation="name" placeholder="${message.schedule.scheduleDetail_placeholder_name}" readonly/></td>
+						<td><input type="tel" data-value="${index}" class="input-div-show surveyorPhone validation-tag" name="pollsterTel" value="${phoneValidation}" oninput="inputOnlyNumber(this)" placeholder="${message.schedule.scheduleDetail_placeholder_contact}" readonly/></td>
+						<td><input type="email" data-value="${index}" class="input-div-show surveyorMail validation-tag" name="pollsterEmail" value="${mail}" data-validation="email" placeholder="${message.schedule.scheduleDetail_placeholder_email}" readonly/></td>
+						<td class="text-center">
+							<span class="surveyor-role add-role" data-pollster-type="${roleValue}">${roleText}</span>
+							<select class="surveyor-role-select select-list-box table-select none">
+								<option value="MEMBER">${message.schedule.scheduleDetail_member}</option>
+								<option value="LEADER">${message.schedule.scheduleDetail_leader}</option>
 							</select>
-						</span>
-					</select>
-					</td>
-					<td class="text-center">
-						<span class="surveyor-button-box">
-							<input type="button" class="is-key-button" onclick="listModify(this);" value="수정"/>
-							<input type="button" class="is-danger-button" onclick="listRemove(this);" value="삭제"/>
-						</span>
-						<span class="surveyor-update-button-box none">
-							<input type="button" class="is-key-button" onclick="listUpdate(this);" value="저장"/>
-							<input type="button" class="is-basic-button" onclick="listCancel(this);" value="취소"/>
-						</span>
-					</td>`
-					
-		if(nameValidation == "" || nameValidation.length < 4 || !nameRegExp.test(nameValidation)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 이름입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else if(phoneValidation == "" || !phoneRegExp.test(phoneValidation)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 연락처입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else if(mail == "" || mail.length < 6 || !emailRegExp.test(mail)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 이메일입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else {
-			
-			//조사 가능한 인원 수
-			if(Number(totalAppendValue) < trIndex.length) {
-				new ModalBuilder().init().alertBody('더 이상 인원을 추가할 수 없습니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			} else {
-				//연락처 값 존재 유무 체크
-				if(dupleCheckBySelectAll('.surveyorPhone',phone,trIndex.length-1)){
-					new ModalBuilder().init().alertBody('중복된 연락처 정보가 존재합니다. 이메일을 확인해 주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
-					return false;
-				}
-				
-				//이메일 값 존재 유무 체크
-				if(dupleCheckBySelectAll('.surveyorMail',mail,trIndex.length-1)){
-					new ModalBuilder().init().alertBody('중복된 이메일이 존재합니다. 이메일을 확인해 주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
-					return false;
-				}
-			
-				tbody.append(tr);
-				tr.innerHTML = html;
+						</select>
+						</td>
+						<td class="text-center">
+							<span class="surveyor-button-box">
+								<input type="button" class="is-key-button" onclick="listModify(this);" value="${message.common.button_update}"/>
+								<input type="button" class="is-danger-button" onclick="listRemove(this);" value="${message.common.button_delete}"/>
+							</span>
+							<span class="surveyor-update-button-box none">
+								<input type="button" class="is-key-button surveyorUpdate" onclick="listUpdate(this, ${index});" value="${message.common.button_save}"/>
+								<input type="button" class="is-basic-button" onclick="listCancel(this);" value="${message.common.button_cancel}"/>
+							</span>
+						</td>`
+						
+			//연락처 값 존재 유무 체크
+			if(dupleCheckBySelectAll('.surveyorPhone',phone,index)){
+				new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_duplicate_contact).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+				return false;
 			}
+			
+			//이메일 값 존재 유무 체크
+			if(dupleCheckBySelectAll('.surveyorMail',mail,index)){
+				new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_duplicate_email).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+				return false;
+			}			
+			
+			tbody.append(tr);
+			tr.innerHTML = html;
+			role.options[0].selected = true;
+			parent.remove();
 		}
-		
-		role.options[0].selected = true;
-		//등록 후 입력값 초기화 
-		surveroyInputList.forEach(remove => document.getElementById(remove).value = '');
-		
 	}
 	
 	//조사원 삭제
 	function listRemove(_this,pollsterId = ''){
-		new ModalBuilder().init().alertBody('조사원을 삭제 하시겠습니까?').footer(3,'확인',function(button, modal){
+		new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_investigator_delete).footer(3,message.common.button_confirm,function(button, modal){
 			if(!isNull(pollsterId))deletePollsterIdArray.push(pollsterId);
 			_this.closest('.surveyorAppendItem').remove();
-			const trIndex = document.querySelectorAll('.surveyorAppendItem');
-			trIndex.forEach((item, index) => {
-				item.setAttribute('data-surveyor', index+1)
-				item.querySelectorAll('.surveyorNumber').forEach(number => {
-					number.textContent = index+1;
-				})
+			
+			const updateButton = document.querySelectorAll('.surveyorUpdate');
+			const trIndex = document.querySelectorAll('.surveyorTotal');
+			const phoneInput = document.querySelectorAll('.surveyorPhone');
+			const mailInput = document.querySelectorAll('.surveyorMail');
+			const listAddButton = document.getElementById('surveyorListAddButton');
+			const totalAppendValue = document.getElementById('totalIvtigator').innerText;
+			
+			trIndex.forEach((item, index) => item.setAttribute('data-surveyor', index));
+			phoneInput.forEach((item, index) => item.setAttribute('data-value', index));
+			mailInput.forEach((item, index) => item.setAttribute('data-value', index));
+			updateButton.forEach((item, index) => {
+				if(item.classList.contains('surveyorAdd')){
+					item.setAttribute('onclick', 'listAdd(this,'+index+')');
+				} else {
+					item.setAttribute('onclick', 'listUpdate(this,'+index+')');
+				}
 			});
+			
+			if(totalAppendValue > trIndex.length) listAddButton.classList.remove('none');
+			
+			
+			
 			modal.close();
-		}, '취소', function(button, modal){
+		}, message.common.button_cancel, function(button, modal){
 			modal.close();
 		}).open();
 	}
@@ -372,13 +472,25 @@
 		const buttonUpdateBox = parent.querySelector('.surveyor-update-button-box');
 		const roleBox = parent.querySelector('.surveyor-role');
 		const roleSelectBox = parent.querySelector('.surveyor-role-select');
-		parent.querySelectorAll('.input-table-text').forEach(input => {
+		parent.querySelectorAll('.input-div-show').forEach(input => {
 			input.readOnly = false;
+			input.classList.remove('input-div-show');
+			input.classList.add('input-table-text');
 		})
 		buttonBox.classList.add('none');
 		buttonUpdateBox.classList.remove('none');
 		roleBox.classList.add('none');
 		roleSelectBox.classList.remove('none');
+		
+		const updateButton = document.querySelectorAll('.surveyorUpdate');
+		const trIndex = document.querySelectorAll('.surveyorTotal');
+		const phoneInput = document.querySelectorAll('.surveyorPhone');
+		const mailInput = document.querySelectorAll('.surveyorMail');
+		
+		phoneInput.forEach((item, index) => item.setAttribute('data-value', index));
+		mailInput.forEach((item, index) => item.setAttribute('data-value', index));
+		updateButton.forEach((item, index) => item.setAttribute('onclick', 'listUpdate(this, '+index+')'));
+		trIndex.forEach((item, index) => item.setAttribute('data-surveyor', index));		
 		
 		//조사원 수정 취소시
 		closeNameValue = parent.querySelector('.surveyorName').value;
@@ -388,7 +500,7 @@
 	}
 	
 	//조사원 저장
-	function listUpdate(_this){
+	function listUpdate(_this, index){
 		const parent = _this.closest('.surveyorAppendItem');
 		const parentIndex = parent.dataset.surveyor;
 		const buttonBox = parent.querySelector('.surveyor-button-box');
@@ -396,36 +508,29 @@
 		const roleBox = parent.querySelector('.surveyor-role');
 		const roleSelectBox = parent.querySelector('.surveyor-role-select');
 		const name = parent.querySelector('.surveyorName').value;
-		const nameValidation = name.replace(/\s/g, '');
 		const phone = parent.querySelector('.surveyorPhone').value;
 		const phoneValidation = phone.replace(/\s/g, '');
 		const mail = parent.querySelector('.surveyorMail').value;		
 		
-		if(nameValidation == "" || nameValidation.length < 4 || !nameRegExp.test(nameValidation)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 이름입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else if(phoneValidation == "" || !phoneRegExp.test(phoneValidation)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 연락처입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else if(mail == "" || mail.length < 6 || !emailRegExp.test(mail)){
-			new ModalBuilder().init().alertBody('잘못된 유형의 이메일입니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
-			return false;
-		} else {
+		if(validation('#surveyorAppendBox')) {
 			//연락처 값 존재 유무 체크
-			if(dupleCheckBySelectAll('.surveyorPhone',phone,parentIndex-1)){
-				new ModalBuilder().init().alertBody('중복된 연락처 정보가 존재합니다. 연락처을 확인해 주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+			if(dupleCheckBySelectAll('.surveyorPhone',phone,index)){
+				new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_duplicate_contact).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 				return false;
 			}
 			
 			//이메일 값 존재 유무 체크
-			if(dupleCheckBySelectAll('.surveyorMail',mail,parentIndex-1)){
-				new ModalBuilder().init().alertBody('중복된 이메일이 존재합니다. 이메일을 확인해 주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+			if(dupleCheckBySelectAll('.surveyorMail',mail,index)){
+				new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_duplicate_email).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 				return false;
 			}
 			
 			parent.querySelectorAll('.input-table-text').forEach(input => {
 				input.readOnly = true;
-			})
+				input.classList.remove('input-table-text');
+				input.classList.add('input-div-show');
+			});
+			
 			buttonUpdateBox.classList.add('none');
 			buttonBox.classList.remove('none');
 			roleSelectBox.classList.add('none');
@@ -437,6 +542,7 @@
 			const selectValue = selectRole.options[selectRole.selectedIndex].value;
 			roleBox.textContent = selectText;
 			roleBox.setAttribute('data-pollster-type', selectValue)
+			
 		}
 	}
 	
@@ -455,6 +561,8 @@
 		
 		parent.querySelectorAll('.input-table-text').forEach(input => {
 			input.readOnly = true;
+			input.classList.remove('input-table-text');
+			input.classList.add('input-div-show');
 		})
 		
 		buttonUpdateBox.classList.add('none');
@@ -463,25 +571,25 @@
 		roleBox.classList.remove('none');
 	}
 	
+	// 조사 저장
 	function invstScheduleSave(){
 	    
 	    let tmExmnPollsterSaveDTO = new Object();
 	    let tmExmnPollsterList = new Array();
-	    let totalCount = document.getElementById('totalCount').innerText;
+	    let totalCount = document.getElementById('totalIvtigator').innerText;
 	    
 		let addRole = document.querySelectorAll('.add-role');
 		
 	    let roleValues = Array.from(addRole).map(item => item.dataset.pollsterType);
 		if(parseInt(totalCount) === addRole.length){
 		    if(!roleValues.includes('LEADER')) {
-				new ModalBuilder().init().alertBody('조사원 중 팀장은 1명 존재해야합니다.').footer(4,'확인',function(button, modal){modal.close();}).open(); 
+				new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_investigator_need_leader).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open(); 
 				return false;
 			}
 		}
-				
 		let leaderDupleCheck = hasDuplicates(roleValues, 'LEADER');
 		if(leaderDupleCheck) {
-			new ModalBuilder().init().alertBody('조사원 중 팀장은 1명 존재해야합니다.').footer(4,'확인',function(button, modal){modal.close();}).open(); 
+			new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_investigator_need_leader).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open(); 
 			return false;
 		}
 		
@@ -519,12 +627,12 @@
 		.then(response => response.json())
 		.then(result => {
 					if(result.code == '200'){
-						new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
+						new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 							modal.close();
 							window.location.reload();
 						}).open();
 					}else{
-						new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){modal.close();}).open();
+						new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 					}
 				}
 		)	
@@ -533,7 +641,20 @@
 	
 	//조사코드 등록/수정 
 	function partcptCdSave(exmnmngId){
-		
+		const partcptCd = document.getElementById('partcptCd').value;
+		if (!!partcptCd) {
+			new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_partcptCd_reset_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+				modal.close();
+				asyncPartcptCdSave();
+			}, message.common.button_cancel, function (button, modal) {
+				modal.close();
+			}).open();
+		} else {
+			asyncPartcptCdSave();
+		}
+	}
+	
+	function asyncPartcptCdSave(){
 		fetch(__contextPath__+"/datamng/schedule/"+exmnmngId+"/partcptCd",{
 			method: "POST",
 		})
@@ -547,10 +668,10 @@
 						
 						if(existPartcptCd === 'false'){
 							partcptCdBtn.setAttribute('data-exist-partcptcd', true);
-							partcptCdBtn.value = '조사코드 수정';
+							partcptCdBtn.value = message.schedule.scheduleDetail_invest_code_update;
 						} 
-					}else{
-						new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){modal.close();}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 					}
 				}
 		)	
@@ -563,9 +684,191 @@
 		const elements = document.querySelectorAll(elementName);
 		if(elements.length > 0){
 			let elementsValues = Array.from(elements)
-										.filter((el, index) => index !== _thisIdx)
+										.filter((el, index) => 
+										!el.dataset.value || el.dataset.value != _thisIdx)
 										.map(el => el.value);
+			console.log(elementsValues);
 			return elementsValues.some(s => s.includes(checkValue));
 		}
 	}
+	
+	function surveyorListAddAll(){
+		new ModalBuilder().init(message.schedule.scheduleDetail_excel_surveyor_regist).ajaxBody(__contextPath__ + "/datamng/schedule/invst/save").footer(3, message.common.button_regist, function (button, modal) {
+			let fileInfo =  $("#fileUploadInput")[0];
+			const table = document.getElementById('surveyorAppendUpdateBox');
+			let tr = document.querySelectorAll('.surveyorTotal');
+			const trIndex = tr.length;
+			const totalAppendValue = document.getElementById('totalIvtigator').innerText;
+			
+			let file = fileInfo.files[0];
+			let formData = new FormData();
+			formData.append("file", file);
+			
+			fetch(__contextPath__+ "/datamng/schedule/invst/excelUpload", {
+				method : "POST",
+				body : formData
+			})
+			.then(response => response.json())
+			.then(result => {
+				const dataList = result.data.dataList;
+				let html = '';
+				let selectHtml = '';
+				if (!isNull(dataList) && dataList.length > 0) {
+					
+					//if(Number(totalAppendValue) <= dataList.length) {
+					//	new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_no_more_add).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+					//	return
+			 		//}
+					
+					$('.surveyorTotal').remove();
+					
+					for (const item of dataList) {
+						html +=`
+								<tr class="surveyorAppendList surveyorTotal">
+									<td><input type="text" class="input-table-text surveyorName validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_name}" data-validation="name" value="${item.name}"/></td>
+									<td><input type="tel" data-value="${trIndex}" class="input-table-text surveyorPhone validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_contact}" value="${item.contact}"/></td>
+									<td><input type="email" data-value="${trIndex}" class="input-table-text surveyorMail validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_email}" data-validation="email" value="${item.email}"/></td>
+									<td class="text-center">
+										<select class="select-list-box table-select surveyorRole" data-value="${item.role}">
+											<option value="MEMBER">${message.schedule.scheduleDetail_member}</option>
+											<option value="LEADER">${message.schedule.scheduleDetail_leader}</option>
+										</select>						
+									</td>
+									<td class="text-center">
+										<img src="/images/add_img.png" class="cm-csimg surveyorUpdate surveyorAdd" onclick="listAdd(this, ${trIndex});" alt="${message.common.button_add}">
+									</td>
+								</tr>
+								`
+						tr = document.querySelectorAll('.surveyorTotal');
+						tr.forEach((item, idx) => item.setAttribute('data-surveyor', idx));
+					}
+					table.insertAdjacentHTML('beforeend', html);
+					
+					$('.surveyorRole').each(function() {
+						let role = $(this).data("value");
+					        
+				        $(this).find('option').each(function() {
+				            var option = $(this);
+	
+				            if (option.val() === role) {
+				                option.prop('selected', true);
+				                return false;
+				            }
+				        });
+				    });
+					modal.close();
+				}
+			})
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+	
+	function surveyorListAdd() {
+		const table = document.getElementById('surveyorAppendUpdateBox');
+		let tr = document.querySelectorAll('.surveyorTotal');
+		const trIndex = tr.length;
+		const totalAppendValue = document.getElementById('totalIvtigator').innerText;
+		const html =`
+					<tr class="surveyorAppendList surveyorTotal">
+						<td><input type="text" class="input-table-text surveyorName validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_name}" data-validation="name"/></td>
+						<td><input type="tel" data-value="${trIndex}" class="input-table-text surveyorPhone validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_contact}"/></td>
+						<td><input type="email" data-value="${trIndex}" class="input-table-text surveyorMail validation-tag" placeholder="${message.schedule.scheduleDetail_placeholder_email}" data-validation="email"/></td>
+						<td class="text-center">
+							<select class="select-list-box table-select surveyorRole">
+								<option value="MEMBER">${message.schedule.scheduleDetail_member}</option>
+								<option value="LEADER">${message.schedule.scheduleDetail_leader}</option>
+							</select>						
+						</td>
+						<td class="text-center">
+							<img src="/images/add_img.png" class="cm-csimg surveyorUpdate surveyorAdd" onclick="listAdd(this, ${trIndex});" alt="${message.common.button_add}">
+						</td>
+					</tr>
+					`
+		//조사 가능한 인원 수
+		if(Number(totalAppendValue) <= trIndex) {
+			new MsgModalBuilder().init().alertBody(message.schedule.scheduleDetail_no_more_add).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+			return
+			
+ 		}
+					
+		table.insertAdjacentHTML('beforeend', html);
+		tr = document.querySelectorAll('.surveyorTotal');
+		tr.forEach((item, idx) => item.setAttribute('data-surveyor', idx));
+		
+	}
+
+	// 설문 결과 보기
+	function viewSurveyResult(srvyrsltId, _this){
+		fetch(__contextPath__+"/datamng/schedule/survey/"+srvyrsltId)
+		.then((response) => {
+	    	return response.text();
+	  	})
+	  	.then((html) => {
+			document.querySelector("#surveyResult").innerHTML = html;
+			datePickerSet();
+			
+			const id = document.getElementById('srvyrsltId');
+			if(id) id.value = srvyrsltId
+			
+	  	})
+	  	const parent = _this.closest('tbody');
+		parent.querySelectorAll('tr').forEach(tr => {
+			if(tr.classList.contains('schedule-tr-active')) {
+				tr.classList.remove('schedule-tr-active')
+			}
+		})
+		
+		_this.closest('tr').classList.add('schedule-tr-active');
+	}
+	function updateSurveyStts(exmnmngId,sttsCd){
+		let msg = message.schedule.scheduleDetail_complete_update;
+		if(sttsCd === 'ESC004'){
+			msg = message.schedule.scheduleDetail_progress_update;
+		}
+		console.log(msg)
+		new MsgModalBuilder().init(msg).footer(4,message.common.button_confirm,function(button, modal){
+			fetch(__contextPath__+"/datamng/schedule/survey/"+exmnmngId,{
+				method: "PUT"
+			})
+			.then(response => response.json())
+			.then(result =>
+			{
+				if(result.code == '200'){
+					modal.close();
+					window.location.reload();
+				}else{
+					new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
+				}
+			})
+		}).open();
+	}
+	
+	
+	let gpsUpdate = (_this) => {
+		new ModalBuilder().init('GPS Update', '800').ajaxBody(__contextPath__+"/datamng/schedule/invst/survey/gps/update").footer(3,'변경하기',function(button, modal){
+			const element = _this;
+			const parentNextElement = element.closest('.kecc-quest').nextElementSibling;
+			const tazElement = parentNextElement.querySelector('.cm-location-box');
+			const gpsLocation = document.getElementById('modalGpsLocation');
+			
+			if(gpsLocation.value != '') {
+				element.value = `${gpsLng}, ${gpsLat}`
+				tazElement.value = gpsTaz;
+				
+				element.dataset.update = 'Y';
+				tazElement.dataset.update = 'Y';
+				
+				modal.close();
+			} else {
+				alert('좌표를 입력해주세요.')
+			}
+			
+		}, '취소', function(button, modal){
+			modal.close();
+		}).open();
+	}
+	
+	
+	
 </script>

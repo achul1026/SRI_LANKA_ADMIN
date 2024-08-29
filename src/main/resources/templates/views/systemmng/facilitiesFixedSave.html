@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+			<form id="facilitySaveForm" name="facilitySaveForm">	
+				<div class="is-box">
+					<div>
+        				<h3 class="info-title" th:text="#{facilities.facilitiesSave.title.fixed}">시설물 등록</h3>
+        			</div>
+        			<div class="infoTableWrap">
+        				<input type="hidden" name="eqpmntClsf" th:value="${typeCd}">
+						<table class="infoTable survey-save-table">
+<!-- 							<tr> -->
+<!-- 								<th th:text="#{common.table.agency}">관리기관</th> -->
+<!-- 								<td> -->
+<!-- 									<input type="text" class="input-table-text validation-tag" th:placeholder="#{facilities.placeholder.agency}"/> -->
+<!-- 								</td>							 -->
+<!-- 								<th th:text="#{common.table.manager}">관리자</th> -->
+<!-- 								<td> -->
+<!-- 									<input type="text" class="input-table-text validation-tag" th:placeholder="#{facilities.placeholder.manager}"/> -->
+<!-- 								</td>							 -->
+<!-- 							</tr> -->
+							<tr>
+<!-- 								<th th:text="#{common.contact}">연락처</th> -->
+<!-- 								<td> -->
+<!-- 									<input type="text" class="input-table-text validation-tag" th:placeholder="#{facilities.placeholder.contact}"/> -->
+<!-- 								</td>							 -->
+							</tr>
+							<tr>
+								<th th:text="#{facilities.table.location}">설치위치</th>
+								<td>
+									<input type="text" name="instllcNm" class="input-table-text validation-tag" th:placeholder="#{facilities.placeholder.location}"/>
+								</td>							
+								<th th:text="#{facilities.table.direction.code}">방향 코드</th>
+								<td>
+<!-- 									<input type="text" name="drctCd" class="input-table-text validation-tag"/> -->
+									<select name="drctCd" class="select-list-box table-select">
+										<option th:each="item:${drctCd}" th:text="${item.cdNm}" th:value="${item.cd}"></option>
+									</select>
+								</td>	
+							</tr>
+							<tr>
+								<th th:text="#{invst.common.road.lane.number}">도로 차선 수</th>
+                    			<td><input type="text" id="laneCnt" class="input-table-text validation-tag" oninput="inputOnlyNumber(this)" name="laneCnt" th:placeholder="#{invst.common.placeholder.road.lane.number}" onkeyup="valid(this);"/></td>
+								<th th:text="#{facilities.table.road.code}">도로 코드</th>
+								<td>
+									<select name="roadCd" class="select-list-box table-select">
+										<option th:each="item:${roadCd}" th:text="${item}" th:value="${item}"></option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<th th:text="#{facilities.table.regist.coordinate}">시설물 위치 등록</th>
+								<td>
+									<div class="facilities-location-box">
+										<div class="facities-location">
+											<label th:text="#{common.table.coordinate.x}">X좌표</label>
+											<input type="hidden" class="validation-tag" name="lon" id="facilitiesLocationLng" th:placeholder="#{facilities.placeholder.coordinate.x}"/>
+											<input type="number" id="lngCoordinates" class="input-table-text" th:placeholder="#{facilities.placeholder.coordinate.x}"/>
+										</div>
+										<div class="facities-location">
+											<label th:text="#{common.table.coordinate.y}">Y좌표</label>
+											<input type="hidden" class="validation-tag" name='lat' id="facilitiesLocationLat" th:placeholder="#{facilities.placeholder.coordinate.y}"/>
+											<input type="number" id="latCoordinates" class="input-table-text" th:placeholder="#{facilities.placeholder.coordinate.y}"/>
+										</div>
+										<input type="button" onclick="setCoordinatesMarker();" class="is-key-button" th:value="#{facilities.table.regist.coordinate}"/>
+									</div>
+								</td>
+								<th th:text="#{common.table.useYn}">사용 여부</th>
+								<td>
+									<select name="useYn" class="select-list-box table-select">
+										<option value="Y" th:text="#{common.option.useYn.y}">사용</option>
+										<option value="N" th:text="#{common.option.useYn.n}">미사용</option>
+									</select>
+								</td>
+							</tr>
+							<tr id="tableMap" class="surveyDirectionBox">
+								<th th:text="#{common.table.map}">맵</th>
+								<td colspan="3" id="mapSearch">
+									<span id="mapContainer" class="detailMap">
+										<span id="map"></span>
+								    	<span id="zoomBox">
+			    							<span id="zoomIn"><img th:src="@{/images/zoom_in.png}" th:alt="#{common.imgAlt.expansion}"/></span>
+			    							<span id="zoomOut"><img th:src="@{/images/zoom_out.png}" th:alt="#{common.imgAlt.reduce}"/></span>
+		    							</span>
+									</span>
+								</td>
+							</tr>
+						</table>
+        			</div>
+				</div>
+			</form>
+			<div class="info-button-box">
+                <a th:href="@{/systemmng/facilities}" class="is-basic-button" th:text="#{common.button.prePage}">취소</a>
+                <input type="button" class="is-key-button overLapping" onclick="facilitySave()" th:value="#{common.button.regist}"/>
+            </div>
+        </div>
+	</th:block>
+</html>
+
+<script>
+	(async () => {
+		let mapgl = await mapboxGl();
+		setMapZoomControl(mapgl);
+		setMapSearch(mapgl);
+	})();  
+	
+	//시설물 저장
+	function facilitySave(){
+		if (validation('#facilitySaveForm')) {
+			fetch(__contextPath__ + "/systemmng/facilities", {
+				method: "POST",
+				body: new FormData($("#facilitySaveForm")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(message.facilities.facilitiesSave_complete_save).footer(4, message.common.button_regist, function (button, modal) {
+							location.href = __contextPath__ + "/systemmng/facilities";
+						}).open();
+					}
+				})
+		}
+	}
+</script>

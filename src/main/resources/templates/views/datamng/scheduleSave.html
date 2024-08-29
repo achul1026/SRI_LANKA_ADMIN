@@ -5,23 +5,23 @@
       
 	<th:block layout:fragment="content">
         <div>
-            <h3 id="infoTitle">기본 정보</h3>
+            <h3 id="infoTitle" th:text="#{schedule.scheduleSave.title}">기본 정보</h3>
         </div>
 		<div class="list-table-container">
 			<div class="list-search-wrap mt48">
 				<div class="list-search-box">
-					<input type="text" class="input-text" placeholder="조사명을 검색해주세요." style="margin:0 8px 0 0;">
-					<input type="button" id="invstListButton" class="is-key-button" value="검색"/>					
+					<input type="text" class="input-text" th:placeholder="#{common.search.placeholder.investName}" style="margin:0 8px 0 0;">
+					<input type="button" id="invstListButton" class="is-key-button" th:value="#{common.button.search}"/>					
 				</div>			
 			</div>		
 			<div class="mt16">
 				<table class="list-table">
 					<thead>
 		                <tr>
-		                    <th>조사명</th>
-		                    <th>조사 기간</th>
-		                    <th>조사 시간</th>
-		                    <th>캘린더 색상</th>
+		                    <th th:text="#{invst.common.invest.name}">조사명</th>
+		                    <th th:text="#{common.table.investPeriod}">조사 기간</th>
+		                    <th th:text="#{schedule.common.invest.time}">조사 시간</th>
+		                    <th th:text="#{invst.common.calendar.color}">캘린더 색상</th>
 		                </tr>
 					</thead>
 					<tbody>
@@ -43,7 +43,7 @@
 										<label><input type="radio" value="9" name="colorSelcet"/></label>
 										<label><input type="radio" value="10" name="colorSelcet"/></label>
 					            	</span>
-									<input type="button" class="input-reset" value="저장"/>				            
+									<input type="button" class="input-reset" th:value="#{common.button.save}"/>				            
 				            	</span>
 				            </td>
 		      			</tr>
@@ -53,54 +53,60 @@
 		</div>
 		<div id="invstTableContainer">
 	        <div>
-            	<h3 class="info-title">조사원/일정 등록</h3>
+            	<h3 class="info-title" th:text="#{schedule.scheduleSave.title.sub}">조사원/일정 등록</h3>
         	</div>
 			<div id="infoTableWrap">
 				<form id="">
 					<table id="infoTable">
 						<tr>
-							<th>조사 기간</th>
+							<th th:text="#{common.table.investPeriod}">조사 기간</th>
 							<td>
-								<input type="text" class="input-text startPicker" placeholder="날짜를 선택해주세요.">
+								<input type="text" class="input-text startPicker" th:placeholder="#{common.search.placeholder.date}">
 								<span>~</span>
-								<input type="text" class="input-text endPicker" placeholder="날짜를 선택해주세요.">
+								<input type="text" class="input-text endPicker" th:placeholder="#{common.search.placeholder.date}">
 							</td>
-							<th>조사 시간</th>
+							<th th:text="#{schedule.common.invest.time}">조사 시간</th>
 							<td>
-								<span class="select-time-box mr8">
-									<select class="select-list-box select-hour startHour"></select>
-									<select class="select-list-box select-minute startMinute"></select>
-								</span>
-								~
-								<span class="select-time-box ml8">
-									<select class="select-list-box select-hour endHour"></select>
-									<select class="select-list-box select-minute endMinute"></select>							
-								</span>							
+								<div class="select-date-box flex-justify-left">
+									<div class="select-div-box">
+										<select class="select-list-box select-hour startHour"></select>
+									</div>
+									<div class="select-div-box">
+										<select class="select-list-box select-minute startMinute"></select>
+									</div>
+									~
+									<div class="select-div-box">
+										<select class="select-list-box select-hour endHour"></select>
+									</div>
+									<div class="select-div-box">
+										<select class="select-list-box select-minute endMinute"></select>
+									</div>
+								</div>								
 							</td>
-							<th>조사원 등록</th>
+							<th th:text="#{schedule.common.investigators.regist}">조사원 등록</th>
 							<td>
-								<input type="button" id="interiorInvst" class="is-key-button" value="내부 조사원"/>
-								<input type="button" id="externalInvst" class="is-key-button" value="일반 조사원"/>
+								<input type="button" id="interiorInvst" class="is-key-button" th:value="#{schedule.scheduleSave.investigators.internal}"/>
+								<input type="button" id="externalInvst" class="is-key-button" th:value="#{schedule.scheduleSave.investigators.general}"/>
 							</td>
 						</tr>
 					</table>
 				</form>
 				<div id="invstTable">
 					<div class="table-total-title">
-						<div id="totalList">총 조사원<span id="totalCount">6</span>명</div>			       	
-						<div><input type="button" class="input-reset" value="조사코드 자동생성"/></div>					
+						<div id="totalList"><span th:text="#{schedule.common.investigators.total}">총 조사원</span><span id="totalCount">6</span><span th:text="#{common.unit.person}">명</span></div>			       	
+						<div><input type="button" class="input-reset" th:value="#{schedule.scheduleSave.generate.invest.code}"/></div>					
 					</div>
 					<table class="list-table">
 						<thead>
 			                <tr>
-			                    <th>번호</th>
-			                    <th>ID</th>
-			                    <th>이름</th>
-			                    <th>연락처</th>
-			                    <th>이메일</th>
-			                    <th>소속</th>
-			                    <th>권한</th>
-			                    <th>조사코드</th>
+			                    <th th:text="#{common.table.number}">번호</th>
+			                    <th th:text="#{common.id}">ID</th>
+			                    <th th:text="#{common.name}">이름</th>
+			                    <th th:text="#{common.contact}">연락처</th>
+			                    <th th:text="#{common.email}">이메일</th>
+			                    <th th:text="#{common.institution}">소속</th>
+			                    <th th:text="#{common.authority}">권한</th>
+			                    <th th:text="#{schedule.scheduleDetail.invest.code}">조사코드</th>
 			                </tr>
 						</thead>
 						<tbody>
@@ -120,8 +126,8 @@
 			</div> 
 		</div>
 		<div class="info-button-box">
-            <a th:href="@{/systemmng/code/group}" class="is-key-button">삭제</a>
-            <a th:href="@{/systemmng/code/group}" id="" class="is-basic-button">취소</a>
+            <a th:href="@{/systemmng/code/group}" class="is-key-button" th:text="#{common.button.delete}">삭제</a>
+            <a th:href="@{/systemmng/code/group}" id="" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
         </div>		
 	</th:block>
 </html>
@@ -135,14 +141,14 @@
 	})
 	
 	$('#invstListButton').on('click', function(){
-	    new ModalBuilder().init('조사 찾기').ajaxBody('/datamng/schedule/invst/list').footer(1, '등록하기', function (button, modal) {}).open();	
+	    new ModalBuilder().init(message.schedule.scheduleSave_find_invest).ajaxBody('/datamng/schedule/invst/list').footer(1, message.common.button_regist, function (button, modal) {}).open();	
 	})
 	
 	$('#interiorInvst').on('click', function(){
-	    new ModalBuilder().init('내부 조사원 등록').ajaxBody('/datamng/schedule/invst/interior/save').footer(1, '등록하기', function (button, modal) {}).open();	
+	    new ModalBuilder().init(message.schedule.scheduleSave_internal_investigator_regist).ajaxBody('/datamng/schedule/invst/interior/save').footer(1, message.common.button_regist, function (button, modal) {}).open();	
 	})
 	
 	$('#externalInvst').on('click', function(){
-	    new ModalBuilder().init('외부 조사원 등록').ajaxBody('/datamng/schedule/invst/external/save').footer(1, '등록하기', function (button, modal) {}).open();	
+	    new ModalBuilder().init(message.schedule.scheduleSave_general_investigator_regist).ajaxBody('/datamng/schedule/invst/external/save').footer(1, message.common.button_regist, function (button, modal) {}).open();	
 	})
 </script>

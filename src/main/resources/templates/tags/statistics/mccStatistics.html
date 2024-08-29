@@ -1,0 +1,60 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	
+<th:block th:fragment="mccStatisticsFragment">
+	<div class="statisticsInsertBox">
+		<div class="statistics-search-box">
+			<form id="searchTrfvlForm">
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.region}">Region</h4>
+					<div id="surveyLocationSearch" class="location-event"></div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.road.name}">Road Name</h4>
+					<div class="select-div-box">
+						<select class="select-list-box table-select-97 statistic-search-mcc validation-tag" id="searchRoadCd" name="searchRoadCd" data-search-type="searchRoadCd" data-validation="oneDateSelect" data-append-location="searchExmnDistance">
+							<option value="" th:text="#{common.select.select}"></option>
+						</select>
+					</div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.mccStatisticsDashboard.location}">Location</h4>
+					<div class="select-div-box">
+						<select class="select-list-box table-select-97 statistic-search-mcc validation-tag" id="searchExmnDistance" name="searchExmnDistance" data-search-type="searchExmnDistance" data-append-location="searchDate" data-validation="oneDateSelect">
+							<option value="" th:text="#{common.select.select}"></option>
+						</select>
+					</div>
+				</div>
+				<div class="statistics-search-item">
+					<h4 class="statistics-search-title" th:text="#{statistics.odStatisticsDashboard.survey.year}">Survey Year</h4>
+					<div class="select-div-box">
+						<select class="dateYear scroll select-list-box table-select-97 validation-tag" id="searchDate" name="searchDate" data-validation="oneDateSelect">
+							<option value="" th:text="#{common.select.select}"></option>
+						</select>
+					</div>
+				</div>
+			</form>
+			<div class="statistics-search-button">
+				<input type="button" class="is-key-button wd100" th:value="#{statistics.button.apply}" onclick="searchMccStatistics();"/>
+			</div>
+		</div>
+	</div>
+	<div class="statistics-search-view">
+		<div class="statistics-search-img">
+			<img th:src="@{/images/dash_search.png}" alt="serach"/>
+			<div th:text="#{statistics.mccStatisticsDashboard.search}">검색조건을 입력 후 검색해주세요.</div>
+		</div>
+	</div>
+	<div class="statistics-list-box none">
+		<div class="statistics-content">
+			<div class="flex-between">
+				<div id="downloadTitle"></div>
+				<input type="button" class="is-key-button" th:value="#{statistics.button.download}" onclick="mccExcelDownload();" />
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		
+	</script>
+</th:block>

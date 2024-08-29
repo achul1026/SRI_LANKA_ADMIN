@@ -1,0 +1,79 @@
+<html xmlns:th="http://www.thymeleaf.org"  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<th:block th:fragment="RegionPopulationStats">
+	<div class="statistics-append-box">
+		<div class="flex-end is-box mb16">
+			<input type="button" id="excelDownLoadBtn" class="is-key-button" th:value="#{common.button.download}"/>
+		</div>
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.transport.mean}">교통 수단</h4>
+					<select class="scroll select-list-box" data-chart-div="modeOfTransportationChart"  id="MODE_OF_TRANSPORTATION" onchange="searchChartData(this,'MODE_OF_TRANSPORTATION','roadside')">
+						<option th:text="#{common.select.select}">선택</option>
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="modeOfTransportationChart">
+				</div>
+			</div>					
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.roadSideChartStats.numberOfPassengers}">탑승 승객 수</h4>
+					<select class="scroll select-list-box" data-chart-div="numberOfPassengersChart" id="NUMBER_OF_PASSENGERS" onchange="searchChartData(this,'NUMBER_OF_PASSENGERS','roadside')">
+						<option th:text="#{common.select.select}">선택</option>
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="numberOfPassengersChart">
+				</div>
+			</div>					
+		</div>
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.starting.point.type}">출발지 유형</h4>
+				<!-- chart  -->
+				<div class="content-chart" id="typeOfDeparturePointChart">
+				</div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.destination.type}">도착지 유형</h4>
+				<!-- chart  -->
+				<div class="content-chart" id="typeOfArrivalPointChart">
+				</div>
+			</div>
+		</div>
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.start.time}">출발 시간</h4>
+					<select class="scroll select-list-box" id="DEPARTURE_TIME" data-chart-div="departureTimeChart" onchange="searchChartData(this,'DEPARTURE_TIME','roadside')">
+						<option th:text="#{common.select.select}">선택</option>
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="departureTimeChart">
+				</div>
+			</div>
+		</div>
+		<div class="od-statistics-content-box">
+			<div class="od-statistics-content-item is-box">
+				<h4 class="statistics-cm-chart-title" th:text="#{statistics.odStatisticsDashboard.passage.purpose}">통행 목적</h4>
+				<!-- chart  -->
+				<div class="content-chart" id="purposeOfTravelChart">
+				</div>
+			</div>
+			<div class="od-statistics-content-item is-box">
+				<div class="statistics-title-flex">
+					<h4 class="statistics-cm-chart-title" th:text="#{statistics.roadSideChartStats.ratioByPurpose}">통행 목적별 통행 비율</h4>
+					<select class="scroll select-list-box" data-chart-div="sideHourTransportationChart" id="HOUR_TRANSPORTATION" onchange="searchChartData(this,'HOUR_TRANSPORTATION','roadside')">
+						<option th:text="#{common.select.select}">선택</option>
+					</select>
+				</div>
+				<!-- chart  -->
+				<div class="content-chart" id="sideHourTransportationChart">
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>

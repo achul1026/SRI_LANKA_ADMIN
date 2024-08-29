@@ -1,55 +1,99 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/modalLayout}">
-	<th:block layout:fragment="modalContent">
-		<form id="boardSave" name="boardSave">
-			<div>
-				<table class="modal-table">
-					<tbody>
+      layout:decorate="~{layout/layout}">
+	<th:block layout:fragment="content">
+		<div class="is-box">
+			<div id="filterTitle">
+				<h3 class="info-title">게시글 등록</h3>
+			</div>
+			<form id="boardSave" name="boardSave">
+				<div class="infoTableWrap">
+					<table class="infoTable">
+						<colgroup>
+							<col width="15%">
+							<col width="35%">
+							<col width="15%">
+							<col width="35%">
+						</colgroup>
 						<tr>
-							<th>분류</th>
+							<th th:text="#{common.table.subject}">제목</th>
 							<td>
-								<select name="bbsType">
-									<option th:each="item:${bbsCdList}" th:text="${item.getName()}" th:value="${item.getCode()}"></option>
+								<input type="text" class="input-table-text validation-tag"  name="bbsTitle" th:placeholder="#{alarm.common.placeholder.search.title}">
+							</td>
+							<th th:text="#{common.table.subject}">분류</th>
+							<td>
+								<select class="select-list-box table-select" name="bbsType">
+									<option th:each="item:${bbsCdList}" th:text="${item.cdNm}" th:value="${item.cd}"></option>
 								</select>
 							</td>
 						</tr>
 						<tr>
-							<th>작성일</th>
-							<td><input type="text" th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}" readonly></td>
-						</tr>
-						<tr>
-							<th>작성자</th>
-							<td><input type="text" name="registId" th:value="${writer}" readonly></td>
-						</tr>
-						<tr>
-							<th>제목</th>
-							<td><input type="text" name="bbsTitle"></td>
-						</tr>
-						<tr>
-							<th>내용</th>
-							<td><textarea class="text-area" name="bbsCnts" placeholder="내용을 입력해주세요."></textarea></td>
-						</tr>
-						<tr>
-							<th>첨부파일</th>
+							<th th:text="#{common.table.registDate}">작성일</th>
 							<td>
-								<div id="fileList"></div>
-								<input type="file" id="fileInput" multiple="multiple" name="files" onchange="updateFileList()"/>
-								<input type="hidden" name="extsChk" value="jpg">
-								<input type="hidden" name="extsChk" value="png">
+								<input type="text" class="input-table-text " th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}" readonly>
+							</td>
+							<th th:text="#{common.table.writer}">작성자</th>
+							<td>
+								<input type="text" class="input-table-text" name="registId" th:value="${writer}" readonly>
 							</td>
 						</tr>
 						<tr>
-							<th>노출여부</th>
+							<th th:text="#{board.file}">첨부파일</th>
 							<td>
-								<input type="radio" name="dspyYn" value="Y" checked>노출
-								<input type="radio" name="dspyYn" value="N">미노출
+								<div class="modal-double-wrap">
+									<div id="fileList" class="modal-date-show wd100"></div>
+									<input type="button" style="min-width:80px;" th:value="#{common.button.file}" class="is-key-button" id="fileInputButton"/>
+									<input type="file" id="fileInput" multiple="multiple" class="none" name="files" onchange="updateFileList()"/>
+									<input type="hidden" name="extsChk" value="jpg">
+									<input type="hidden" name="extsChk" value="png">
+								</div>
+							</td>
+							<th th:text="#{common.table.exposure}">노출 여부</th>
+							<td>
+								<div class="select-div-box">
+									<select class="select-list-box table-select" name="dspyYn">
+										<option value="Y" th:text="#{common.option.dspyYn.y}">노출</option>
+										<option value="N" th:text="#{common.option.dspyYn.n}">미노출</option>
+									</select>
+								</div>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-			</div>
-		</form>
+						<tr>
+							<th th:text="#{common.table.content}">내용</th>
+							<td colspan="3">
+								<textarea class="modal-textarea validation-tag" name="bbsCnts" th:placeholder="#{common.search.placeholder.content}"></textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
 	</th:block>
 </html>
+<script>
+	document.getElementById('fileInputButton').addEventListener('click', () => document.getElementById('fileInput').click());
+	
+	//등록 버튼 생성해서 달아주세요
+	function saveBoard() {
+		if(validation('#boardSave')){
+//			if (!inputChecked) {
+			fetch(__contextPath__ + "/potalmng/board/save", {
+				method: "POST",
+				body: new FormData($("#boardSave")[0])
+			})
+			.then(response => response.json())
+			.then(result => {
+				if (result.code == '200') {
+					new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+						window.location.reload();
+						modal.close();
+					}).open();
+				} else {
+					throw Error(result.message);
+				}
+			})
+			.catch(error => alert(error.message));
+		}
+	}
+</script>

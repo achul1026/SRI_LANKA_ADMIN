@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+        <div>
+			<div class="is-box">
+				<div>
+       				<h3 class="info-title" th:text="#{facilities.facilitiesDetail.title.portable}">시설물 상세</h3>
+       			</div>
+       			<div class="infoTableWrap">
+					<table class="infoTable survey-save-table">
+						<tr>
+							<th th:text="#{facilities.table.location}">설치위치</th>
+							<td th:text="${facilityInfo.instllcNm}"></td>							
+							<th th:text="#{facilities.table.direction.code}">방향 코드</th>
+							<td th:text="${facilityInfo.drctCd}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{invst.common.road.lane.number}">도로 차선 수</th>
+                   			<td th:text="${facilityInfo.laneCnt}"></td>
+							<th th:text="#{facilities.table.road.code}">도로 코드</th>
+							<td th:text="${facilityInfo.roadCd}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{common.table.coordinate.xy}"></th>
+								<td th:text="|${facilityInfo.lon}, ${facilityInfo.lat}|"></td>
+							<th th:text="#{common.table.useYn}">사용 여부</th>
+							<td th:text="${facilityInfo.useYn}"></td>
+						</tr>
+						<tr>
+							<th th:text="#{facilities.table.date}">설치일</th>
+							<td th:text="${#temporals.format(facilityInfo.updtDt, 'yyyy.MM.dd HH:mm:ss')}"></td>
+<!-- 							<th th:text="#{common.table.coordinate.x}">X좌표</th> -->
+<!-- 							<td th:text="${facilityInfo.lon}">79.92619137078884</td> -->
+<!-- 							<th th:text="#{common.table.coordinate.y}">Y좌표</th> -->
+<!-- 							<td th:text="${facilityInfo.lat}">6.9996839117806275</td> -->
+						</tr>
+						<tr id="tableMap">
+							<th th:text="#{common.table.map}">맵</th>
+							<td colspan="3" id="coordinateDetail">
+								<span id="mapContainer" class="detailMap">
+									<span id="map"></span>
+								</span>
+							</td>
+						</tr>
+					</table>
+       			</div>
+				<div id="logList">
+					
+				</div>
+			</div>
+			<div class="info-button-box">
+                <a th:href="@{/systemmng/facilities}" class="is-basic-button cm-leftFix-btn" th:text="#{common.button.prePage}">이전 페이지</a>
+                <input type="button" class="is-danger-button" th:onclick="deleteFacility([[${facilityInfo.instllcId}]], [[${typeCd}]])" th:value="#{common.button.delete}"/>
+				<a th:href="@{/systemmng/facilities/{type}/{instllcId}/update(type=${typeCd},instllcId=${facilityInfo.instllcId})}" class="is-key-button" th:text="#{common.button.update}">수정</a>                
+            </div>
+        </div>
+	</th:block>
+</html>
+
+<script th:inline="javascript">
+	document.addEventListener("DOMContentLoaded",function(){
+		asynchronousSearchList(null);
+	});
+	
+	const lng = /*[[${facilityInfo.lon}]]*/;
+	const lat = /*[[${facilityInfo.lat}]]*/;
+	(async () => {
+		let mapgl = await mapboxGl(lng, lat);
+		setMapZoomControl(mapgl);
+		setMarker(lng, lat)
+	})();
+	
+	function deleteFacility(instllcId, typeCd){
+		new MsgModalBuilder().init().alertBody(message.facilities.facilitiesDetail_confirm_delete).footer(3, message.common.button_confirm, function (button, modal) {
+			modal.close();
+			fetch(__contextPath__+"/systemmng/facilities/"+typeCd+"/"+instllcId, {
+				method: "DELETE"
+			})
+				.then(response => response.json())
+	 			.then(result => {
+	 				if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.data.message).footer(4, message.common.button_confirm, function (button, modal) {
+							location.href = __contextPath__ + "/systemmng/facilities";
+						}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.data.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+	 			})
+		}, message.common.button_cancel, function (button, modal) {
+			modal.close();
+		}).open();
+	}
+	
+	function asynchronousSearchList(){
+		const instllcId = /*[[${facilityInfo.instllcId}]]*/;
+		
+		let pageNo = document.getElementById('asynchronousPageNo') != null ? document.getElementById('asynchronousPageNo').value : 1;
+		const params = new URLSearchParams();
+        params.append('pageNo', pageNo);
+		
+		fetch(`${__contextPath__}/systemmng/facilities/${instllcId}/log?${params.toString()}`)
+		.then((response) => {
+		    return response.text();
+		})
+		.then((html) => {
+			const appendDiv = document.getElementById('logList');
+			appendDiv.innerHTML = html;
+		});
+	}
+	
+</script>

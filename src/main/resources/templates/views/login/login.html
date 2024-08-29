@@ -1,60 +1,132 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link th:href="@{/images/favicon-16x16.png}" rel="icon">
-    <link th:href="@{/images/favicon-32x32.png}" rel="icon">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
-    <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
-    <script th:src="@{/js/common.js}"></script>
-    <title>SRILANKA</title>
-    <link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}"/>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link th:href="@{/images/favicon-16x16.png}" rel="icon">
+	<link th:href="@{/images/favicon-32x32.png}" rel="icon">
+	<link th:href="@{/css/style.css}" rel="stylesheet">
+	<script th:src="@{/js/jquery-1.12.4.min.js}"></script>
+	<script th:src="@{/js/rda.common.js}"></script>
+	<script th:src="@{/js/rda.validation.js}"></script>
+	<script th:src="@{/js/rda.modal.js}"></script>
+	<title>SRILANKA</title>
+	<link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}" />
 	<script type="text/javascript">
-	    var __contextPath__ = $('#contextPathHolder').attr('data-contextPath');
-	    if(isNull(__contextPath__)) __contextPath__ = '';  
+		var __contextPath__ = $('#contextPathHolder').attr('data-contextPath');
+		if (isNull(__contextPath__)) __contextPath__ = '';
 	</script>
+	<script th:src="@{'/js/messages/message_' + ${lang} + '.js'}"></script>
 </head>
-<body>
+<body th:data-prod="${@environment.getProperty('spring.config.activate.on-profile')} eq 'prod'" onload="disableContextAndDrag()">
 	<section id="LoginSection">
 		<div id="loginContainer">
-		    <div class="rda-wrap">
-		        <div id="loginLogoBox">
-		            <div id="loginLogo"><img th:src="@{/images/logo.png}" alt="로고"></div>
-		            <h1 id="loginTitle">RDA</h1>
-		        </div>
-		        <div id="loginContentBox">
-		            <form th:action="@{/login/confirm}" method="post">
-		                <div>
-		                    <div class="login-input-box">
-		                        <label for="mngrAccountId" class="login-input-title">아이디</label>
-		                        <input type="text" id="userId" name="userId" placeholder="아이디를 입력해주세요." class="login-input" maxlength="12"></input>
-		                        <div class="error-message"></div>
-		                    </div>
-		                    <div class="login-input-box">
-		                        <label for="mngrAccountPwd" class="login-input-title">비밀번호</label>
-		                        <input type="password" id="userPswd" name="userPswd" placeholder="비밀번호를 입력해주세요." class="login-input" maxlength="20"></input>
-		                        <div class="error-message"></div>
-		                    </div>
-		                </div>
-		                <div id="loginIdSave">
-	                        <input type="checkbox" id="loginIdCheckBox">
-	                        <label for="loginIdCheckBox" class="login-check-txt">아이디 저장</label>
-		                </div>
-		                <div id="loginButtonBox">
-		                    <button type="submit" id="loginButton" class="login-button">로그인</button>
-		                    <a th:href="@{/join}" class="login-button">회원가입</a>
-		                </div>
-		            </form>
-		            <div id="loginPassword">
-		                <a th:href="@{/login/find/id/info}" id="loginSearch">아이디 / 비밀번호 찾기</a>
-		            </div>
-		        </div>
-		    </div>
+			<div class="rda-wrap">
+				<div id="loginLogo">
+					<img th:src="@{/images/logo.png}" th:alt="#{login.logo}" th:onclick="loginBackdoor([[${@environment.getProperty('spring.config.activate.on-profile')}]])">
+				</div>
+				<div id="langSave">
+					<div>
+						<input type="radio" id="eng" class="lang-check" name="lang" value="eng" onclick="setLangCookie()" th:checked="${lang == '' or lang == 'eng'}">
+						<label for="eng" class="lang-check-btn">Eng</label>
+					</div>
+					<div>
+						<input type="radio" id="sinh" class="lang-check" name="lang" value="sin" onclick="setLangCookie()" th:checked="${lang == 'sin'}">
+						<label for="sinh" class="lang-check-btn">Sinh</label>
+					</div>
+					<div>
+						<input type="radio" id="kor" class="lang-check" name="lang" value="kor" onclick="setLangCookie()" th:checked="${lang == 'kor'}">
+						<label for="kor" class="lang-check-btn">Kor</label>
+					</div>
+				</div>
+				<div id="loginContentBox">
+					<form id="loginForm" th:action="@{/login/confirm}" method="post">
+						<input type="hidden" name="loginLang" id="loginLang" th:value="${lang == '' ? 'eng' : ''}" />
+						<div>
+							<div class="login-input-box">
+								<label for="userId" class="login-input-title" th:text="#{login.login.id}">아이디</label>
+								<input type="text" id="userId" name="userId" th:placeholder="#{login.common.placeholer.id}" class="login-input validation-tag" data-validation="name" onkeyup="valid(this)" maxlength="13"/>
+							</div>
+							<div class="login-input-box">
+								<label for="userPswd" class="login-input-title"
+									th:text="#{login.login.password}">비밀번호</label>
+								<input type="password" id="userPswd" name="userPswd" th:placeholder="#{login.common.placeholder.password}" class="login-input validation-tag" data-validation="pw" onkeyup="valid(this)" maxlength="32"/>
+							</div>
+						</div>
+						<div id="loginIdSave">
+							<label for="loginIdCheckBox" class="login-check-txt container">
+								<input type="checkbox" id="loginIdCheckBox">
+								<span class="checkmark"></span>
+								<span th:text="#{login.login.saveId}">아이디 저장</span>
+							</label>
+							<a th:href="@{/login/find/id/info}" id="loginSearch"
+								th:text="#{login.login.findIdOrPassword}">아이디 / 비밀번호 찾기</a>
+						</div>
+						<div id="loginButtonBox">
+							<button type="button" id="loginButton" onclick="login();" class="login-button" th:text="#{login.login.login}">로그인</button>
+						</div>
+					</form>
+					<div id="loginPassword">
+						<a th:href="@{/join}" class="join-button" th:text="#{login.common.join}">회원가입</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	</section>
 </body>
 </html>
+<script th:inline="javascript">
+	document.addEventListener("DOMContentLoaded", function () {
+		
+		//로그인 실패시 메시지 표시
+	    const loginFailMsg = /*[[${loginFailMsg}]]*/;
+	    if(loginFailMsg && loginFailMsg !== "") {
+	        new MsgModalBuilder().init().alertBody(loginFailMsg).footer(4,message.common.button_confirm, function(button, modal){
+	        	modal.close();
+	        }).open();
+	    }
+	    
+		//아이디 저장 로직
+		var key = localStorage.getItem("userIdChk");
+		var userIdElement = document.getElementById('userId');
+		var loginIdCheckBox = document.getElementById('loginIdCheckBox');
+		if (key !== "") {
+			userIdElement.value = key;
+		}
+		if (userIdElement.value !== "") {
+			loginIdCheckBox.checked = true;
+		}
+		loginIdCheckBox.addEventListener('change', function () {
+			if (loginIdCheckBox.checked) {
+				localStorage.setItem("userIdChk", userIdElement.value);
+			} else {
+				localStorage.removeItem("userIdChk");
+			}
+		});
+		userIdElement.addEventListener('keyup', function () {
+			if (loginIdCheckBox.checked) {
+				localStorage.setItem("userIdChk", userIdElement.value);
+			}
+		});
+		let lang = localStorage.getItem("lang");
+		if (isNull(lang)) lang = 'eng';
+		document.getElementById('langSave').value = lang;
+		if (isNull(lang)) localStorage.setItem("lang", lang);
+	});
+	
+	document.getElementById('loginForm').addEventListener('keydown', function(event) {
+	    if (event.key === 'Enter') {
+	        event.preventDefault();
+	        login();
+	    }
+	});
+	
+	let login = () => {
+		if(validation('#loginContentBox')) {
+			document.getElementById('loginForm').submit();
+		}
+	}
+</script>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{statistics.dashboard.download.title}">데이터 다운로드</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="is-box">
+        <!-- 필터 섹션 시작 -->
+        <div id="filterWrap">
+            <div id="filterTitle">
+                <h2 th:text="#{common.search.title}">검색 설정</h2>
+            </div>
+            <table id="filterTable">
+                <colgroup>
+                    <col width="15%">
+                    <col width="85%">
+                </colgroup>
+                <tr>
+                    <th th:text="#{statistics.survey.year}">조사 연도</th>
+                    <td>
+                        <select id="nbYearSelect" class="select-list-box">
+                            <option value="" th:text="#{statistics.all.years}">전체 연도</option>
+                            <option th:each="year : ${years}" th:value="${year}" th:text="${year}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th th:text="#{statistics.item}">항목</th>
+                    <td>
+                        <select id="nbItemSelect" class="select-list-box">
+                            <option value="MCC,TM" th:text="#{statistics.item.mcc_tm}">MCC,TM</option>
+                            <option value="METRO" th:text="#{statistics.item.metro}">METRO</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div id="filterBtnWrap">
+                <button id="nbSearchButton" class="is-key-button" th:text="#{common.search}">검색</button>
+            </div>
+        </div>
+        <!-- 필터 섹션 끝 -->
+
+        <!-- 검색 결과 섹션 시작 -->
+        <div id="nbSearchResultView" class="none">
+            <div class="list-save-box">
+                <div id="totalList">
+                    <span id="totalCount"></span><span th:text="#{common.search.result}">건의 검색 결과를 찾았습니다.</span>
+                </div>
+                <div class="btn-wrap">
+                    <button id="nbDownloadButton" class="is-key-button" th:text="#{common.download.excel}">엑셀 다운로드
+                    </button>
+                </div>
+            </div>
+            <div class="nb_table-container">
+                <table id="listTable">
+                    <thead>
+                    <tr>
+                        <!-- 테이블 헤더 -->
+                        <th th:text="#{statistics.route.no}">ROUTE NO</th>
+                        <th th:text="#{statistics.name.of.road}">NAME OF ROAD</th>
+                        <th th:text="#{statistics.prov}">PROV</th>
+                        <th th:text="#{statistics.ce}">CE</th>
+                        <th th:text="#{statistics.lat}">Lat</th>
+                        <th th:text="#{statistics.lon}">Long</th>
+                        <th th:text="#{statistics.type.of.count}">TYPE OF COUNT</th>
+                        <th th:text="#{statistics.date.of.count}">DATE OF COUNT</th>
+                        <th th:text="#{statistics.total.no.of.veh}">TOTAL NO.OF VEH.</th>
+                        <th th:text="#{statistics.hrs.of.count}">HRS OF COUNT</th>
+                        <th th:text="#{statistics.mcl.percent}">MCL %</th>
+                        <th th:text="#{statistics.twl.percent}">TWL %</th>
+                        <th th:text="#{statistics.car.percent}">CAR %</th>
+                        <th id="header-13">LGV %</th>
+                        <th id="header-14">MP&GV %</th>
+                        <th id="header-15">LP&GV %</th>
+                        <th id="header-16">HG3 %</th>
+                        <th id="header-17">AG3 %</th>
+                        <th id="header-18">AG4 %</th>
+                        <th id="header-19">AG5 %</th>
+                        <th id="header-20">AG6 %</th>
+                        <th id="header-21">CUM % OF VEH</th>
+                        <th id="header-22">MCL Count</th>
+                        <th id="header-23">TWL Count</th>
+                        <th id="header-24">CAR Count</th>
+                        <th id="header-25">LGV Count</th>
+                        <th id="header-26">MP&GV Count</th>
+                        <th id="header-27">LP&GV Count</th>
+                        <th id="header-28">HG3 Count</th>
+                        <th id="header-29">AG3 Count</th>
+                        <th id="header-30">AG4 Count</th>
+                        <th id="header-31">AG5 Count</th>
+                        <th id="header-32">AG6 Count</th>
+                        <th id="header-33">TOTAL Count</th>
+                        <th id="header-34" style="display:none;">MG1 Count</th>
+                        <th id="header-35" style="display:none;">MG2 Count</th>
+                        <th id="header-36" style="display:none;">LGV Count</th>
+                        <th id="header-37" style="display:none;">AG4 Count</th>
+                        <th id="header-38" style="display:none;">AG5 Count</th>
+                        <th id="header-39" style="display:none;">AG6 Count</th>
+                        <th id="header-40" style="display:none;">FVH Count</th>
+                        <th id="header-41" style="display:none;">TOTAL Count</th>
+                    </tr>
+                    </thead>
+                    <tbody id="nbGrid">
+                    <!-- 데이터 로우는 JavaScript로 동적 생성됨 -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="pagination"></div>
+        </div>
+        <!-- 검색 결과 섹션 끝 -->
+
+        <!-- 로딩 오버레이 -->
+        <div id="nb-loadingOverlay">
+            <div class="nb-loader"></div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+
+        /**
+         * 값을 포맷팅하는 함수
+         * @param {*} value - 포맷할 값
+         * @returns {string} 포맷된 값 또는 '-'
+         */
+        function formatValue(value) {
+            return value === null || value === undefined || value === '' ? '-' : value;
+        }
+
+        /**
+         * 메시지 객체
+         * 다국어 지원을 위한 메시지 정의
+         */
+        var nbMessages = {
+            downloadNotImplemented: /*[[#{download.notImplemented}]]*/ '엑셀 다운로드 기능이 구현되지 않았습니다.',
+            filterDataMessage: /*[[#{filter.dataMessage}]]*/ '항목: {0}, 년도: {1}',
+            downloadExcelMessage: /*[[#{download.excelMessage}]]*/ '엑셀 파일을 다운로드합니다.',
+            noSearchResults: /*[[#{statistics.no.search.results}]]*/ '검색 결과가 없습니다.',
+            loadDataFailed: /*[[#{statistics.load.data.failed}]]*/ '데이터를 불러오는 데 실패했습니다.',
+            item: /*[[#{statistics.item}]]*/ '항목',
+            year: /*[[#{statistics.year}]]*/ '년도',
+            value: /*[[#{statistics.value}]]*/ '값',
+            allYears: /*[[#{statistics.allyear}]]*/ 'all',
+            networkNotOk: /*[[#{error.network.not.ok}]]*/ 'Network response was not ok',
+            unexpectedResponse: /*[[#{error.unexpected.response}]]*/ 'Unexpected response structure',
+            searchButtonNotFound: /*[[#{error.search.button.not.found}]]*/ 'Search button not found',
+            downloadButtonNotFound: /*[[#{error.download.button.not.found}]]*/ 'Download button not found'
+        };
+
+        var currentPage = 1;
+        var itemsPerPage = 10;
+
+        /**
+         * 로딩 바를 표시하는 함수
+         */
+        function showLoadingBar() {
+            document.getElementById('nb-loadingOverlay').style.display = 'flex';
+        }
+
+        /**
+         * 로딩 바를 숨기는 함수
+         */
+        function hideLoadingBar() {
+            document.getElementById('nb-loadingOverlay').style.display = 'none';
+        }
+
+        /**
+         * 데이터를 필터링하고 가져오는 함수
+         * @param {number} [page=1] - 페이지 번호
+         */
+        function nbFilterData(page = 1) {
+            currentPage = page;
+            showLoadingBar();
+            var item = document.getElementById('nbItemSelect').value;
+            var year = document.getElementById('nbYearSelect').value;
+
+            fetch(`/statistics/dashboard/download/data?item=${item}&year=${year}&page=${currentPage}&size=${itemsPerPage}`)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error(nbMessages.networkNotOk);
+                    }
+                    return response.json();
+                })
+                .then(function (responseData) {
+                    if (responseData && responseData.content) {
+                        document.getElementById('totalCount').textContent = responseData.totalElements;
+                        nbPopulateGrid(responseData.content);
+                        document.getElementById('nbSearchResultView').classList.remove('none');
+                        nbCreatePagination(responseData);
+                    } else {
+                        throw new Error(nbMessages.unexpectedResponse);
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Error:", error);
+                    document.getElementById('nbSearchResultView').classList.add('none');
+                    alert(nbMessages.loadDataFailed + ': ' + error.message);
+                })
+                .finally(function () {
+                    hideLoadingBar();
+                });
+        }
+
+        /**
+         * 테이블 헤더를 업데이트하는 함수
+         * @param {string} item - 선택된 항목 (METRO 또는 MCC,TM)
+         */
+        function updateTableHeaders(item) {
+            var headers = item === 'METRO' ? getMetroHeaders() : getMccTmHeaders();
+
+            Object.keys(headers).forEach(function (id) {
+                var element = document.getElementById(id);
+                if (element) {
+                    element.textContent = headers[id];
+                    element.style.display = 'table-cell';
+                }
+            });
+
+            // METRO 항목일 경우 추가 컬럼 숨기기
+            if (item === 'METRO') {
+                ['header-34', 'header-35', 'header-36', 'header-37', 'header-38', 'header-39', 'header-40', 'header-41'].forEach(function (id) {
+                    var element = document.getElementById(id);
+                    if (element) {
+                        element.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        /**
+         * METRO 항목의 헤더 정보를 반환하는 함수
+         * @returns {Object} METRO 헤더 정보
+         */
+        function getMetroHeaders() {
+            return {
+                'header-13': 'LGV %',
+                'header-14': 'MP&GV %',
+                'header-15': 'LP&GV %',
+                'header-16': 'HG3 %',
+                'header-17': 'AG3 %',
+                'header-18': 'AG4 %',
+                'header-19': 'AG5 %',
+                'header-20': 'AG6 %',
+                'header-21': 'CUM % OF VEH',
+                'header-22': 'MCL Count',
+                'header-23': 'TWL Count',
+                'header-24': 'CAR Count',
+                'header-25': 'LGV Count',
+                'header-26': 'MP&GV Count',
+                'header-27': 'LP&GV Count',
+                'header-28': 'HG3 Count',
+                'header-29': 'AG3 Count',
+                'header-30': 'AG4 Count',
+                'header-31': 'AG5 Count',
+                'header-32': 'AG6 Count',
+                'header-33': 'TOTAL Count'
+            };
+        }
+
+        /**
+         * MCC,TM 항목의 헤더 정보를 반환하는 함수
+         * @returns {Object} MCC,TM 헤더 정보
+         */
+        function getMccTmHeaders() {
+            return {
+                'header-13': 'VAN %',
+                'header-14': 'MBU %',
+                'header-15': 'LBU %',
+                'header-16': 'LGV %',
+                'header-17': 'MG1 %',
+                'header-18': 'MG2 %',
+                'header-19': 'HG3 %',
+                'header-20': 'AG3 %',
+                'header-21': 'AG4 %',
+                'header-22': 'AG5 %',
+                'header-23': 'AG6 %',
+                'header-24': 'FVH %',
+                'header-25': 'CUM % OF VEH',
+                'header-26': 'MCL Count',
+                'header-27': 'TWL Count',
+                'header-28': 'CAR Count',
+                'header-29': 'VAN Count',
+                'header-30': 'MBU Count',
+                'header-31': 'LBU Count',
+                'header-32': 'LGV Count',
+                'header-33': 'MG1 Count',
+                'header-34': 'MG2 Count',
+                'header-35': 'HG3 Count',
+                'header-36': 'AG3 Count',
+                'header-37': 'AG4 Count',
+                'header-38': 'AG5 Count',
+                'header-39': 'AG6 Count',
+                'header-40': 'FVH Count',
+                'header-41': 'TOTAL Count'
+            };
+        }
+
+        /**
+         * 그리드에 데이터를 채우는 함수
+         * @param {Array} data - 표시할 데이터 배열
+         */
+        function nbPopulateGrid(data) {
+            var grid = document.getElementById('nbGrid');
+            grid.innerHTML = '';
+
+            var item = document.getElementById('nbItemSelect').value;
+            updateTableHeaders(item);
+
+            if (data.length === 0) {
+                var colCount = document.querySelectorAll('#listTable th').length;
+                grid.innerHTML = '<tr><td colspan="' + colCount + '">' + nbMessages.noSearchResults + '</td></tr>';
+                return;
+            }
+
+            data.forEach(function (row) {
+                var rowElement = document.createElement('tr');
+                var cellsHtml = '';
+
+                try {
+                    if (item === 'METRO') {
+                        cellsHtml = populateMetroRow(row);
+                    } else {
+                        cellsHtml = populateMccTmRow(row);
+                    }
+                } catch (error) {
+                    console.error('Error populating row:', error);
+                    cellsHtml = '<td colspan="' + colCount + '">Error populating row data</td>';
+                }
+
+                rowElement.innerHTML = cellsHtml;
+                grid.appendChild(rowElement);
+            });
+        }
+        /**
+         * METRO 데이터 행을 채우는 함수
+         * @param {Object} row - 행 데이터 객체
+         * @returns {string} HTML 문자열
+         */
+        function populateMetroRow(row) {
+            return `
+        <td>${formatValue(row.routeNo)}</td>
+        <td>${formatValue(row.nameOfRoad)}</td>
+        <td>${formatValue(row.prov)}</td>
+        <td>${formatValue(row.ce)}</td>
+        <td>${formatValue(row.lat)}</td>
+        <td>${formatValue(row.lon)}</td>
+        <td>${formatValue(row.typeOfCount)}</td>
+        <td>${formatValue(row.dateOfCount)}</td>
+        <td>${formatValue(row.totalNoOfVeh)}</td>
+        <td>${formatValue(row.hrsOfCount)}</td>
+        <td>${formatValue(row.mclPercentage)}</td>
+        <td>${formatValue(row.twlPercentage)}</td>
+        <td>${formatValue(row.carPercentage)}</td>
+        <td>${formatValue(row.lgvPercentage)}</td>
+        <td>${formatValue(row.mpgvPercentage)}</td>
+        <td>${formatValue(row.lpgvPercentage)}</td>
+        <td>${formatValue(row.hg3Percentage)}</td>
+        <td>${formatValue(row.ag3Percentage)}</td>
+        <td>${formatValue(row.ag4Percentage)}</td>
+        <td>${formatValue(row.ag5Percentage)}</td>
+        <td>${formatValue(row.ag6Percentage)}</td>
+        <td>${formatValue(row.cumPercentageOfVeh)}</td>
+        <td>${formatValue(row.mclCount)}</td>
+        <td>${formatValue(row.twlCount)}</td>
+        <td>${formatValue(row.carCount)}</td>
+        <td>${formatValue(row.lgvCount)}</td>
+        <td>${formatValue(row.mpgvCount)}</td>
+        <td>${formatValue(row.lpgvCount)}</td>
+        <td>${formatValue(row.hg3Count)}</td>
+        <td>${formatValue(row.ag3Count)}</td>
+        <td>${formatValue(row.ag4Count)}</td>
+        <td>${formatValue(row.ag5Count)}</td>
+        <td>${formatValue(row.ag6Count)}</td>
+        <td>${formatValue(row.total)}</td>
+    `;
+        }
+
+        /**
+         * MCC,TM 데이터 행을 채우는 함수
+         * @param {Object} row - 행 데이터 객체
+         * @returns {string} HTML 문자열
+         */
+        function populateMccTmRow(row) {
+            return `
+        <td>${formatValue(row.routeNo)}</td>
+        <td>${formatValue(row.nameOfRoad)}</td>
+        <td>${formatValue(row.prov)}</td>
+        <td>${formatValue(row.ce)}</td>
+        <td>${formatValue(row.lat)}</td>
+        <td>${formatValue(row.lon)}</td>
+        <td>${formatValue(row.typeOfCount)}</td>
+        <td>${formatValue(row.dateOfCount)}</td>
+        <td>${formatValue(row.totalNoOfVeh)}</td>
+        <td>${formatValue(row.hrsOfCount)}</td>
+        <td>${formatValue(row.mclPercentage)}</td>
+        <td>${formatValue(row.twlPercentage)}</td>
+        <td>${formatValue(row.carPercentage)}</td>
+        <td>${formatValue(row.vanPercentage)}</td>
+        <td>${formatValue(row.mbuPercentage)}</td>
+        <td>${formatValue(row.lbuPercentage)}</td>
+        <td>${formatValue(row.lgvPercentage)}</td>
+        <td>${formatValue(row.mg1Percentage)}</td>
+        <td>${formatValue(row.mg2Percentage)}</td>
+        <td>${formatValue(row.hg3Percentage)}</td>
+        <td>${formatValue(row.ag3Percentage)}</td>
+        <td>${formatValue(row.ag4Percentage)}</td>
+        <td>${formatValue(row.ag5Percentage)}</td>
+        <td>${formatValue(row.ag6Percentage)}</td>
+        <td>${formatValue(row.fvhPercentage)}</td>
+        <td>${formatValue(row.cumPercentageOfVeh)}</td>
+        <td>${formatValue(row.mclCount)}</td>
+        <td>${formatValue(row.twlCount)}</td>
+        <td>${formatValue(row.carCount)}</td>
+        <td>${formatValue(row.vanCount)}</td>
+        <td>${formatValue(row.mbuCount)}</td>
+        <td>${formatValue(row.lbuCount)}</td>
+        <td>${formatValue(row.lgvCount)}</td>
+        <td>${formatValue(row.mg1Count)}</td>
+        <td>${formatValue(row.mg2Count)}</td>
+        <td>${formatValue(row.hg3Count)}</td>
+        <td>${formatValue(row.ag3Count)}</td>
+        <td>${formatValue(row.ag4Count)}</td>
+        <td>${formatValue(row.ag5Count)}</td>
+        <td>${formatValue(row.ag6Count)}</td>
+        <td>${formatValue(row.fvhCount)}</td>
+        <td>${formatValue(row.total)}</td>
+    `;
+        }
+
+
+        /**
+         * 페이지네이션을 생성하는 함수
+         * @param {Object} pageData - 페이지 데이터
+         */
+        function nbCreatePagination(pageData) {
+            var paginationElement = document.getElementById('pagination');
+            paginationElement.innerHTML = '';
+
+            if (!pageData || typeof pageData.totalPages !== 'number') {
+                console.error('Invalid page data');
+                return;
+            }
+
+            var totalPages = pageData.totalPages;
+            var currentPage = pageData.currentPage;
+
+            // 시작 페이지와 끝 페이지 계산
+            var startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+            var endPage = Math.min(startPage + 9, totalPages);
+
+            // 이전 페이지 그룹으로
+            paginationElement.appendChild(createPageLink(Math.max(1, startPage - 1), '<i id="pageLeftArrow"></i>', 'prev'));
+
+            // 페이지 번호
+            for (var i = startPage; i <= endPage; i++) {
+                paginationElement.appendChild(createPageLink(i, i, i === currentPage ? 'active page-number' : 'page-number'));
+            }
+
+            // 다음 페이지 그룹으로
+            paginationElement.appendChild(createPageLink(Math.min(totalPages, endPage + 1), '<i id="pageRightArrow"></i>', 'next'));
+        }
+
+        /**
+         * 페이지 링크를 생성하는 함수
+         * @param {number} page - 페이지 번호
+         * @param {string} content - 링크 내용
+         * @param {string} className - 클래스 이름
+         * @returns {HTMLElement} - 생성된 링크 요소
+         */
+        function createPageLink(page, content, className) {
+            var li = document.createElement('li');
+            li.className = 'page-item';
+            var a = document.createElement('a');
+            a.href = 'javascript:void(0);';
+            a.onclick = function () {
+                showLoadingBar(); // 페이지 변경 시 로딩 바 표시
+                nbFilterData(page);
+            };
+            a.innerHTML = content;
+            a.className = className;
+            li.appendChild(a);
+            return li;
+        }
+
+        /**
+         * 엑셀 파일을 다운로드하는 함수
+         */
+        function nbDownloadExcel() {
+            try {
+                var item = document.getElementById('nbItemSelect').value;
+                var year = document.getElementById('nbYearSelect').value;
+                window.location.href = '/statistics/dashboard/download/excel?item=' + item + '&year=' + year;
+                alert(nbMessages.downloadExcelMessage);
+            } catch (error) {
+                console.error('Error downloading Excel:', error);
+				new MsgModalBuilder().init().alertBody(message.dataRegist.excel_download_error).footer(4, message.common.button_confirm, function(button, modal) {
+					modal.close();
+				}).open();                
+            }
+        }
+
+        // 이벤트 리스너 설정
+        document.addEventListener('DOMContentLoaded', function () {
+            var nbSearchButton = document.getElementById('nbSearchButton');
+            if (nbSearchButton) {
+                nbSearchButton.addEventListener('click', function () {
+                    showLoadingBar(); // 검색 버튼 클릭 시 로딩 바 표시
+                    nbFilterData(1);
+                });
+            } else {
+                console.error(nbMessages.searchButtonNotFound);
+            }
+
+            var nbDownloadButton = document.getElementById('nbDownloadButton');
+            if (nbDownloadButton) {
+                nbDownloadButton.addEventListener('click', nbDownloadExcel);
+            } else {
+                console.error(nbMessages.downloadButtonNotFound);
+            }
+
+            // 페이지 로드 시 초기 데이터 로딩
+            var initialItem = document.getElementById('nbItemSelect').value;
+            updateTableHeaders(initialItem);
+            nbFilterData(1);
+
+            // 아이템 선택 변경 시 테이블 헤더 업데이트 및 데이터 새로고침
+            document.getElementById('nbItemSelect').addEventListener('change', function () {
+                updateTableHeaders(this.value);
+                nbFilterData(1);
+            });
+        });
+
+        // 전역 에러 핸들러
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error:', message, 'at', source, lineno, colno);
+            new MsgModalBuilder().init().alertBody(message.common.error_message).footer(4, message.common.button_confirm, function(button, modal) {
+				modal.close();
+			}).open();                    
+            return true;
+        };
+    </script>
+</div>
+</body>
+</html>

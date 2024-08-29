@@ -7,66 +7,80 @@
 		<form id="myinfoUpdateForm" name="myinfoUpdateForm">
 			<div class="is-box">
 				<div>
-					<h3 class="info-title">내정보</h3>
+					<h3 class="info-title" th:text="#{myPage.myInfo}">내 정보</h3>
 					<div class="infoTableWrap mypage-table-wrap">
 						<table class="infoTable">
+							<colgroup>
+								<col width="15%">
+								<col width="35%">
+								<col width="15%">
+								<col width="35%">
+							</colgroup>
 							<tr>
-								<th>ID</th>
+								<th th:text="#{common.id}">ID</th>
 								<td id="userId" th:text="${userInfo.userId}">bluedus</td>
-								<th>가입일</th>
-								<td th:text="${@commonUtils.formatLocalDateTime(userInfo.registDt, 'yyyy-MM-dd')}">2024-04-11</td>
+								<th th:text="#{common.name}">이름</th>
+								<td th:text="${userInfo.userNm}">홍길동</td>
 							</tr>
 							<tr id="myPagePassword">
-								<th>비밀번호</th>
+								<th th:text="#{common.password}">비밀번호</th>
 								<td>
-									<input type="button" id="myPagePwChangeButton" class="is-key-button" value="비밀번호변경"/>
+									<input type="button" id="myPagePwChangeButton" class="is-key-button" th:value="#{mngr.mngrUpdate.button.password.change}"/>
 								</td>
 							</tr>
 							<tr id="myPagePasswordCheck" class="none">
-								<th>기존 비밀번호</th>
-								<td colspan="3">
-									<input type="password" id="userPswd" class="input-info-text" placeholder="기존 비밀번호를 입력해주세요."/>
-									<input type="button" id="myPageDefaultCheckButton" class="is-key-button" value="확인">
+								<th th:text="#{mngr.mngrPwUpdate.current.password}">기존 비밀번호</th>
+								<td>
+									<div class="flex-between gap8">
+										<input type="password" id="userPswd" class="input-info-text" th:placeholder="#{mngr.mngrPwUpdate.placeholder.current.password}"/>
+										<input type="button" id="myPageDefaultCheckButton" class="is-key-button" th:value="#{common.button.confirm}">
+									</div>
 								</td>
 							</tr>
 							<tr id="myPagePasswordUpdate" class="none">
-								<th>신규 비밀번호</th>
-								<td><input type="password" id="myPagePwUpdate" class="input-table-text" placeholder="신규 비밀번호를 입력해주세요."/></td>
-								<th>신규 비밀번호 확인</th>
+								<th th:text="#{mngr.mngrPwUpdate.new.password}">신규 비밀번호</th>
+								<td><input type="password" id="myPagePwUpdate" class="input-table-text" th:placeholder="#{mngr.mngrPwUpdate.placeholder.new.password}"/></td>
+								<th th:text="#{mngr.mngrPwUpdate.new.password.check}">신규 비밀번호 확인</th>
 								<td>
-									<input type="password" id="myPagePwUpdateCheck" class="input-info-text" placeholder="신규 비밀번호를 입력해주세요."/>
-									<input type="button" id="myPagePwUpdateButton" class="is-key-button" value="확인">	
+									<div class="flex-between gap8">
+										<input type="password" id="myPagePwUpdateCheck" class="input-info-text" th:placeholder="#{mngr.mngrPwUpdate.placeholder.new.password.check}"/>
+										<input type="button" id="myPagePwUpdateButton" class="is-key-button" th:value="#{common.button.confirm}">	
+									</div>
 								</td>
 							</tr>
 							<tr>
-								<th>소속</th>
-								<td th:text="${userInfo.bffltdNm}">RDA</td>
-								<th>부서</th>
-								<td th:text="${userInfo.deptNm}">홍길동</td>
-<!-- 								<td>(부서)</td> -->
-							</tr>
-							<tr>
-								<th>연락처</th>
+								<th th:text="#{common.contact}">연락처</th>
 								<td><input type="text" class="input-info-text" name="userTel" th:value="${userInfo.userTel}" /></td>
-								<th>이메일</th>
+								<th th:text="#{common.email}">이메일</th>
 								<td><input type="text" class="input-info-text" name="userEmail" th:value="${userInfo.userEmail}" /></td>
 							</tr>
 							<tr>
-								<th>이름</th>
-								<td th:text="${userInfo.userNm}">홍길동</td>
-								<th>권한</th>
-								<td th:text="${userInfo.authgrpNm}">일반사용자</td>
+								<th th:text="#{common.institution}">소속</th>
+								<td th:text="${userInfo.bffltdNm}">RDA</td>
+								<th th:text="#{common.department}">부서</th>
+								<td th:text="${userInfo.deptNm}">홍길동</td>
+							</tr>
+							<tr>
+								<th:block th:unless="${userInfo.userType.code == 'UTC001'}">
+									<th th:text="#{common.authority}">권한</th>
+									<td>
+										<div class="flex-between">
+											<span th:text="${userInfo.authgrpNm}"></span>
+											<th:block th:if="${rqstStts != waiting}">
+												<input type="button" onclick="applyAuth()" class="is-key-button" th:value="#{myPage.button.authority.apply}"/>
+											</th:block>
+										</div>
+									</td>
+								<th:block>
+								<th th:text="#{common.joinDate}">가입일</th>
+								<td th:text="${@commonUtils.formatLocalDateTime(userInfo.registDt, 'yyyy-MM-dd')}">2024-04-11</td>
 							</tr>	
 							<tr>
-								<th>권한 요청</th>
-								<th:block th:if="${rqstStts != waiting}">
-									<td>
-										<input type="button" id="authButton" class="is-key-button" value="권한 신청"/>
-									</td>
-								</th:block>
-								<th:block th:if="${rqstStts == waiting}">
-									<td th:text="${rqstStts}">
-									</td>
+								<th:block th:unless="${userInfo.userType.code == 'UTC001'}">
+									<th:block th:if="${rqstStts == waiting}">
+										<th th:text="#{myPage.authority.apply.status}">권한 요청 상태</th>
+										<td th:text="${rqstStts.name}"></td>
+									</th:block>
 								</th:block>
 							</tr>									
 						</table>
@@ -75,7 +89,7 @@
 			</div>
 		</form>
 		<div class="info-button-box">
-            <a href="javascript:void(0)" id="myinfoUpdateBtn" class="is-key-button">저장</a>
+            <a href="javascript:void(0)" id="myinfoUpdateBtn" class="is-key-button" th:text="#{common.button.save}">저장</a>
         </div>
 	</th:block>
 </html>
@@ -92,7 +106,8 @@
 		const formData = new FormData($("#myinfoUpdateForm")[0]);
 		formData.append("userId",userId);
 		
-		new ModalBuilder().init().alertBody("저장 하시겠습니까?").footer(3,'등록',function(button, modal){
+		new MsgModalBuilder().init().alertBody(message.mypage.mypage_save_confirm).footer(3,message.common.button_regist,function(button, modal){
+			modal.close();
 			fetch(__contextPath__+"/mypage",{
 				method: "PUT",
 				body: formData
@@ -101,13 +116,13 @@
 			.then(result => {
 				if(result.code == '200'){
 					modal.close();
-					new ModalBuilder().init().successBody(result.message).footer(4,'확인',function(button, modal){
+					new MsgModalBuilder().init().successBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 						modal.close();
                     	location.href= __contextPath__+"/mypage";
                     }).open();
 				}
 			})
-		}, '취소', function(button, modal){
+		}, message.common.button_cancel, function(button, modal){
 			modal.close();
 		}).open();
 	});
@@ -125,7 +140,7 @@
 			pwDefaultCheck.classList.add('none');
 			pwChange.classList.remove('none');
 		} else {
-			new ModalBuilder().init().alertBody('비밀번호를 입력해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+			new MsgModalBuilder().init().alertBody(message.mypage.mypage_password_reqeust).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 		}
 	});
 	
@@ -137,71 +152,81 @@
 		
 		//validation
 		if(validation.test(pwUpdateValue) == false) {
-			new ModalBuilder().init().alertBody('비밀번호는 8~20자 영문 소문자+숫자+특수문자로 입력해주세요.').footer(4,'확인',function(button, modal){modal.close();}).open();
+			new MsgModalBuilder().init().alertBody(message.mypage.mypage_password_invalid).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 			return
 		}
 		
 		if(pwUpdateValue === pwUpdateCheckValue) {
-			new ModalBuilder().init().alertBody("비밀번호를 변경하시겠습니까?").footer(3,'변경하기',function(button, modal){
+			new MsgModalBuilder().init().alertBody(message.mypage.mypage_password_change_confirm).footer(3,message.mngr.mngrUpdate_button_password_change,function(button, modal){
+				modal.close();
 				const userPswd = document.getElementById("userPswd").value;
 				var formData = new FormData();
 				formData.append("userId",userId);
 				formData.append("userPswd",userPswd);
 				formData.append("newUserPswd",pwUpdateValue);
 				
-				fetch(__contextPath__+"/systemmng/mngr/pw/update/"+userId,{
+				fetch(__contextPath__+"/systemmng/mngr/pw/update/",{
 	        		method: "PUT",
 	        		body: formData
 	        	})
 	        	.then(response => response.json())
 	        	.then(result => {
 	        		if(result.code == '200'){
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+						new MsgModalBuilder().init().alertBody(result.data.message).footer(4,message.common.button_confirm,function(button, modal){
 							window.location.reload()
 							modal.close();
 						}).open();
 						modal.close();
 					}else{
-						new ModalBuilder().init().alertBody(result.data.message).footer(4,'확인',function(button, modal){
+						new MsgModalBuilder().init().alertBody(result.message).footer(4,message.common.button_confirm,function(button, modal){
 							modal.close();
 						}).open();
 					}
 	        	})
-			}, '취소', function(button, modal){
+			}, message.common.button_cancel, function(button, modal){
 				modal.close();
 			}).open();
 			pwChange.classList.add('none');
 			pwDefault.classList.remove('none');			
 		} else {
-			new ModalBuilder().init().alertBody('비밀번호가 일치하지 않습니다.').footer(4,'확인',function(button, modal){modal.close();}).open();
+			new MsgModalBuilder().init().alertBody(message.mypage.mypage_password_mismatch).footer(4,message.common.button_confirm,function(button, modal){modal.close();}).open();
 		}
 	});
 	
 	//권한 신청
-	document.getElementById('authButton').addEventListener('click', () => {
-		new ModalBuilder().init('권한 신청', '1100').ajaxBody("/mypage/auth").footer(3,'신청',function(button, modal){
-			new ModalBuilder().init().alertBody("신청 하시겠습니까?").footer(3,'확인',function(button, modal){
-				fetch(__contextPath__+"/mypage/auth",{
-					method: "POST",
-					body: new FormData($("#authRequstForm")[0])
-				})
-				.then(response => response.json())
-				.then(result => {
-					if(result.code == '200'){
-						modal.close();
-						new ModalBuilder().init().successBody(result.message).footer(4,'확인',function(button, modal){
-							modal.close();
+	function applyAuth(){
+// 	document.getElementById('authButton').addEventListener('click', () => {
+		new ModalBuilder().init(message.mypage.mypage_apply_for_authority, '1100').ajaxBody("/mypage/auth").footer(3,message.common.button_application,function(button, modal){
+			if(confirm(message.mypage.mypage_apply_for_authority_confirm)) {
+					var selectBox = document.getElementById('authgrp');
+			        var selectedOption = selectBox.options[selectBox.selectedIndex];
+			        var authgrpId = selectedOption.value;
+			        var authgrpNm = selectedOption.text;
+					var rqstRsn = document.getElementById('rqstRsn').value;
+			        
+			        var formData = new FormData();
+					formData.append("authgrpId",authgrpId);
+					formData.append("authgrpNm",authgrpNm);
+					formData.append("rqstRsn",rqstRsn);
+					
+					fetch(__contextPath__+"/mypage/auth",{
+						method: "POST",
+						body: formData
+					})
+					.then(response => response.json())
+					.then(result => {
+						if(result.code == '200'){
+							alert(result.message);
 							window.location.reload();
-	                    }).open();
-					}
-				});
-			}, '취소', function(button, modal){
-				modal.close();
-			}).open();	
-		}, '취소', function(button, modal){
+							
+						}
+					});
+			}
+		}, message.common.button_cancel, function(button, modal){
 			modal.close();
 		}).open();	
-	});
+// 	});
+	}
 	
 	//비밀번호 변경
 // 	document.getElementById('myPagePwUpdateButton').addEventListener('click', () => {

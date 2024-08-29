@@ -1,0 +1,177 @@
+<html xmlns:th="http://www.thymeleaf.org">
+	<div id="scheduleHistoryContainer" class="mt24">
+		<div class="flex-between">
+			<h3 class="info-title" th:text="#{schedule.scheduleSurveyResult.title}">조사 결과 상세</h3>
+		</div>
+		<!-- 일반인 시작 -->
+		<th:block th:if="${keccYn == 'N'}">
+			<div class="quest-wrap mt16">
+		       	<div class="quest-body-wrap">
+			       	<div class="quset-result-box">
+			          	<div class="quest-result" th:if="${not #lists.isEmpty(tlSrvyAnsHistoryResultDTO.surveyResultTableList)}" th:each="item,status : ${tlSrvyAnsHistoryResultDTO.surveyResultTableList}">
+			          		<div class="quest-result-title" th:text="${item.qstnNm}"></div>
+			          		<div class="quest-result-value" th:text="${item.ansCnt}"></div>
+			          	</div>	
+			       	</div>
+		       	</div>
+		     </div>
+		</th:block>
+	    <!-- 여기가 일반인 끝 -->
+	    
+		<th:block th:if="${keccYn == 'Y'}">
+			<input type="hidden" id="srvyrsltId"/>
+			<div class="quest-wrap mt16 kecc-quest-wrap">
+				<th:block th:if="${not #lists.isEmpty(tlSrvyAnsHistoryResultDTO)}" th:each="item,status : ${tlSrvyAnsHistoryResultDTO}">
+					<div th:switch=${item.qstnType} class="kecc-quest">
+						<!-- 주관식 -->
+						<div th:case="'QTC001'">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="input">
+									<div class="quest-kecc-result">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value date-result-value">
+											<input type="text" class="cm-location-box kecc-result" th:value="${item.ansCnts}" data-update="N" th:placeholder="#{schedule.scheduleSurveyResult.placeholder}" onkeyup="setKeccUpdateChecked(this)">
+											<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- radio -->
+						<div th:case="'QTC002'">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="checked">
+									<div class="quest-kecc-result" data-update="N">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value input-result-value" th:each="ansItem ,ansStatus : ${item.ansList}">
+											<label class="input-result-value-list">
+												<input type="radio" th:name="${item.srvyMetadataCd+'_'+item.sectSqno}" onchange="setKeccUpdateChecked(this, 'checked')" class="quest-result-input" th:checked="${ansItem == item.ansCnts or item.etcYn eq 'Y' and ansItem == 'Other'} ? 'checked' : null"/>
+												<span th:text="${ansItem}"></span>
+												<input type="hidden" class="kecc-value" th:value="${ansItem}" th:data-meta-data-code="${item.srvyMetadataCd}"/>
+												<th:block th:if="${item.srvyMetadataCd eq 'SMD018' and ansItem == 'Other'}">
+													<input type="text" class="survey-input-direct" th:value="${item.etcYn eq 'Y'} ? ${item.ansCnts} : null  " readonly/>
+												</th:block>
+											</label>
+										</div>
+										<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>											
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- 체크박스 -->
+						<div th:case="'QTC003'">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="checked">
+									<div class="quest-kecc-result" data-update="N">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value input-result-value" th:each="ansItem ,ansStatus : ${item.ansList}">
+											<label class="input-result-value-list">
+												<input type="checkbox" class="quest-result-input" onchange="setKeccUpdateChecked(this, 'checked')" th:checked="${ansItem == item.ansCnts} ? 'checked' : null"/>
+												<span th:text="${ansItem}"></span>
+												<input type="hidden" class="kecc-value" th:value="${item.ansCnts}"/>
+											</label>
+										</div>
+									</div>
+									<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>
+								</div>
+							</div>							
+						</div>
+						
+						<!-- 시간 -->
+						<div th:case="'QTC004'">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="dateTime" th:data-meta-data-code="${item.srvyMetadataCd}" th:data-sect-sqno="${item.sectSqno}"  data-update="N">
+									<div class="quest-kecc-result">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value date-result-value">
+											<div class="input-result-value-list date-result-value-list">
+												<input type="text" placeholder="date" name="result"  onchange="setKeccDate(this)" class="cm-date-box startPicker" th:placeholder="#{schedule.scheduleSurveyResult.date}" th:value="${#strings.substring(item.ansCnts,0,10)}" readonly/>
+												<div class="cm-select-box">
+													<select class="kecc-hour" onchange="setKeccDate(this)">
+														<option th:each="hour,hourStatus : ${hourArr}" th:value="${hour}" th:text="${hour}+ ' hour'" th:selected="${#strings.substring(item.ansCnts,11,13) == hour}"></option>
+													</select>
+												</div>
+												<div class="cm-select-box">
+													<select class="kecc-minute" onchange="setKeccDate(this)">
+														<option th:each="minute,minuteStatus : ${minArr}" th:value="${minute}" th:text="${minute}+ ' minute'" th:selected="${#strings.substring(item.ansCnts,14,16) == minute}"></option>
+													</select>
+												</div>
+												<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>
+												<input type="hidden" class="kecc-date-value" th:value="${#strings.substring(item.ansCnts,0,16)}"/>
+												<input type="hidden" class="kecc-date-elapsedTime"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>							
+						</div>
+						
+						<!-- GPS -->
+						<div th:case="QTC008">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="input">
+									<div class="quest-kecc-result">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value date-result-value">
+											<div class="input-result-value-list date-result-value-list">
+												<input type="text" name="result" class="kecc-result cm-location-box" th:value="${item.ansCnts}" th:placeholder="#{schedule.scheduleSurveyResult.placeholder}" onclick="gpsUpdate(this)" data-update="N" readonly/>
+												<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- location(taz) -->
+						<div th:case="QTC005">
+							<div class="quest-body-wrap">
+								<div class="quset-kecc-result-box" data-type="input">
+									<div class="quest-kecc-result">
+										<div class="quest-result-title" th:text="${item.qstnTitle}"></div>
+										<div class="quest-result-value date-result-value">
+											<div class="input-result-value-list date-result-value-list">
+												<input type="text" name="result" class="kecc-result cm-location-box" th:placeholder="#{schedule.scheduleSurveyResult.placeholder}" th:value="${item.ansCnts}" data-update="N" readonly/>
+												<input type="hidden" class="srvyansId" th:value="${item.srvyansId}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>						
+						</div>
+						
+					</div>
+				</th:block>
+			</div>
+			<div class="text-center mt32">
+				<input type="button" class="is-key-button" value="설문 답변 수정하기" onclick="scheduleKeccSurveyUpdata()"/>
+			</div>
+		</th:block>
+	</div>
+</html>
+
+
+			<!--셀렉-->
+			<!--	<div class="quest-wrap mt16 qct006">-->
+			<!--		<div class="quest-body-wrap">-->
+			<!--			<div class="quset-result-box">-->
+			<!--				<div class="quest-result" th:if="${not #lists.isEmpty(tlSrvyAnsHistoryResultDTO.surveyResultTableList)}"-->
+			<!--					th:each="item,status : ${tlSrvyAnsHistoryResultDTO.surveyResultTableList}">-->
+			<!--					<div class="quest-result-title" th:text="${item.qstnNm}"></div>-->
+			<!--					<div class="quest-result-value date-result-value">-->
+			<!--						<div class="input-result-value-list date-result-value-list">-->
+			<!--							<div class="cm-select-box">-->
+			<!--								<select>-->
+			<!--									<option value="">선택</option>-->
+			<!--									<option value="01">00시</option>-->
+			<!--								</select>-->
+			<!--							</div>-->
+	
+			<!--						</div>-->
+			<!--					</div>-->
+			<!--				</div>-->
+			<!--			</div>-->
+			<!--		</div>-->
+			<!--	</div>-->

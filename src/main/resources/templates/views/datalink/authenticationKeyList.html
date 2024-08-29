@@ -1,54 +1,85 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-      
-      <th:block layout:fragment="content">
-      	<div class="is-box">
-	      	<form id="searchForm" name="searchForm" action="/datalink/authentication" method="get">
-	      		<div class="list-search-wrap">
-					<div class="list-search-box">
-						<select class="select-list-box" name="searchType">
-							<option>발급상태</option>
-						</select>
-						<input type="text" class="input-text" placeholder="이메일을 입력하세요.">
-						<button type="submit" id="searchBtn" class="is-key-button">검색</button>
-					</div>		
-	      		</div>
-			</form>
-			<div id="listTableContainer">
-				<div id="totalList">총 <span id="totalCount"></span>건의 검색 결과를 찾았습니다.</div>
-				<table id="listTable">
-					<thead>
-		                <tr>
-		                    <th>번호</th>
-		                    <th>이메일</th>
-		                    <th>인증키</th>
-		                    <th>발급상태</th>
-		                    <th>만료일</th>
-		                </tr>
-					</thead>
-					<tbody>
-						<tr class="table-link" onclick="generatingKey();">
-							<td>TEST</td>
-							<td>TEST</td>
-							<td>TEST</td>
-							<td>TEST</td>
-							<td>TEST</td>
-						</tr>
-					</tbody>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<form id="searchForm" name="searchForm" action="/datalink/authentication" method="get">
+			<input type="hidden" id="pageNo" name="pageNo" value="1">
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2 th:text="#{common.search.title}">검색 설정</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<tr>
+						<th th:text="#{api.authenticationKeyList.option.issuanceStatus}">발급 상태</th>
+						<td>
+							<select class="select-list-box" name="searchTypeCd">
+								<option value="" th:text="#{api.authenticationKeyList.option.issuanceStatus.all}">발급상태</option>
+								<option value="0" th:selected="${#httpServletRequest.getParameter('searchTypeCd') == '0'}" th:text="#{api.authenticationKeyList.option.issuanceStatus.wait}">대기(보류)</option>
+								<option value="1" th:selected="${#httpServletRequest.getParameter('searchTypeCd') == '1'}" th:text="#{api.authenticationKeyList.option.issuanceStatus.complete}">발급완료</option>
+								<option value="2" th:selected="${#httpServletRequest.getParameter('searchTypeCd') == '2'}" th:text="#{api.authenticationKeyList.option.issuanceStatus.expired}">만료</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.search.detail.content}">상세 내용</th>
+						<td>
+							<input type="text" class="input-text search-input" name="searchContent" th:placeholder="#{api.authenticationKeyList.placeholder.searchContext}" th:value="${#httpServletRequest.getParameter('searchContent')}">
+						</td>
+					</tr>
 				</table>
+				<div id="filterBtnWrap">
+					<button type="submit" id="searchBtn" class="is-key-button"
+						th:text="#{common.button.search}">검색</button>
+				</div>
 			</div>
-<!-- 			<div th:insert="tags/paging/paging :: pagingFragment"></div> -->
-      	</div>
-	</th:block>
+		</form>
+		<div id="listTableContainer">
+			<div id="totalList"><span id="totalCount"></span> <span th:text="#{common.search.result}">건의 검색 결과를
+					찾았습니다.</span></div>
+			<table id="listTable" class="cm-list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.number}">번호</th>
+						<th th:text="#{common.email}">이메일</th>
+<!--						<th th:text="#{api.authenticationKeyList.svrcname}">서비스명</th>-->
+						<th th:text="#{api.authenticationKeyList.authenticationKey}">인증키</th>
+						<th th:text="#{api.authenticationKeyList.option.issuanceStatus}">발급상태</th>
+						<th th:text="#{api.authenticationKeyList.requestDate}">신청일</th>
+						<th th:text="#{api.authenticationKeyList.expirationDate}">만료일</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${totalCnt > 0}">
+					</th:block>
+					<tr class="table-link" th:onclick="generatingKey([[${item.certkeyId}]]);" th:each="item, status : ${list}">
+						<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+						<td th:text="${item.email}"></td>
+<!--						<td th:text="${item.srvcNm}"></td>-->
+						<td th:text="${item.apiKey}"></td>
+						<td th:switch="${item.sttsCd}">
+							<p th:case="'0'" th:text="#{api.authenticationKeyList.option.issuanceStatus.wait}"></p>
+							<p th:case="'1'" th:text="#{api.authenticationKeyList.option.issuanceStatus.complete}"></p>
+							<p th:case="'2'" th:text="#{api.authenticationKeyList.option.issuanceStatus.expired}"></p>
+						</td>
+						<td th:text="${@commonUtils.formatLocalDateTime(item.rqstDt,'yyyy-MM-dd')}"></td>
+						<td th:text="${item.endYmd}"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div th:insert="tags/paging/paging :: pagingFragment"></div>
+	</div>
+</th:block>
+
 </html>
 <script type="text/javascript">
-	function generatingKey(){
-		new ModalBuilder().init("인증키 요청 상세", "1000").ajaxBody(__contextPath__+"/datalink/authentication/detail").footer(3,"메일 전송",function(button,modal){
-			modal.close();
-		}, '취소', function(button, modal){
-			modal.close();
-		}).open();
+	function generatingKey(certkeyId) {
+		location.href =`${__contextPath__}/datalink/authentication/detail?certkeyId=${certkeyId}`; 
 	}
 </script>

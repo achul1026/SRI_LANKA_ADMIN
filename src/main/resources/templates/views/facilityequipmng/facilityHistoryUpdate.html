@@ -21,17 +21,21 @@
 						<td><input type="text" placeholder="들어갈내용" /></td>
 						<th>하자 발생 일시</th>
 						<td>
-							<input type="text" class="input-text startPicker" placeholder="기간을 설정해주세요.">
-							<span class="select-time-box mr8">
-								<select class="select-list-box select-hour startHour"></select>
-								<select class="select-list-box select-minute-unit"></select>
-							</span>
+							<div class="select-date-box">
+								<input type="text" class="input-text startPicker" th:placeholder="#{common.search.placeholder.date}">
+								<div class="select-div-box">
+									<select class="select-list-box select-hour startHour"></select>
+								</div>
+								<div class="select-div-box">
+									<select class="select-list-box select-minute-unit"></select>
+								</div>
+							</div>
 						</td>
 					</tr>
 					<tr>
 						<th>하자 보수 일시</th>
 						<td>
-							<input type="text" class="input-text endPicker ml0" placeholder="기간을 설정해주세요.">
+							<input type="text" class="input-text endPicker ml0" th:placeholder="#{common.search.placeholder.date}">
 							<span class="select-time-box mr8">
 								<select class="select-list-box select-hour endHour"></select>
 								<select class="select-list-box select-minute-unit"></select>

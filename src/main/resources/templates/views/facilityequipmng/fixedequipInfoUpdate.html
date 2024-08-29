@@ -21,7 +21,7 @@
 						<td><input type="text" placeholder="설치 위치를 입력해주세요."/></td>
 						<th>설치일자</th>
 						<td>
-							<input type="text" class="input-text startPicker" placeholder="기간을 설정해주세요.">
+							<input type="text" class="input-text startPicker" th:placeholder="#{common.search.placeholder.date}">
 						</td>
 					</tr>
 					<tr>
@@ -33,11 +33,11 @@
 						<td><input type="text" placeholder="포트 번호를 입력해주세요."/></td>
 					</tr>
 					<tr>
-						<th>X좌표</th>
+						<th th:text="#{common.table.coordinate.x}">X좌표</th>
 						<td>
 							<input type="text" placeholder="X좌표를 입력해주세요."/>
 						</td>
-						<th>Y좌표</th>
+						<th th:text="#{common.table.coordinate.y}">Y좌표</th>
 						<td><input type="text" placeholder="Y좌표를 입력해주세요."/></td>
 					</tr>
 				</table>

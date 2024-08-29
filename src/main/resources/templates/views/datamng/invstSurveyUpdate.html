@@ -6,7 +6,7 @@
 	<th:block layout:fragment="content">
 		<div class="is-box">
 	        <div>
-	            <h3 id="infoTitle">OD 조사 수정</h3>
+	            <h3 id="infoTitle" th:text="#{invst.invstSurveyUpdate.title}">OD 조사 수정</h3>
 	            <input type="hidden" id="exmnmngId" th:value="${srvyInvstInfo.exmnmngId}">
 	        </div>
 	        <div class="infoTableWrap">
@@ -24,7 +24,7 @@
 											<h5 class="quest-box-title" th:text="'Q'+${qstnItem.qstnSqno}+'.'"></h5>
 											<span class="quest-name" th:data-qstn-type="${qstnItem.qstnTypeCd}" th:data-qstn-ordr="${qstnItem.qstnSqno}" th:data-qstn-id="${qstnItem.qstnId}" th:text="${qstnItem.qstnTitle}"></span>
 											<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC001'}">
-												<span class="quest-type">(주관식)</span>
+												<span class="quest-type" th:text="#{invst.invstSurveyUpdate.subjective}">(주관식)</span>
 											</th:block>
 										</div>
 										<th:block th:if="${qstnItem.qstnTypeCd.getCode() eq 'QTC002'}">
@@ -38,8 +38,8 @@
 													</th:block>						
 												</ul>
 												<div class="list-append">
-													<input type="button" class="mr8" onclick="optionAdd(this)" value="+ 옵션 추가"/>
-													<input type="button" onclick="optionEtcAdd(this)" value="+ 기타 옵션 추가"/>
+													<input type="button" class="mr8" onclick="optionAdd(this)" th:value="#{survey.common.button.option.add}"/>
+													<input type="button" onclick="optionEtcAdd(this)" th:value="#{survey.common.button.option.etc.add}"/>
 												</div>
 											</div>
 										</th:block>
@@ -63,10 +63,10 @@
 	        </div>
 		</div>
 		<div class="info-button-box">
-            <a th:href="@{/datamng/invst/{exmnmngId}/update(exmnmngId=${srvyInvstInfo.exmnmngId})}" id="" class="is-basic-button">이전 페이지</a>
+            <a th:href="@{/datamng/invst/{exmnmngId}/update(exmnmngId=${srvyInvstInfo.exmnmngId})}" id="" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
             <!-- <a href="javascript:void(0);" class="is-key-button" onclick="updateInvstMngSurveySctn();">수정</a> -->
-            <input type="button" class="is-key-button overLapping" onclick="updateInvstMngSurveySctn();" value="수정"/>
-            <a th:href="@{/datamng/invst}" class="is-basic-button">취소</a>
+            <input type="button" class="is-key-button overLapping" onclick="updateInvstMngSurveySctn();" th:value="#{common.button.update}"/>
+            <a th:href="@{/datamng/invst}" class="is-basic-button" th:text="#{common.button.cancel}">취소</a>
         </div>
 	</th:block>
 </html>

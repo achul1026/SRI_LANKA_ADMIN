@@ -6,19 +6,21 @@
 	<th:block layout:fragment="modalContent">
 		<div class="list-table-container" style="min-width:1000px">
 			<div class="list-search-box" style="text-align:left;">
-				<select class="select-list-box">
-					<option>test</option>
-				</select>
-				<input type="text" class="input-text modal-input-text" placeholder="조사명을 입력해주세요.">
+				<div class="select-div-box">
+					<select class="select-list-box">
+						<option>test</option>
+					</select>
+				</div>
+				<input type="text" class="input-text modal-input-text" th:placeholder="#{common.search.placeholder.investName}">
 				<input type="button" class="is-key-button" value="검색">
 			</div>
 			<table class="list-table mt16">
 				<thead>
 					<tr>
 						<th>선택</th>
-						<th>조사명</th>
+						<th th:text="#{invst.common.invest.name}">조사명</th>
 						<th>조사담당자</th>
-						<th>조사기간</th>
+						<th th:text="#{common.table.investPeriod}">조사기간</th>
 						<th>조사등록자</th>
 					</tr>
 				</thead>

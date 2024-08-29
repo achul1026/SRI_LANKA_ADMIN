@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div id="mapContainer">
+		<div id="map"></div>
+		<div id="zoomBox">
+			<span id="zoomIn" class="cm-box-shadow"><img th:src="@{/images/zoom_in.png}"
+					th:alt="#{common.imgAlt.expansion}" /></span>
+			<span id="zoomOut" class="cm-box-shadow"><img th:src="@{/images/zoom_out.png}"
+					th:alt="#{common.imgAlt.reduce}" /></span>
+		</div>
+		<div id="rightFixed">
+			<div id="cadDown">
+				<input type="button" value="Trans CAD 다운로드" id="cadBtn" class="is-basic-button dashboard-down-button cm-box-shadow" onclick="cadDownToggle(this);"/>
+				<div id="cadDownSearchBox" class="none">
+					<div class="gis-search-header">
+						<h4 class="facilities-search-title">Trans Cad Download</h4>
+						<button type="button" class="facilities-search-close" onclick="cadDownToggle(this);">
+							<img th:src="@{/images/close_light.png}" th:alt="close" />
+						</button>
+					</div>
+					<div class="map-filter-wrap">
+						<div class="facilities-search-item">
+							<h4>수집원</h4>
+							<select class="select-list-box table-select search-type validation-tag" data-validation="select" onchange="transTypeChangeYear(this);">
+								<option value="">선택</option>
+								<option value="vds">VDS</option>
+								<option value="fixedMetroCount">Metro Count</option>
+								<option value="moveMetroCount">Portable Metro Count</option>
+							</select>
+						</div>
+						<div class="facilities-search-item">
+							<h4>조사연도</h4>
+							<select id="transYear" class="select-list-box table-select validation-tag" data-validation="select">
+								<option value="">선택</option>
+							</select>
+						</div>
+						<div class="facilities-search-item">
+							<input type="button" class="is-key-button wd100" onclick="setCadDown(this)" value="다운로드">
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div id="mapStyle" class="map-style-statics">
+				<button type="button" class="map-style-main-btn cm-box-shadow" onclick="mapStyle();">
+					<img th:src="@{/images/main_lc_img03.png}" th:alt="#{common.imgAlt.expansion}" />
+					<span th:text="#{main.map.style}">map Style</span>
+				</button>
+				<div id="mapStyleList">
+					<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+						<img th:src="@{/images/map_style_01.png}" th:alt="#{common.imgAlt.expansion}"
+							class="map__style_img" />
+						<input type="button" id="satellite-streets-v12" class="map-style input-reset"
+							th:value="#{main.map.satellite}" />
+					</label>
+					<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+						<img th:src="@{/images/map_style_02.png}" th:alt="#{common.imgAlt.expansion}"
+							class="map__style_img" />
+						<input type="button" id="light-v11" class="map-style input-reset" th:value="#{main.map.light}" />
+					</label>
+					<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+						<img th:src="@{/images/map_style_03.png}" th:alt="#{common.imgAlt.expansion}"
+							class="map__style_img" />
+						<input type="button" id="dark-v11" class="map-style input-reset" th:value="#{main.map.dark}" />
+					</label>
+					<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+						<img th:src="@{/images/map_style_04.png}" th:alt="#{common.imgAlt.expansion}"
+							class="map__style_img" />
+						<input type="button" id="streets-v12" class="map-style input-reset"
+							th:value="#{main.map.streets}" />
+					</label>
+					<label class="map__style_btn cm-box-shadow" onclick="mapStyleBtn(this)">
+						<img th:src="@{/images/map_style_05.png}" th:alt="#{common.imgAlt.expansion}"
+							class="map__style_img" />
+						<input type="button" id="outdoors-v12" class="map-style input-reset"
+							th:value="#{main.map.outdoors}" />
+					</label>
+				</div>
+				<!--			<div id="mapStyleList">-->
+				<!--				<label><input type="button" id="satellite-streets-v12" class="map-style input-reset"-->
+				<!--						th:value="#{main.map.satellite}" /></label>-->
+				<!--				<label><input type="button" id="light-v11" class="map-style input-reset"-->
+				<!--						th:value="#{main.map.light}" /></label>-->
+				<!--				<label><input type="button" id="dark-v11" class="map-style input-reset"-->
+				<!--						th:value="#{main.map.dark}" /></label>-->
+				<!--				<label><input type="button" id="streets-v12" class="map-style input-reset"-->
+				<!--						th:value="#{main.map.streets}" /></label>-->
+				<!--				<label><input type="button" id="outdoors-v12" class="map-style input-reset"-->
+				<!--						th:value="#{main.map.outdoors}" /></label>-->
+				<!--			</div>-->
+			</div>
+		</div>
+		<div id="mapLegend">
+			<div class="map-legend-title-box" onclick="legendToggle(this);">
+				<h4 class="legend-title" th:text="#{common.table.legend}">범례</h4>
+				<button type="button" class="map-legend-arrow">
+					<img th:src="@{/images/right_arrow.png}" alt="arrow" />
+				</button>
+			</div>
+			<ul class="map-legend-list">
+				<li id="facilitiesLegendBox"></li>
+			</ul>
+		</div>
+	</div>
+	<button type="button" id="sideBarButton">
+		<img th:src="@{/images/white_arrow2.png}" th:alt="#{common.imgAlt.arrow}">
+	</button>
+	<div class="dashboard-content-wrap">
+		<div class="dashboard-button-search-box">
+			<input type="button" th:value="#{statistics.gisStatistics.traffic}" id="dbTrafficButton" class="is-basic-button dashboard-search-button" />
+			<input type="button" th:value="#{statistics.trafficStatsDataExcelDownload.avgSpd}" id="dbSpeedButton" class="is-basic-button dashboard-search-button search-speed-icon" />
+		</div>
+		<div id="trafficSearchBox" class="dashborad-search-box none">
+			<div class="gis-search-header">
+				<h4 class="facilities-search-title" th:text="#{statistics.gisStatistics.search.traffic}">교통량 검색</h4>
+				<button type="button" class="facilities-search-close" onclick="facilitiesClose();">
+					<img th:src="@{/images/close_light.png}" th:alt="close" />
+				</button>
+			</div>
+			<div class="map-filter-wrap">
+				<div class="facilities-search-item">
+					<h4 th:text="#{statistics.gisStatistics.facilities}">수집원</h4>
+					<select class="select-list-box table-select serach-type">
+						<option value="vds" th:text="#{facilities.vds}">VDS</option>
+						<option value="fixedMetroCount" th:text="#{facilities.fixed}">Metro Count</option>
+						<option value="moveMetroCount" th:text="#{facilities.portable}">Portable Metro Count</option>
+					</select>
+				</div>
+				<div class="facilities-search-item">
+					<h4 th:text="#{common.table.region}">지역</h4>
+					<div id="tafficLocationSearch" class="location-event"></div>
+				</div>
+				<div class="facilities-search-item">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.period}">기간</h4>
+					<input type="button" th:value="#{statistics.trafficPeriodStatisics.monthly}" class="is-sub-button is-key-button wd49"
+						onclick="statisticsSerachType(this);" data-serach="month" />
+					<input type="button" th:value="#{statistics.trafficPeriodStatisics.hourly}" class="is-sub-button wd49" onclick="statisticsSerachType(this);"
+						data-serach="time" />
+					<input type="hidden" class="search-date-type" value="month" />
+				</div>
+				<div class="facilities-search-item serach-month">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.monthly}">월별</h4>
+					<div class="cm-dubble-input">
+						<input type="text" class="input-table-text monthStartPicker validation-tag"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.start}" readonly />
+						<input type="text" class="input-table-text monthEndPicker validation-tag"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.end}" readonly />
+					</div>
+				</div>
+				<div class="facilities-search-item serach-time none">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.daily}">날짜</h4>
+					<div class="cm-dubble-input">
+						<input type="text" class="input-table-text startPicker wd100" onchange="valid(this);"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.start}" readonly />
+						<input type="text" class="input-table-text endPicker wd100" onchange="valid(this);"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.end}" readonly />
+					</div>
+				</div>
+				<div class="facilities-search-item serach-time none">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.hourly}">시간대별</h4>
+					<div class="flex-center">
+						<select class="select-list-box table-select searchStartHour" data-validation="select"></select>
+						<span class="ml8 mr8">~</span>
+						<select class="select-list-box table-select searchEndHour" data-validation="select"></select>
+					</div>
+				</div>
+				<div class="facilities-search-button-box">
+					<input type="button" id="tafficSearchBtn" class="is-key-button dashborad-search-button"
+						th:value="#{common.button.search}" onclick="gisStatisticsSearch(this, 'trfvlm')" />
+				</div>
+			</div>
+		</div>
+
+		<!--평균속도-->
+		<div id="speedSearchBox" class="dashborad-search-box none">
+			<div class="gis-search-header">
+				<h4 class="facilities-search-title" th:text="#{statistics.gisStatistics.search.speed}">평균속도 검색</h4>
+				<button type="button" class="facilities-search-close" onclick="facilitiesClose();">
+					<img th:src="@{/images/close_light.png}" th:alt="close" />
+				</button>
+			</div>
+			<div class="map-filter-wrap">
+				<div class="facilities-search-item">
+					<h4 th:text="#{statistics.gisStatistics.facilities}">수집원</h4>
+					<select class="select-list-box table-select serach-type">
+						<option value="vds" th:text="#{facilities.vds}">VDS</option>
+						<option value="fixedMetroCount" th:text="#{facilities.fixed}">Metro Count</option>
+						<option value="moveMetroCount" th:text="#{facilities.portable}">Portable Metro Count</option>
+					</select>
+				</div>
+				<div class="facilities-search-item">
+					<h4 th:text="#{common.table.region}">지역</h4>
+					<div id="speedLocationSearch" class="location-event"></div>
+				</div>
+				<div class="facilities-search-item">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.period}">기간</h4>
+					<input type="button" th:value="#{statistics.trafficPeriodStatisics.monthly}" class="is-sub-button is-key-button wd49"
+						onclick="statisticsSerachType(this);" data-serach="month" />
+					<input type="button" th:value="#{statistics.trafficPeriodStatisics.hourly}" class="is-sub-button wd49" onclick="statisticsSerachType(this);"
+						data-serach="time" />
+					<input type="hidden" class="search-date-type" value="month" />
+				</div>
+				<div class="facilities-search-item serach-month">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.monthly}">월별</h4>
+					<div class="cm-dubble-input">
+						<input type="text" class="input-table-text monthStartPicker validation-tag"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.start}" readonly />
+						<input type="text" class="input-table-text monthEndPicker validation-tag"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.end}" readonly />
+					</div>
+				</div>
+				<div class="facilities-search-item serach-time none">
+					<h4>날짜</h4>
+					<div class="cm-dubble-input">
+						<input type="text" class="input-table-text startPicker wd100" onchange="valid(this);"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.start}" readonly />
+						<input type="text" class="input-table-text endPicker wd100" onchange="valid(this);"
+							th:placeholder="#{statistics.gisStatistics.placeholder.date.end}" readonly />
+					</div>
+				</div>
+				<div class="facilities-search-item serach-time none">
+					<h4 th:text="#{statistics.trafficPeriodStatisics.hourly}">시간대별</h4>
+					<div class="flex-center">
+						<select class="select-list-box table-select searchStartHour" data-validation="select"></select>
+						<span class="ml8 mr8">~</span>
+						<select class="select-list-box table-select searchEndHour" data-validation="select"></select>
+					</div>
+				</div>
+				<div class="facilities-search-button-box">
+					<input type="button" id="tafficSearchBtn" class="is-key-button dashborad-search-button"
+						th:value="#{common.button.search}" onclick="gisStatisticsSearch(this, 'avgspeed')" />
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
+
+</html>
+<script th:inline="javascript">
+	hourTimeSelect('#trafficSearchBox');
+	hourTimeSelect('#speedSearchBox');
+	gisViewStyle();
+	rdaLocation('tafficLocationSearch', null);
+	rdaLocation('speedLocationSearch', null);
+	monthPicker();
+	
+
+	const baseAuthYn = /*[[${baseAuthYn}]]*/
+	if (!!baseAuthYn) {
+		new MsgModalBuilder().init().alertBody(message.main.main_go_to_mypage).footer(4, message.common.button_confirm, function (button, modal) {modal.close();}).open();
+	}
+
+	(async () => {
+		let mapgl = await mapboxGl('79.8432074508284', '6.93684430977207', 10);
+		setMapStyle(mapgl);
+		setMapZoomControl(mapgl);
+		setTazCodeLayer(mapgl);
+
+		/* mapClusters(mapgl) */
+		//sidebar control
+		const sideBarButton = document.getElementById('sideBarButton');
+		sideBarButton.addEventListener('click', () => {
+			const body = document.body;
+			const sideBar = document.getElementById('sideBar');
+			const mainContent = document.getElementById('mainContent');
+			if (body.classList.contains('sidebarActive')) {
+				body.classList.remove('sidebarActive');
+			} else {
+				body.classList.add('sidebarActive')
+			}
+			setTimeout(() => {
+				mapgl.resize();
+			}, 400);
+		})
+
+		/* document.getElementById('tafficSearchBtn').addEventListener('click', () => {
+			mapClusters(mapgl);
+		})
+		
+		document.getElementById('speedSearchBtn').addEventListener('click', () => {
+			mapClusters(mapgl);
+		}) */
+	})();
+
+	//상단 button event
+	const searchButton = document.querySelectorAll('.dashboard-search-button');
+	searchButton.forEach(button => {
+		button.addEventListener('click', (e) => {
+			const _this = e.target;
+			const allItem = _this.closest('.dashboard-button-search-box').querySelectorAll('.dashboard-search-button');
+			if (!_this.classList.contains('active')) {
+				facilitiesClose();
+				allItem.forEach(item => item.classList.remove('active'));
+				_this.classList.add('active');
+				if (_this.getAttribute('id') == 'dbTrafficButton') {
+					document.getElementById('trafficSearchBox').classList.remove('none');
+				} else if (_this.getAttribute('id') == 'dbSpeedButton') {
+					document.getElementById('speedSearchBox').classList.remove('none');
+				}
+			} else {
+				facilitiesClose();
+			}
+		})
+	})
+
+	function mapStyleBtn() {
+		const mapStyleButtons = document.querySelectorAll('.map-style');
+		const clickedButton = event.target;
+
+		mapStyleButtons.forEach(btn => {
+			if (btn === clickedButton) {
+				btn.classList.add('active');
+			} else {
+				btn.classList.remove('active');
+			}
+		});
+	}
+
+	function cadDownToggle(_this) {
+		mapboxPopupRemove();
+		const cadDownWrap = document.getElementById('cadDownSearchBox');
+		if (cadDownWrap.classList.contains('none')) {
+			cadDownWrap.classList.remove('none');
+		} else {
+			cadDownWrap.classList.add('none');
+			const searchType = _this.closest('#cadDown').querySelectorAll('.select-list-box');
+			searchType.forEach(select => {
+				select.querySelectorAll('option').forEach(option => {
+					if(option.value === '') option.selected = true;
+				})
+			})
+		}
+	}
+
+</script>

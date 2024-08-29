@@ -1,39 +1,88 @@
 @charset "UTF-8";
 
+/*한국말*/
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NanumSquare';
+	font-weight: 100;
+	font-display: block;
+    src: local('NanumSquareL'),
+    url('/fonts/NanumSquareL.woff') format('woff'),
+    url('/fonts/NanumSquareL.otf') format('opentype');
+}
+@font-face {
+	font-family: 'NanumSquare';
+	font-weight: 200;
+	font-display: block;
+	src: local('NanumSquareR'),
+    url('/fonts/NanumSquareR.woff') format('woff'),
+    url('/fonts/NanumSquareR.otf') format('opentype');
+}
+@font-face {
+	font-family: 'NanumSquare';
 	font-weight: 300;
-	font-display: swap;
-	src: url('/fonts/OpenSans-Light.woff2') format('woff2'), url('/fonts/OpenSans-Light.woff') format('woff');
+	font-display: block;
+    src: local('NanumSquareB'),
+    url('/fonts/NanumSquareB.woff') format('woff'),
+    url('/fonts/NanumSquareB.otf') format('opentype');
 }
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NanumSquare';
 	font-weight: 400;
-	font-display: swap;
-	src: url('/fonts/OpenSans-Regular.woff2') format('woff2'), url('/fonts/OpenSans-Regular.woff') format('woff');
+	font-display: block;
+	src: local('NanumSquareEB'),
+    url('/fonts/NanumSquareEB.woff') format('woff'),
+    url('/fonts/NanumSquareEB.otf') format('opentype');
+}
+
+
+
+/*싱할라어*/
+@font-face {
+	font-family: 'NotoSansSH';
+	font-weight: 100;
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Thin.woff') format('woff');
 }
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NotoSansSH';
+	font-weight: 200;
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Light.woff') format('woff');
+}
+@font-face {
+	font-family: 'NotoSansSH';
+	font-weight: 300;
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-ExtraLight.woff') format('woff');
+}
+@font-face {
+	font-family: 'NotoSansSH';
+	font-weight: 400;
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Regular.woff') format('woff');
+}
+@font-face {
+	font-family: 'NotoSansSH';
 	font-weight: 500;
-	font-display: swap;
-	src: url('/fonts/OpenSans-Medium.woff2') format('woff2'), url('/fonts/OpenSans-Medium.woff') format('woff');
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Medium.woff') format('woff');
 }
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NotoSansSH';
 	font-weight: 600;
-	font-display: swap;
-	src: url('/fonts/OpenSans-SemiBold.woff2') format('woff2'), url('/fonts/OpenSans-SemiBold.woff') format('woff');
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Bold.woff') format('woff');
 }
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NotoSansSH';
 	font-weight: 700;
-	font-display: swap;
-	src: url('/fonts/OpenSans-Bold.woff2') format('woff2'), url('/fonts/OpenSans-Bold.woff') format('woff');
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-ExtraBold.woff') format('woff');
 }
 @font-face {
-	font-family: 'OpenSans';
+	font-family: 'NotoSansSH';
 	font-weight: 800;
-	font-display: swap;
-	src: url('/fonts/OpenSans-ExtraBold.woff2') format('woff2'), url('/fonts/OpenSans-ExtraBold.woff') format('woff');
+	font-display: block;
+	src: url('/fonts/NotoSansSinhala-Black.woff') format('woff');
 }
 

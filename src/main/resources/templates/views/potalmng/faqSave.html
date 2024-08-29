@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{faq.faqSave.title}">FAQ 등록</h3>
+		</div>
+		<form id="faqSave" name="faqSave">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{faq.common.question}">질문</th>
+						<td>
+							<input type="text" class="input-table-text validation-tag" name="faqQstn"
+								th:placeholder="#{alarm.common.placeholder.search.title}">
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<select class="select-list-box table-select" name="faqType">
+								<option th:each="item:${faqCdList}" th:text="${item.cdNm}" th:value="${item.cd}">
+								</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td>
+							<input type="text" class="input-table-text" name="registId" th:value="${writer}" readonly>
+						</td>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td>
+							<div class="select-div-box">
+								<select class="select-list-box table-select" name="dspyYn">
+									<option value="Y" th:text="#{common.option.dspyYn.y}">노출</option>
+									<option value="N" th:text="#{common.option.dspyYn.n}">미노출</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+					</tr>
+					<tr>
+						<th th:text="#{faq.common.answer}">답변</th>
+						<td colspan="3">
+							<textarea class="modal-textarea validation-tag" name="faqAns"
+								th:placeholder="#{common.search.placeholder.content}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box cm-btn-box">
+				<div>
+		            <a href="/potalmng/faq" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+				</div>
+				<div>
+		            <input type="button" onclick="saveFaq()" class="is-key-button overLapping" th:value="#{common.button.regist}" autocomplete="off">
+				</div>
+    	    </div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	function saveFaq() {
+		if (validation('#faqSave')) {
+			//			if (!inputChecked) {
+			fetch(__contextPath__ + "/potalmng/faq/save", {
+				method: "POST",
+				body: new FormData($("#faqSave")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							location.href="/potalmng/faq";
+						}).open();
+					} else {
+						throw Error(result.message);
+					}
+				})
+				.catch(error => alert(error.message));
+		}
+	}
+</script>

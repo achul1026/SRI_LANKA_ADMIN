@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{faq.faqUpdate.title}">FAQ 수정</h3>
+		</div>
+		<form id="faqUpdate" name="faqUpdate">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{faq.common.question}">질문</th>
+						<td>
+							<input type="text" class="input-table-text validation-tag" name="faqQstn" th:value="${faqInfo.faqQstn}"
+								th:placeholder="#{alarm.common.placeholder.search.title}">
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<select class="select-list-box table-select" name="faqType">
+								<option th:each="item:${faqCdList}" th:text="${item.cdNm}" th:value="${item.cd}" th:selected="${faqInfo.faqType eq cdNm}">
+								</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td th:text="${faqInfo.registId}"></td>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td>
+							<div class="select-div-box">
+								<select class="select-list-box table-select" name="dspyYn">
+									<option value="Y" th:text="#{common.option.dspyYn.y}" th:selected="${faqInfo.dspyYn eq 'Y'}">노출</option>
+									<option value="N" th:text="#{common.option.dspyYn.n}" th:selected="${faqInfo.dspyYn eq 'N'}">미노출</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+					</tr>
+					<tr>
+						<th th:text="#{faq.common.answer}">답변</th>
+						<td colspan="3">
+							<textarea class="modal-textarea validation-tag" name="faqAns" th:text="${faqInfo.faqAns}"
+								th:placeholder="#{common.search.placeholder.content}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+	            <a th:href="@{/potalmng/faq/{faqId}(faqId=${faqInfo.faqId})}" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+	            <input type="button" th:onclick="updateFaq([[${faqInfo.faqId}]])" class="is-key-button overLapping" th:value="#{common.button.update}" autocomplete="off">
+    	    </div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	function updateFaq(faqId) {
+		if (validation('#faqUpdate')) {
+			//			if (!inputChecked) {
+			fetch(__contextPath__ + "/potalmng/faq/"+faqId, {
+				method: "PUT",
+				body: new FormData($("#faqUpdate")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							location.href="/potalmng/faq/"+faqId;
+						}).open();
+					} else {
+						throw Error(result.message);
+					}
+				})
+				.catch(error => alert(error.message));
+		}
+	}
+</script>

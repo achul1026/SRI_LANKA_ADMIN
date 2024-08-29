@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/modalLayout}">
+<th:block layout:fragment="modalContent">
+	<form id="searchForm" name="searchForm">
+		<input type="hidden" name="pageNo" id="asynchronousPageNo" value="1">
+		<div class="modal-filter">
+			<h3 class="modal-filter-title" th:text="#{api.common.table.apiMngAgency}">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<select class="select-list-box modal-select" id="searchType" name="bffltdCd">
+					<option value="" th:text="#{api.common.table.apiMngAgency}">관리기관</option>
+					<th:block th:each="item : ${bffltdCd}">
+						<option th:value="${item.cd}" th:text="${item.cdNm}" th:selected="${item.cd == searchOption?.searchType}"></option>
+					</th:block>
+				</select>
+			</div>
+			<h3 class="modal-filter-title">상세 내용</h3>
+			<div class="modal-search-wrap">
+				<input type="text" id="searchContent" name="searchContent" class="input-text modal-input" placeholder="검색어를 입력해주세요." th:value="${searchOption.searchContent}">
+				<button type="button" id="searchBtn" onclick="pageMoveForAsynchronous(1)" class="modal-search">
+					<img src="/images/search.png" class="cm-csimg find-img" alt="검색">
+				</button>
+			</div>
+		</div>
+	</form>
+	<div id="apiTableWrap">
+		<div>
+			<h3 class="modal-filter-title api-table-title">API 서비스 목록</h3>
+			<table class="list-table">
+				<thead>
+					<tr>
+						<th>추가</th>
+						<th>서비스명</th>
+						<th>서비스 분류</th>
+						<th>서비스url</th>
+						<th>제공 기관</th>
+					</tr>
+				</thead>
+				<tbody class="modal-table-pointer">
+					<th:block th:if="${not #lists.isEmpty(apiSrvcList)}">
+						<tr class="srvcList" onclick="checkedApiSrvc(this)" th:each="item ,status : ${apiSrvcList}">
+							<td>
+								<input type="checkbox" name="checkbox" class="modal-taz-checkbox" 
+									th:data-srvcId="${item.srvcId}"
+									th:data-srvcNm="${item.srvcNm}"
+									th:data-srvcClsf="${item.srvcClsf}"
+									th:data-srvcUrl="${item.srvcUrl}"
+									th:data-pvsnInst="${item.pvsnInst}"/>
+							</td>
+							<td th:text="${item.srvcNm}"></td>
+							<td th:text="${item.srvcClsf}"></td>
+							<td th:text="${item.srvcUrl}"></td>
+							<td th:text="${item.pvsnInst}"></td>
+					    </tr>
+				    </th:block>
+	    			<th:block th:unless="${not #lists.isEmpty(apiSrvcList)}">
+						<tr>
+							<td colspan="5">조회된 API 서비스가 없습니다. 검색 조건을 확인해주세요.</td>							
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+			<div th:insert="tags/paging/asynchronousPaging :: pagingFragment"></div>
+		</div>
+		<div>
+			<h3 class="modal-filter-title api-table-title">Select List</h3>
+			<div class="scroll modal-taz-select-table-list">
+				<table id="select-api-table"class="list-table">
+					<thead>
+						<tr>
+							<th>서비스명</th>
+							<th>서비스 분류</th>
+							<th>서비스url</th>
+							<th>제공 기관</th>
+							<th>삭제</th>
+						</tr>
+					</thead>
+					<tbody id="modalSelectTbody">
+						<tr id="apiSelectNotdata">
+							<td colspan="5">선택된 API 서비스가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</th:block>
+</html>

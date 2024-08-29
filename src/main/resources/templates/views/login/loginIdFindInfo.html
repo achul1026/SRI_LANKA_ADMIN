@@ -10,37 +10,37 @@
     <link th:href="@{/images/favicon-32x32.png}" rel="icon">
     <link th:href="@{/css/style.css}" rel="stylesheet">
     <script th:src="@{/js/jquery-1.12.4.min.js}"></script>
-    <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/rda.common.js}"></script>
+    <script th:src="@{/js/rda.validation.js}"></script>
     <script th:src="@{/js/rda.modal.js}"></script>
     <title>SRILANKA</title>
+    <script th:src="@{'/js/messages/message_' + ${lang} + '.js'}"></script>
 </head>
-<body>
+<body th:data-prod="${@environment.getProperty('spring.config.activate.on-profile')} eq 'prod'" onload="disableContextAndDrag()">
 	<section id="LoginSection">
 		<div id="loginContainer">
 		    <div class="rda-wrap">
 		        <div id="findTitleBox">
-		            <h1 id="findTitle">아이디찾기</h1>
+		            <h1 id="findTitle" th:text="#{login.loginIdFindInfo.findId}">아이디 찾기</h1>
 		        </div>
 		        <div id="loginContentBox">
 		        	<div id="loginButtonBox">
-		        		<a th:href="@{/login/find/id/info}" class="idpw-toggle-button active">아이디 찾기</a>
-		        		<a th:href="@{/login/find/pw/info}" class="idpw-toggle-button">비밀번호 찾기</a>
+		        		<a th:href="@{/login/find/id/info}" class="idpw-toggle-button active" th:text="#{login.loginIdFindInfo.findId}">아이디 찾기</a>
+		        		<a th:href="@{/login/find/pw/info}" class="idpw-toggle-button" th:text="#{login.loginIdFindInfo.findPassword}">비밀번호 찾기</a>
 		        	</div>
-		            <form>
+		            <form id="findIdForm">
 		                <div id="idFind">
 		                    <div class="login-input-box">
-		                        <label for="mngrNm" class="login-input-title">이름</label>
-		                        <input type="text" id="userNm" placeholder="이름을 입력해주세요." class="login-input" maxlength="12"></input>
-		                        <div class="error-message"></div>
+		                        <label for="mngrNm" class="login-input-title" th:text="#{common.name}">이름</label>
+		                        <input type="text" id="userNm" name="userNm" th:placeholder="#{login.common.placeholder.name}" class="login-input validation-tag" onkeyup="valid(this);" data-validation="name" maxlength="12"/>
 		                    </div>
 		                    <div class="login-input-box">
-		                        <label for="mngrEmail" class="login-input-title">이메일</label>
-		                        <input type="email" id="userEmail" placeholder="이메일을 입력해주세요." class="login-input" maxlength="25"></input>
-		                        <div class="error-message"></div>
+		                        <label for="mngrEmail" class="login-input-title" th:text="#{common.email}">이메일</label>
+		                        <input type="email" id="userEmail" name="userEmail" th:placeholder="#{login.common.placeholder.email}" class="login-input validation-tag" onkeyup="valid(this)" data-validation="email" maxlength="50"/>
 		                    </div>
 		                </div>		                
 			            <div>
-			                <button type="button" id="find-button">아이디 찾기</button>
+			                <button type="button" id="find-button" th:text="#{login.loginIdFindInfo.findId}">아이디 찾기</button>
 			            </div>
 		            </form>
 		        </div>
@@ -50,30 +50,39 @@
 </body>
 <script type="text/javascript">
 	$('#find-button').on('click', function(){
-		var userEmail = $("#userEmail").val();
-		var formData = {
-				userNm: $("#userNm").val(),
-				userEmail: userEmail
-		};
-		$.ajax({
-			url: "/login/find/id/info",
-			type: "POST",
-			contentType: "application/json",
-			data: JSON.stringify(formData),
-			success: function(data){
-                if(data.code == 200){
-					new ModalBuilder().init().ajaxBody("/login/find/id/result?userEmail=" + userEmail).footer(3,'로그인',function(button, modal){
-						window.location.href="/login";
-						modal.close();
-					}, '비밀번호 찾기', function(button, modal){
-						window.location.href="/login/find/pw/info";
-						modal.close();
-					}).open();
-					$('#modal-body').css('padding', '40px');
-					$('#modal-footer').css('padding', '0 40px 40px 40px');
-                }
-//  			}
-		}});
+		if(validation('#loginContainer')){
+	// 		$("#userNm").val('blueduss');
+	// 		$("#userEmail").val('blueduss@bluedus.com');
+			let userEmail = document.getElementById('userEmail').value;
+			
+			fetch("/login/find/id/info", {
+				method: "POST",
+				body: new FormData($("#findIdForm")[0])
+			})
+				.then((response) => response.json())
+				.then((result) => {
+					if(result.code == 200){
+	                    new ModalBuilder().init().ajaxBody("/login/find/id/result?userEmail=" + userEmail).footer(3,message.common.button_login,function(button, modal){
+	                    	window.location.href= "/login";
+		                    modal.close();
+	                    }, message.login.loginIdFindInfo_find_password, function(button, modal){
+							window.location.href="/login/find/pw/info";
+							modal.close();
+						}).open();
+	                } else {
+	// 					console.log(result.message);
+	//                 	alert(result);
+						throw Error(result.message)
+	                }
+				})
+				.catch(error => {
+	// 				console.log(error.message);
+					alert(error.message);
+	// 				new ModalBuilder().init().alertBody(error.message).footer(4, message.common.button_confirm, function (button, modal) {
+	// 					modal.close();
+	// 				}).open();
+		 	    });
+		}
 		
 	})
 </script>

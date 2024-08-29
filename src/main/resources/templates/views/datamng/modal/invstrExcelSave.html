@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/modalLayout}">
+      
+	<th:block layout:fragment="modalContent">
+		<div class="list-table-container" style="min-width:1000px;">
+			<div class="mt8">
+				<button type="button" id="excelDownBtn" class="is-key-button" th:text="#{invst.invstDetail.sample.download}">샘플파일 다운로드</button>
+			</div>
+			<div class="mt8">
+				<input type="file" id="fileUploadInput" onchange="addFile(this);" name="files" />
+				<label for="fileUploadInput" class="file-upload-btn">
+					<div class="file-up-btn">
+						<img th:src="@{/images/file_upload.png}" alt="fileUpload" class="file-img">
+						<span th:text="#{invst.invstDetail.excel.upload}">파일 선택</span>
+					</div>
+				</label>
+				<div id="uploadFileWrap" class="none"></div>
+			</div>
+		</div>
+	</th:block>
+</html>
+<script type="text/javascript">
+	$("#excelDownBtn").on('click', function(){
+		window.location.href = `${__contextPath__}/datamng/schedule/invst/excelDownload`;
+	});
+	
+	function addFile(obj){
+		let file = obj.files[0];
+		$("#uploadFileWrap").removeClass('none');
+		
+		let htmlData = '';
+		htmlData += '<div class="file-list">';
+		htmlData += '   <p class="file-name">' + file.name + '</p>';
+		htmlData += '   <input type="button" class="file-delete" onclick="deleteFile(this);">';
+		htmlData += '</div>';
+		$("#uploadFileWrap").append(htmlData);
+	}
+	
+	function deleteFile(_this) {
+		$(_this).closest('div').remove();
+		$("#uploadFileWrap").addClass('none');
+		$('#fileUploadInput').val(''); 
+	}
+</script>

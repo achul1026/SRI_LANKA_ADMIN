@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="TabBtnWrap">
+			<button class="cm-tab-btn on" onclick="asynchronousSearchList(this)" data-type="FCT001" th:text="#{facilities.vds}">VDS</button>
+			<button class="cm-tab-btn" onclick="asynchronousSearchList(this)" data-type="FCT002" th:text="#{facilities.fixed}">Metro Count</button>
+			<button class="cm-tab-btn" onclick="asynchronousSearchList(this)" data-type="FCT003" th:text="#{facilities.portable}">Portable Metro Count</button>
+		</div>
+		<div id="facilitiesList">
+		</div>
+		</div>
+	</div>
+</th:block>
+</html>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+	asynchronousSearchList(null);
+});
+
+function asynchronousSearchList(_this){
+	let form = null;
+	
+	let type = 'FCT001';
+	
+	const searchForm = document.getElementById('searchForm');
+	
+	if(_this != null &&_this.getAttribute('data-type') != null){
+		type = _this.getAttribute('data-type');
+	    searchForm.reset();
+	} else if(document.getElementById('type')){
+		type = document.getElementById('type').value;
+		form = searchForm;
+	}
+	
+	const formData = form !== null ? new FormData(form) : new FormData();
+	let pageNo = document.getElementById('asynchronousPageNo') != null ? document.getElementById('asynchronousPageNo').value : 1;
+	
+	const params = new URLSearchParams(formData);
+	params.append('pageNo', pageNo);
+	
+	fetch(`${__contextPath__}/systemmng/facilities/${type}/list?${params.toString()}`)
+	.then((response) => {
+	    return response.text();
+	})
+	.then((html) => {
+		
+		let btnList = document.querySelectorAll('.cm-tab-btn');
+		
+		for(let i = 0; i < btnList.length;i++){
+			btnList[i].classList.remove('on');
+			if(type == btnList[i].getAttribute('data-type')){
+				btnList[i].classList.add('on');			   
+			}
+		}
+		
+		const appendDiv = document.getElementById('facilitiesList');
+		appendDiv.innerHTML = html;
+	});
+}
+</script>

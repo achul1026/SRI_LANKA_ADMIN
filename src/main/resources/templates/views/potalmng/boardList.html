@@ -1,212 +1,261 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-<body>
-	<th:block layout:fragment="content">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+	<div class="is-box">
 		<form id="searchForm" name="searchForm" action="/potalmng/board" method="get">
-			<input type="hidden" name="pageNo" value="1">
-			<div>
-				<select name="searchType">
-					<option value="">전체</option>
-					<option th:each="item:${bbsCdList}" th:text="${item.getName()}" th:value="${item.getCode()}" th:selected="${searchInfo.searchType eq item.getCode()}"></option>
-				</select>
-				<input id="searchContent" name="searchContent" placeholder="검색어를 입력해 주세요." th:value="${searchInfo.searchContent}"/>
-				<input type="submit" value="검색" id="searchBtn"/>
-			</div>
-		</form>
-		<div>
-			<input type="button" value="전체선택" th:onclick="selectAll()" />
-			<input type="button" value="선택삭제" th:onclick="deleteBoard()"/>
-		</div>
-		<div>
-			<input type="button" value="등록하기" th:onclick="saveBoard()" />
-		</div>
-		<div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div>
-		<table>
-			<thead>
-				<tr>
-					<th>선택</th>
-					<th>번호</th>
-					<th>분류</th>
-					<th>제목</th>
-					<th>등록일</th>
-					<th>작성자</th>
-					<th>노출 여부</th>
-				</tr>
-			</thead>
-			<tbody>
-				<th:block th:if="${totalCnt > 0}">
-					<tr th:each="item, status : ${boardList}">
-						<td><input type="checkbox" name="checkbox" th:value="${item.bbsId}"/></td>
-						<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
-						<td th:text="${item.bbsType}">분류</td>
-						<td th:text="${item.bbsTitle}" th:onclick="updateBoard([[${item.bbsId}]])"></td>
-						<td th:text="${@commonUtils.formatLocalDateTime(item.registDt, 'yyyy-MM-dd')}"></td>
-						<td th:text="${item.registId}"></td>
-						<td th:text="${item.dspyYn} == 'Y' ? '노출' : '미노출'"></td>
+			<div id="filterWrap">
+				<div id="filterTitle">
+					<h2 th:text="#{common.search.title}">검색 설정</h2>
+				</div>
+				<table id="filterTable">
+					<colgroup>
+						<col width="15%">
+						<col width="85%">
+					</colgroup>
+					<tr>
+						<th th:text="#{board.boardList.search.category}">카테고리 선택</th>
+						<td>
+							<select name="searchType" class="select-list-box">
+								<option value="" th:text="#{common.select.all}">전체</option>
+								<option th:each="item:${bbsCdList}" th:text="${item.cdNm}"
+									th:value="${item.cd}"
+									th:selected="${searchInfo.searchType eq item.cd}"></option>
+							</select>
+						</td>
 					</tr>
-				</th:block>
-				<th:block th:if="${totalCnt == 0}">
-                	<tr>
-                		<td colspan="9">검색된 결과가 없습니다.</td>
-                	</tr>
-                </th:block>
-			</tbody>
-		</table>
+					<tr>
+						<th th:text="#{common.search.detail.content}">상세 내용</th>
+						<td>
+							<input type="text" id="searchContent" class="input-text search-input" name="searchContent"
+								th:placeholder="#{common.search.placeholder.searchContext}"
+								th:value="${searchInfo.searchContent}" />
+						</td>
+					</tr>
+				</table>
+				<div id="filterBtnWrap">
+					<button type="submit" id="searchBtn" class="is-key-button"
+						th:text="#{common.button.search}">검색</button>
+				</div>
+			</div>
+			<input type="hidden" name="pageNo" value="1">
+		</form>
+		<div id="listTableContainer">
+			<div class="list-save-box">
+				<div class="flex-center gap8">
+					<input type="button" th:value="#{common.button.selectAll}" class="is-sub-button"
+						th:onclick="selectAll()" />
+					<input type="button" th:value="#{common.button.selectDelete}" class="is-danger-button"
+						th:onclick="deleteBoard()" />
+					<!-- <div id="totalList">총 <span id="totalCount" th:text="${totalCnt}"></span>건의 검색 결과를 찾았습니다.</div> -->
+				</div>
+				<div><a href="/potalmng/board/save" th:text="#{common.button.regist}" class="is-key-button"></a></div>
+			</div>
+			<table id="listTable" class="cm-list-table">
+				<thead>
+					<tr>
+						<th th:text="#{common.table.select}">선택</th>
+						<th th:text="#{common.table.number}">번호</th>
+						<th th:text="#{common.table.class}">분류</th>
+						<th th:text="#{common.table.subject}">제목</th>
+						<th th:text="#{common.table.registDate}">등록일</th>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${totalCnt > 0}">
+						<tr th:each="item, status : ${boardList}" th:onclick="location.href='/potalmng/board/'+[[${item.bbsId}]]">
+							<td onclick="event.stopPropagation();"><input type="checkbox" name="checkbox" th:value="${item.bbsId}"/></td>
+							<td th:text="${@commonUtils.getRownum(paging,status.index)}"></td>
+							<td th:text="${item.bbsType}">분류</td>
+							<td th:text="${item.bbsTitle}"></td>
+							<td th:text="${@commonUtils.formatLocalDateTime(item.registDt, 'yyyy-MM-dd')}"></td>
+							<td th:text="${item.registId}"></td>
+							<td th:text="${item.dspyYn} == 'Y' ? #{common.option.dspyYn.y} : #{common.option.dspyYn.n}">
+							</td>
+						</tr>
+					</th:block>
+					<th:block th:if="${totalCnt == 0}">
+						<tr>
+							<td colspan="9" th:text="#{common.search.result.notExist}">검색된 결과가 없습니다.</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
 		<div th:insert="tags/paging/paging :: pagingFragment"></div>
-	</th:block>
-</body>
+	</div>
+</th:block>
+
 </html>
 <script type="text/javascript">
 	// 게시글 등록
-	function saveBoard(){
-		new ModalBuilder().init("게시글 등록").ajaxBody(__contextPath__+"/potalmng/board/save").footer(3,'등록',function(button, modal){
-			fetch(__contextPath__+"/potalmng/board/save",{
-				method: "POST",
-				body: new FormData($("#boardSave")[0])
-			})
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
-			modal.close();
-		}).open();
-	}
-	
+// 	function saveBoard() {
+// 		new ModalBuilder().init(message.board.boardList_board_regist).ajaxBody(__contextPath__ + "/potalmng/board/save").footer(3, message.common.button_regist, function (button, modal) {
+
+// 			const inputValidationItem = document.querySelectorAll('.boardValue');
+// 			let inputValidation = [];
+// 			inputValidationItem.forEach(input => inputValidation.push(input.value));
+// 			const inputChecked = inputValidation.some(item => item === '');
+// 			if(validation('#boardSave')){
+// 			if (!inputChecked) {
+// 				fetch(__contextPath__ + "/potalmng/board/save", {
+// 					method: "POST",
+// 					body: new FormData($("#boardSave")[0])
+// 				})
+// 					.then(response => response.json())
+// 					.then(result => {
+// 						if (result.code == '200') {
+// 							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+// 								window.location.reload();
+// 								modal.close();
+// 							}).open();
+// 						} else {
+// 							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+// 								modal.close();
+// 							}).open();
+// 							throw Error(result.message);
+// 						}
+// 					})
+// 					.catch(error => alert(error.message));
+// 				modal.close();
+// 			} 
+// 			else {
+// 				alert(message.board.boardList_board_validation);
+// 			}
+// 		}, message.common.button_cancel, function (button, modal) {
+// 			modal.close();
+// 		}).open();
+// 	}
+
 	// 게시글 수정
-	function updateBoard(bbsId){
-		new ModalBuilder().init("게시글 수정").ajaxBody(__contextPath__+"/potalmng/board/"+bbsId).footer(3,"수정",function(button,modal){
-			fetch(__contextPath__+"/potalmng/board/"+bbsId,{
-				method: "PUT",
-				body: new FormData($("#boardUpdate")[0])
-			})
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
-			modal.close();
-		}).open();
-		
-	}
-	
+// 	function updateBoard(bbsId) {
+// 		new ModalBuilder().init(message.board.boardList_board_update).ajaxBody(__contextPath__ + "/potalmng/board/" + bbsId).footer(3, message.common.button_update, function (button, modal) {
+// 			const inputValidationItem = document.querySelectorAll('.boardValue');
+// 			let inputValidation = [];
+// 			inputValidationItem.forEach(input => inputValidation.push(input.value));
+// 			const inputChecked = inputValidation.some(item => item === '');
+
+// 			if (!inputChecked) {
+// 				fetch(__contextPath__ + "/potalmng/board/" + bbsId, {
+// 					method: "PUT",
+// 					body: new FormData($("#boardUpdate")[0])
+// 				})
+// 					.then(response => response.json())
+// 					.then(result => {
+// 						if (result.code == '200') {
+// 							alert(result.message);
+// 							window.location.reload();
+// 						} else {
+// 							alert(result.message);
+// 						}
+// 					})
+// 			} else {
+// 				alert(message.board.boardList_board_validation);
+// 			}
+// 		}, message.common.button_cancel, function (button, modal) {
+// 			modal.close();
+// 		}).open();
+
+// 	}
+
 	// 게시글 삭제
-	function deleteBoard(){
-		new ModalBuilder().init().alertBody('해당 게시글을 삭제하시겠습니까?').footer(3,'확인',function(button, modal){
-			const selectedElements = document.querySelectorAll('input[name="checkbox"]:checked');
-		    const bbsIds = Array.from(selectedElements).map(el => el.value);
-		    
-	        fetch(__contextPath__+"/potalmng/board",{
-				method: "DELETE",
-				headers: {
-		            'Content-Type': 'application/json',
-		        },
-		        body: JSON.stringify({ bbsIds: bbsIds })
-		    })
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
+	function deleteBoard() {
+		new MsgModalBuilder().init().alertBody(message.board.boardList_board_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+				modal.close();
+				const selectedElements = document.querySelectorAll('input[name="checkbox"]:checked');
+				const bbsIds = Array.from(selectedElements).map(el => el.value);
+
+				fetch(__contextPath__ + "/potalmng/board", {
+					method: "DELETE",
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({bbsIds: bbsIds})
+				})
+					.then(response => response.json())
+					.then(result => {
+						if (result.code == '200') {
+							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+								window.location.href = __contextPath__ + "/potalmng/board";
+								modal.close();
+							}).open();
+						} else {
+							new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+								modal.close();
+							}).open();
+						}
+					})
+		}, message.common.button_cancel, function (button, modal) {
 			modal.close();
 		}).open();
 	}
-	
+
 	// 전체선택
-	function selectAll()  {
-		if($('input:checkbox').is(':checked') == true){
+	function selectAll() {
+		if ($('input:checkbox').is(':checked') == true) {
 			$('input:checkbox').prop('checked', false);
 		} else {
-			$('input:checkbox').prop('checked', true);				
+			$('input:checkbox').prop('checked', true);
 		}
 	}
-	
+
 	//선택한 파일 목록 출력
 	function updateFileList() {
-	    var fileInput = document.getElementById('fileInput');
-	    var fileListDiv = document.getElementById('fileList');
-	    fileListDiv.innerHTML = ''; // 기존 목록 초기화
-	
-	    Array.from(fileInput.files).forEach((file, index) => {
-	        var fileDiv = document.createElement('div');
-	        fileDiv.innerHTML ='<span>' + file.name + '</span>' + ' <button type="button" onclick="removeFile(' + index + ')">X</button>';
-	        fileListDiv.appendChild(fileDiv);
-	    });
+		var fileInput = document.getElementById('fileInput');
+		var fileListDiv = document.getElementById('fileList');
+		fileListDiv.innerHTML = ''; // 기존 목록 초기화
+
+		Array.from(fileInput.files).forEach((file, index) => {
+			var fileDiv = document.createElement('div');
+			fileDiv.innerHTML = '<span>' + file.name + '</span>' + ' <button type="button" onclick="removeFile(' + index + ')">X</button>';
+			fileListDiv.appendChild(fileDiv);
+		});
 	}
-	
+
 	// 첨부파일 목록에서 제거
 	function removeFile(index) {
-	    var fileInput = document.getElementById('fileInput');
-	    var dataTransfer = new DataTransfer();
-	
-	    Array.from(fileInput.files).forEach((file, i) => {
-	        if (i != index) {
-	            dataTransfer.items.add(file);
-	        }
-	    });
-	
-	    fileInput.files = dataTransfer.files;
-	    updateFileList(); // 파일 목록 업데이트
+		var fileInput = document.getElementById('fileInput');
+		var dataTransfer = new DataTransfer();
+
+		Array.from(fileInput.files).forEach((file, i) => {
+			if (i != index) {
+				dataTransfer.items.add(file);
+			}
+		});
+
+		fileInput.files = dataTransfer.files;
+		updateFileList(); // 파일 목록 업데이트
 	}
-	
+
 	// DB에서 첨부파일 제거
-	function deleteFileData(fileId){
-		new ModalBuilder().init().alertBody('해당 파일을 삭제하시겠습니까?').footer(3,'확인',function(button, modal){
-			fetch(__contextPath__+"/potalmng/notice/" + fileId,{
+	function deleteFileData(fileId) {
+		new MsgModalBuilder().init().alertBody(message.board.boardList_board_file_delete_confirm).footer(3, message.common.button_confirm, function (button, modal) {
+			fetch(__contextPath__ + "/potalmng/notice/" + fileId, {
 				method: "DELETE"
 			})
-			.then(response => response.json())
-			.then(result => {
-								if(result.code == '200'){
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-										window.location.reload();
-									}).open();
-								} else {
-									new ModalBuilder().init().alertBody(result.message).footer(4,'확인',function(button, modal){
-										modal.close();
-									}).open();
-								}
-				
-			})
-		}, '취소', function(button, modal){
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+							window.location.reload();
+						}).open();
+					} else {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							modal.close();
+						}).open();
+					}
+
+				})
+		}, message.common.button_cancel, function (button, modal) {
 			modal.close();
 			updateNotice(bbsId);
 		}).open();
 	}
-	
+
 	// 파일 다운로드
 // 	function download(fileId) {
 // 	    fetch(__contextPath__ + "/potalmng/notice/download/" + fileId, {
@@ -238,7 +287,7 @@
 // 	        a.remove();
 // 	    })
 // 	    .catch(error => {
-// 	        console.error('파일 다운로드 중 에러가 발생했습니다:', error);
+// 	        console.error('파일 다운로드 중 에러가 발생했습니다:', error.message);
 // 	    });
 // 	}
 </script>

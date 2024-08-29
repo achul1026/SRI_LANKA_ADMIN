@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<th:block layout:fragment="content">
+	<div class="is-box">
+		<div id="filterTitle">
+			<h3 class="info-title" th:text="#{board.boardSave.title}">게시글 등록</h3>
+		</div>
+		<form id="boardSave" name="boardSave">
+			<div class="infoTableWrap">
+				<table class="infoTable">
+					<colgroup>
+						<col width="15%">
+						<col width="35%">
+						<col width="15%">
+						<col width="35%">
+					</colgroup>
+					<tr>
+						<th th:text="#{common.table.subject}">제목</th>
+						<td>
+							<input type="text" class="input-table-text validation-tag" name="bbsTitle"
+								th:placeholder="#{alarm.common.placeholder.search.title}">
+						</td>
+						<th th:text="#{common.table.class}">분류</th>
+						<td>
+							<select class="select-list-box table-select" name="bbsType">
+								<option th:each="item:${bbsCdList}" th:text="${item.cdNm}" th:value="${item.cd}">
+								</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.registDate}">작성일</th>
+						<td>
+							<input type="text" class="input-table-text "
+								th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}" readonly>
+						</td>
+						<th th:text="#{common.table.writer}">작성자</th>
+						<td>
+							<input type="text" class="input-table-text" name="registId" th:value="${writer}" readonly>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{common.table.exposure}">노출 여부</th>
+						<td colspan="3">
+							<div class="select-div-box">
+								<select class="select-list-box table-select" name="dspyYn">
+									<option value="Y" th:text="#{common.option.dspyYn.y}">노출</option>
+									<option value="N" th:text="#{common.option.dspyYn.n}">미노출</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th th:text="#{board.file}">첨부파일</th>
+						<td colspan="3">
+							<div>
+			<!--								<div id="fileList" class="modal-date-show wd100"></div>-->
+			<!--								<input type="button" style="min-width:80px;" th:value="#{common.button.file}"-->
+			<!--									class="is-key-button" id="fileInputButton" />-->
+			<!--								<input type="file" id="fileInput" multiple="multiple" name="files"-->
+			<!--									onchange="fileUpload();" />-->
+			<!--								<input type="file" id="fileInput" multiple="multiple" class="none" name="files"-->
+			<!--									onchange="updateFileList()" />-->
+							</div>
+							<div id="fileWrap">
+									<input type="file" id="fileUploadInput" onchange="addFile(this);" multiple name="files" />
+									<label for="fileUploadInput" class="file-upload-btn">
+										<div class="file-up-btn">
+											<img th:src="@{/images/file_upload.png}" alt="fileUpload" class="file-img">
+											<span th:text="#{board.file.upload}">파일 업로드</span>
+										</div>
+									</label>
+<!-- 									<input type="hidden" name="extsChk" value="jpg"> -->
+<!-- 									<input type="hidden" name="extsChk" value="png"> -->
+							</div>
+							<div id="uploadFileWrap" class="none">
+							</div>
+
+						</td>
+
+					</tr>
+					<tr>
+						<th th:text="#{common.table.content}">내용</th>
+						<td colspan="3">
+							<textarea class="modal-textarea validation-tag" name="bbsCnts"
+								th:placeholder="#{common.search.placeholder.content}"></textarea>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="info-button-box">
+				<a href="/potalmng/board" class="is-basic-button" th:text="#{common.button.prePage}">이전 페이지</a>
+				<input type="button" onclick="saveBoard()" class="is-key-button overLapping"
+					th:value="#{common.button.regist}" autocomplete="off">
+			</div>
+		</form>
+	</div>
+</th:block>
+
+</html>
+<script>
+	let filesArr = new Array();
+
+	/* 첨부파일 추가 */
+	function addFile(obj) {
+		let maxFileCnt = 5;  
+		let attFileCnt = document.querySelectorAll('.file-list').length;   
+		let remainFileCnt = maxFileCnt - attFileCnt;
+		let curFileCnt = obj.files.length; 
+		const fileWrap = document.getElementById('uploadFileWrap');
+
+		// 첨부파일 개수 확인
+		if (curFileCnt > remainFileCnt) {
+			alert(message.board.boardSave_exceed_length(maxFileCnt));
+		} else {
+			for (const file of obj.files) {
+				// 첨부파일 검증
+				if (fileValid(file)) {
+					// 파일 배열에 담기
+					let reader = new FileReader();
+					reader.onload = function () {
+						filesArr.push(file);
+					};
+					reader.readAsDataURL(file);
+					fileWrap.classList.remove('none');
+					// 목록 추가
+					let htmlData = '';
+					htmlData += '<div class="file-list">';
+					htmlData += '   <p class="file-name">' + file.name + '</p>';
+					htmlData += '   <input type="button" class="file-delete" onclick="deleteFile(this);">';
+					htmlData += '</div>';
+					fileWrap.insertAdjacentHTML('beforeend', htmlData);
+				} else {
+					continue;
+				}
+			}
+		}
+	}
+
+	/* 첨부파일 검증 */
+	function fileValid(obj) {
+		//확장자 확인 필요
+		const fileTypes = ['application/pdf', 'image/gif', 'image/jpeg', 'image/png', 'image/bmp', 'image/tif', 'application/haansofthwp', 'application/x-hwp'];
+// 		if (obj.name.length > 100) {
+// 			alert("파일명이 100자 이상인 파일은 제외되었습니다.");
+// 			return false;
+// 		} else 
+			if (obj.size > (25 * 1024 * 1024)) {
+			alert(message.board.boardSave_exceed_size);
+			return false;
+		} 
+// 			else if (obj.name.lastIndexOf('.') == -1) {
+// 			alert("확장자가 없는 파일은 제외되었습니다.");
+// 			return false;
+// 		} else if (!fileTypes.includes(obj.type)) {
+// 			alert("첨부가 불가능한 파일은 제외되었습니다.");
+// 			return false;
+
+		else {
+			return true;
+		}
+	}
+
+	/* 첨부파일 삭제 */
+	function deleteFile(btnParent) {
+		let fileList = btnParent.parentNode;
+		let fileWrap = document.getElementById('uploadFileWrap');
+		
+		fileList.remove();
+		
+		if(fileWrap.childElementCount === 0) {
+			fileWrap.classList.add('none');
+		} 
+	}
+
+	function saveBoard() {
+		if (validation('#boardSave')) {
+			fetch(__contextPath__ + "/potalmng/board/save", {
+				method: "POST",
+				body: new FormData($("#boardSave")[0])
+			})
+				.then(response => response.json())
+				.then(result => {
+					if (result.code == '200') {
+						new MsgModalBuilder().init().alertBody(result.message).footer(4, message.common.button_confirm, function (button, modal) {
+							window.location.href="/potalmng/board";
+							modal.close();
+						}).open();
+					} else {
+						throw Error(result.message);
+					}
+				})
+				.catch(error => alert(error.message));
+		}
+	}
+</script>

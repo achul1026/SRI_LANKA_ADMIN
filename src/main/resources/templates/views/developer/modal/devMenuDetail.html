@@ -9,41 +9,75 @@
 				<table class="modal-table">
 					<tbody>
 						<tr>
-							<th>메뉴명 <span class="required">*</span></th>
+							<th th:text="#{menu.common.menu.name}">메뉴명 <span class="required">*</span></th>
 							<td>
-								<select id="menuNm" name="menuNm" class="select-list-box" onchange="updateMenuCd()">
-								    <option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}" th:selected="${item.cdNm} == ${tcMenuMng.menuNm}">노출</option>
+<!-- 								<div class="select-div-box"> -->
+<!-- 									<select id="menuNm" name="menuNm" class="select-list-box" onchange="updateMenuCd()"> -->
+<!-- 									    <option th:each="item : ${tcCdInfoList}" th:value="${item.cdNm}" th:text="${item.cdNm}" th:data-cd="${item.cd}" th:selected="${item.cdNm} == ${tcMenuMng.menuNm}">노출</option> -->
+<!-- 									</select> -->
+<!-- 									<input type="text" id="menuCd" name="menuCd" th:value="${tcMenuMng.menuCd}" placeholder="메뉴 코드를 입력하세요."/> -->
+<!-- 								</div> -->
+								<select id="menuNm" name="menuNm" class="select-list-box" onchange="updateMenuCdAndMenunm()">
+								    <option th:each="item : ${tcCdInfoList}" th:text="${item.cdNm}" th:data-cd="${item.cd}" 
+									    th:selected="${item.cdNm} == ${tcMenuMng.menuNm}">
+<!-- 									    th:data-menunmEng="${item.cdnmEng}" th:data-menunmKor="${item.cdnmKor}" th:data-menunmSin="${item.cdnmSin}"  -->
+									    노출</option>
 								</select>
-								<input type="hidden" id="menuCd" name="menuCd"/>
+								<input type="hidden" id="menuCd" name="menuCd" value=""/>
+<!-- 								<input type="hidden" id="menunmEng" name="menunmEng" th:value="${tcMenuMng.menunmEng}"/> -->
+<!-- 								<input type="hidden" id="menunmKor" name="menunmKor" th:value="${tcMenuMng.menunmKor}"/> -->
+<!-- 								<input type="hidden" id="menunmSin" name="menunmSin" th:value="${tcMenuMng.menunmSin}"/> -->
 							</td>
-							<th>메뉴 URL 패턴 <span class="required">*</span></th>
-							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" th:value="${tcMenuMng.uppermenuUrlpttrn}" placeholder="예) /system/**"></td>
+<!-- 							<th>메뉴명 eng<span class="required">*</span></th> -->
+<!-- 							<td> -->
+<!-- 								<input type="text" id="menunmEng" name="menunmEng" th:value="${tcMenuMng.menunmEng}" placeholder="영어 메뉴명을 입력하세요."/> -->
+<!-- 							</td> -->
+						</tr>
+<!-- 						<tr> -->
+<!-- 							<th>메뉴명 kor<span class="required">*</span></th> -->
+<!-- 							<td><input type="text" id="menunmKor" name="menunmKor" th:value="${tcMenuMng.menunmKor}" placeholder="한국어 메뉴명을 입력하세요."/></td> -->
+<!-- 							<th>메뉴명 sin<span class="required">*</span></th> -->
+<!-- 							<td><input type="text" id="menunmSin" name="menunmSin" th:value="${tcMenuMng.menunmSin}" placeholder="싱할라어 메뉴명을 입력하세요."/></td> -->
+<!-- 						</tr> -->
+						<tr>
+							<th th:text="#{menu.common.url.pattern}">메뉴 URL 패턴 <span class="required">*</span></th>
+							<td><input type="text" id="uppermenuUrlpttrn" name="uppermenuUrlpttrn" th:value="${tcMenuMng.uppermenuUrlpttrn}" th:placeholder="#{menu.common.placeholder.url.pattern}"></td>
+							<th th:text="#{menu.common.url}">메뉴 URL <span class="required">*</span></th>
+							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" th:value="${tcMenuMng.menuUrlpttrn}" th:placeholder="#{menu.common.placeholder.url}"></td>
+						</tr>
+<!-- 						<tr> -->
+<!-- 							<th>메뉴 설명 eng</th> -->
+<!-- 							<td><input type="text" id="menudescrEng" name="menudescrEng" th:value="${tcMenuMng.menudescrEng}" placeholder="영어 메뉴 설명을 입력하세요."></td> -->
+<!-- 							<th>메뉴 설명 kor</th> -->
+<!-- 							<td><input type="text" id="menudescrSin" name="menudescrKor" th:value="${tcMenuMng.menudescrKor}" placeholder=" 한국어 메뉴 설명을 입력하세요."></td> -->
+<!-- 						</tr> -->
+						<tr>
+<!-- 							<th>메뉴 설명 sin</th> -->
+<!-- 							<td><input type="text" id="menudescrSin" name="menudescrSin" th:value="${tcMenuMng.menudescrSin}" placeholder="싱할라어 메뉴 설명을 입력하세요."></td> -->
+							<th th:text="#{menu.common.order}">메뉴 순서</th>
+							<td><input type="text" id="menuSqno" name="menuSqno" th:value="${tcMenuMng.menuSqno}" oninput="inputOnlyNumber(this)" th:placeholder="#{menu.common.placeholder.order}"></td>
 						</tr>
 						<tr>
-							<th>메뉴 URL <span class="required">*</span></th>
-							<td><input type="text" id="menuUrlpttrn" name="menuUrlpttrn" th:value="${tcMenuMng.menuUrlpttrn}" placeholder="예) /system/main"></td>
-							<th>메뉴 설명</th>
-							<td><input type="text" id="menuDescr" name="menuDescr" th:value="${tcMenuMng.menuDescr}" placeholder="메뉴 설명을 입력하세요."></td>
-						</tr>
-						<tr>
-							<th>메뉴 순서</th>
-							<td><input type="text" id="menuSqno" name="menuSqno" th:value="${tcMenuMng.menuSqno}" placeholder="메뉴 순서를 입력하세요."></td>
-		 					<th>노출여부</th>
+		 					<th th:text="#{common.table.exposure}">노출여부</th>
 							<td class="text-left">
-								<select id="useYn" name="useYn" class="select-list-box">
-									<option th:selected="${tcMenuMng.useYn == 'Y'}" value="Y">노출</option>
-									<option th:selected="${tcMenuMng.useYn == 'N'}" value="N">비노출</option>
-								</select>
+								<div class="select-div-box">
+									<select id="useYn" name="useYn" class="select-list-box">
+										<option th:selected="${tcMenuMng.useYn == 'Y'}" value="Y" th:text="#{common.option.dspyYn.y}">노출</option>
+										<option th:selected="${tcMenuMng.useYn == 'N'}" value="N" th:text="#{common.option.dspyYn.n}">비노출</option>
+									</select>
+								</div>
 							</td>
-						</tr>
-						<tr th:if="${#strings.isEmpty(tcMenuMng.uppermenuCd)}">
-							<th>기본 메뉴 여부</th>
-							<td class="text-left">
-								<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
-									<option th:selected="${tcMenuMng.bscmenuYn == 'Y'}" value="Y">Y</option>
-									<option th:selected="${tcMenuMng.bscmenuYn == 'N'}" value="N">N</option>
-								</select>
-							</td>
+							<th:block  th:if="${#strings.isEmpty(tcMenuMng.uppermenuCd)}">
+								<th th:text="#{menu.common.default}">기본 메뉴 여부</th>
+								<td class="text-left">
+									<div class="select-div-box">
+										<select id="bscmenuYn" name="bscmenuYn" class="select-list-box">
+											<option th:selected="${tcMenuMng.bscmenuYn == 'Y'}" value="Y" th:text="#{common.option.y}">Y</option>
+											<option th:selected="${tcMenuMng.bscmenuYn == 'N'}" value="N" th:text="#{common.option.n}">N</option>
+										</select>
+									</div>
+								</td>
+							</th:block>
 						</tr>
 					</tbody>
 				</table>

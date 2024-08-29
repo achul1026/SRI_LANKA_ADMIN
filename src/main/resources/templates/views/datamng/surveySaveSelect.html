@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+      
+	<th:block layout:fragment="content">
+		<div class="is-box">
+			<h3 class="info-title" th:text="#{survey.surveySaveSelect.title}">조사유형 선택</h3>
+			<div id="selectSurveyWrap">
+				<a th:href="@{/datamng/survey/save/SYC001}" class="select-survey-list">
+					<img src="/images/investigator_img01.png" class="select-survey-img">
+					<h3 class="select-survey-title" th:text="#{survey.common.od}">OD 조사</h3>
+					<p class="select-survey-sub" th:utext="#{survey.surveySaveSelect.od.descr}">
+						가구실태, 개인실태, 통행실태조사로 가구현황 및<br>
+						개인현황과 통행에 대한 기종점과 통행목적 조사
+					</p>
+				</a>
+				<a th:href="@{/datamng/survey/save/SYC002}" class="select-survey-list">
+					<img src="/images/investigator_img02.png" class="select-survey-img">
+					<h3 class="select-survey-title" th:text="#{survey.common.roadside}">ROADSIDE 조사</h3>
+					<p class="select-survey-sub" th:utext="#{survey.surveySaveSelect.roadside.descr}">
+						도로의 특정한 지점을 통과하는<br>
+						차량의 운전자에게 질문을 하는 방식의 조사
+					</p>
+				</a>
+<!--				<a th:href="@{/datamng/survey/save/SYC003}" class="select-survey-list">-->
+<!--					<img src="/images/investigator_img03.png" class="select-survey-img">-->
+<!--					<h3 class="select-survey-title" th:text="#{survey.common.axleload}">AXLELOAD 조사</h3>-->
+<!--					<p class="select-survey-sub" th:utext="#{survey.surveySaveSelect.axleload.descr}">-->
+<!--						차축하중조사로 차량의 기종점 및<br>-->
+<!--						화물의 종류와 무게를 조사-->
+<!--					</p>-->
+<!--				</a>-->
+				<a th:href="@{/datamng/survey/save}" class="select-survey-list">
+					<img src="/images/investigator_img04.png" class="select-survey-img">
+					<h3 class="select-survey-title" th:text="#{survey.common.custom}">CUSTOM</h3>
+					<p class="select-survey-sub" th:utext="#{survey.surveySaveSelect.custom.descr}">
+						사용자의 상황에 따라 설문 유형을<br>
+						 유연하게 조정할 수 있는 조사
+					</p>
+				</a>
+			</div>
+		</div>
+	</th:block>
+</html>

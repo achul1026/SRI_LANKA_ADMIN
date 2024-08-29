@@ -4,58 +4,54 @@
 		<aside id="sideBar">
 			<div id="sideBarWrap">
 				<div>
-					<div>
+					<div id="logoLine">
 						<a href="#" id="sideLogoBox">
-							<span id="logoImg"><img th:src="@{/images/logo.png}" alt="로고"></span>
-							<span id="sideTitle">RDA</span>
+							<img th:src="@{/images/logo_white.png}" th:alt="#{common.imgAlt.logo}">
 						</a>
 					</div>
+					<div id="sidebarInfo">
+						<div id="sidebarUserBox">
+							<div id="sidebarUser">
+								<img th:src="@{/images/header_user.png}" th:alt="#{common.imgAlt.user}">
+								<div th:text="${@loginMngrUtils.getUserNm()}">User Name</div>
+							</div>
+						</div>
+						<div id="sidebarUserInfo">
+							<a th:href="@{/mypage}" th:text="#{menu.sidebar.mypage}">마이 페이지</a>
+							<a th:href="@{/logout}" th:text="#{menu.sidebar.logout}">로그아웃</a>
+						</div>
+					</div>
+					
 					<div id="sideBarList">
 						<!-- DB 권한 메뉴 호출 START -->
 	 					<th:block th:each="item : ${sideMenuList}"> 
 	 						<th:block th:if="${#lists.isEmpty(item.subMenuList)}"> 
-	 							<div> 
-	 								<a class="side-depth1" th:href="@{/main}" th:text="${item.menuNm}"></a> 
-	 							</div> 
+ 								<a class="side-depth1" th:href="@{/main}">
+									 <div class="side-depth1-title-wrap">
+										  <img th:src="${item.iconPath}" alt="user">
+										  <span class="side-depth1-title" th:text="${item.menuNm}"></span>
+									 </div>
+								 </a> 
 	 						</th:block>		 
-	 						<th:block th:if="${!#lists.isEmpty(item.subMenuList)}"> 
-	 							<div class="sidebar-list-box"> 
-	 								<div class="side-depth1"> 
-	 									<span th:text="${item.menuNm}"></span> 
+	 						<th:block th:if="${!#lists.isEmpty(item.subMenuList)}" th:with="menuUrlpttrn=${@commonUtils.getMenuFirstPath(item.menuUrlpttrn)}"> 
+	 							<div class="sidebar-list-box" th:classappend="${#request.getServletPath().startsWith('/'+menuUrlpttrn) ? 'on':''}"> 
+	 								<div class="side-depth1"  th:classappend="${#request.getServletPath().startsWith('/'+menuUrlpttrn) ? 'active':''}">
+										 <div class="side-depth1-title-wrap">
+											  <img th:src="${item.iconPath}" alt="user">
+		 									  <span class="side-depth1-title" th:text="${item.menuNm}"></span> 
+										 </div>
 	 									<span class="depth1-arrow"><img th:src="@{/images/detph1_arrow.png}" alt="화살표"></span> 
 	 								</div> 
 	 								<ul class="side-depth2-box"> 
 	 									<th:block th:each="subItem : ${item.subMenuList}">
 	 										<li class="side-depth2" th:classappend="${menuDepthInfo != null and menuDepthInfo.subMenuNm eq subItem.menuNm ? 'active' : ''}"> 
-	 											<a th:href="${subItem.menuUrlpttrn}" th:text="${subItem.menuNm}"></a> 
+	 											<a th:href="${subItem.menuUrlpttrn}" class="division-title-box" th:text="${subItem.menuNm}"></a> 
 	 										</li> 
 	 									<th:block> 
 	 								</ul> 
 	 							</div> 
 	 						</th:block>		 
 	 					</th:block> 
-					</div>
-				</div>
-				<div id="sidebarInfo">
-					<div id="sidebarInfoWrap">
-						<div id="sidebarUserBox">
-							<div id="sidebarUser">
-								<span id="sidebarUserIcon"><img th:src="@{/images/header_user.png}" alt="user"></span>
-								<div>admin</div>
-							</div>
-							<button type="button" id="sidebarUserArrow"><img th:src="@{/images/detph1_arrow.png}" alt="arrow"></button>
-						</div>
-						<ul class="side-depth2-box user-info-list-box"> 
-							<li class="side-depth2"> 
-								<a th:href="@{/mypage}">마이 페이지</a> 
-							</li> 
-							<li class="side-depth2"> 
-								<a href="javascript:void(0)" onclick="bookMark();">즐겨찾기</a> 
-							</li> 
-							<li class="side-depth2"> 
-								<a th:href="@{/logout}">로그아웃</a> 
-							</li>
-						</ul>
 					</div>
 				</div>
 			</div>
